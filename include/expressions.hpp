@@ -12,111 +12,110 @@
 // the portable ivy standard libraries are written in terms
 // of a select group of types and operations
 
-struct ivy_object;
+struct hydra_object;
 struct runtime {
-  std::map<std::string, ivy_object*> global_store;
-  std::map<char, ivy_object*> readtable;
+  std::map<std::string, hydra_object*> global_store;
+  std::map<char, hydra_object*> readtable;
 };
 
-
-
-
-
-
-struct ivy_object {
+struct hydra_object {
   //std::string docstring;
 
   virtual bool null() const;
   virtual std::string to_string() const = 0;
-  virtual ivy_object* eval(runtime& r);
-  ivy_object();
-  virtual ~ivy_object();
+  virtual hydra_object* eval(runtime& r);
+  hydra_object();
+  virtual ~hydra_object();
 
 
   // mark & sweep garbage collection
   bool marked;
-  static std::list<ivy_object*> node_list; 
+  static std::list<hydra_object*> node_list; 
   static void collect_garbage(runtime& r);
 };
 
-struct ivy_t : public ivy_object {
+struct hydra_t : public hydra_object {
   std::string to_string() const;  
 };
 
-struct ivy_nil : public ivy_object {
+struct hydra_nil : public hydra_object {
   std::string to_string() const;
   bool null() const;
 };
 
-struct ivy_cons : public ivy_object {
+struct hydra_cons : public hydra_object {
   std::string to_string() const;
-  ivy_object* eval(runtime& r);
+  hydra_object* eval(runtime& r);
 
-  ivy_object* car;
-  ivy_object* cdr;
+  hydra_object* car;
+  hydra_object* cdr;
 
   unsigned len();
 };
 
-struct ivy_num : public ivy_object {
+struct hydra_num : public hydra_object {
   std::string to_string() const;
 
   int val;
 };
 
-struct ivy_oper : public ivy_object {
+struct hydra_oper : public hydra_object {
   std::string to_string() const;
   bool eval_args;
 
-  virtual ivy_object* call(ivy_object* arg_list, runtime& r) = 0; 
+  virtual hydra_object* call(hydra_object* arg_list, runtime& r) = 0; 
 
 protected:
-  std::list<ivy_object*> get_arg_list(ivy_object* arg_list, runtime& r);
+  std::list<hydra_object*> get_arg_list(hydra_object* arg_list, runtime& r);
 };
 
-struct user_oper : public ivy_oper {
+struct user_oper : public hydra_oper {
   std::string to_string() const;
-  ivy_object* call(ivy_object* arg_list, runtime& r);
+  hydra_object* call(hydra_object* arg_list, runtime& r);
+
+  std::string rest;
+  // std::list<std::string> optionals
+  // std::list<std::string> keyword-args
 
   std::list<std::string> arg_names;
-  ivy_object* expr;
-  user_oper(ivy_object* op_def, bool eval_args);
+  hydra_object* expr;
+  user_oper(hydra_object* op_def, bool eval_args);
 };
 
-struct ivy_istream : public ivy_object {
+struct hydra_istream : public hydra_object {
   std::string to_string() const;
   std::istream *stream;  
-  ~ivy_istream();
+  ~hydra_istream();
 };
 
-struct ivy_ostream : public ivy_object {
+struct hydra_ostream : public hydra_object {
   std::string to_string() const;
   std::ostream stream;
 
 };
 
-struct ivy_array : public ivy_object {
+struct hydra_array : public hydra_object {
   std::string to_string() const;
-  std::vector<ivy_object*> array;
+  std::vector<hydra_object*> array;
 };
 
-struct ivy_symbol : public ivy_object {
+struct hydra_symbol : public hydra_object {
   std::string to_string() const;
   std::string symbol;
 
-  ivy_object* eval(runtime& r);
+  hydra_object* eval(runtime& r);
 };
 
-struct ivy_string : public ivy_object {
+struct hydra_string : public hydra_object {
   std::string to_string() const;
   std::string value;  
 };
 
-struct ivy_char : public ivy_object {
+struct hydra_char : public hydra_object {
   std::string to_string() const;
   char value;
 };
 
-std::ostream &operator<<(std::ostream &os, const ivy_object *obj);
+std::ostream &operator<<(std::ostream &os, const hydra_object *obj);
 
-#endif // __IVY_TYPES_HPP
+#endif // __HYDRA_TYPES_HPP

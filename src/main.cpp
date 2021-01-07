@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <variant>
 #include <fstream>
 
@@ -54,10 +54,10 @@ int main(int argc, char **argv) {
   while (!(in == "(quit)")) {
     // cerr << ast << endl;
     try {
-      ivy_string* str = new ivy_string();
+      hydra_string* str = new hydra_string();
       str->value = in;
-      ivy_object* ast = read(str, r);
-      ivy_object* out = ast->eval(r);
+      hydra_object* ast = read(str, r);
+      hydra_object* out = ast->eval(r);
       cout << "* " << out << endl;
     } catch (string e) {
       cout << e << endl;
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 
     cout << "> ";
     getline(cin, in);
-    ivy_object::collect_garbage(r);
+    hydra_object::collect_garbage(r);
   }
   return 0;
 }

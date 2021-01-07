@@ -6,37 +6,37 @@
 using namespace std;
 
 op_cons::op_cons() { eval_args = true; }
-ivy_object *op_cons::call(ivy_object *alist, runtime &r) {
-  list<ivy_object *> arg_list = get_arg_list(alist, r);
+hydra_object *op_cons::call(hydra_object *alist, runtime &r) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r);
   if (arg_list.size() != 2) {
     throw "invalid number of args to cons";
   }
 
-  ivy_object *car = arg_list.front();
+  hydra_object *car = arg_list.front();
   arg_list.pop_front();
-  ivy_object *cdr = arg_list.front();
+  hydra_object *cdr = arg_list.front();
 
-  if (!(dynamic_cast<ivy_cons*>(cdr) || dynamic_cast<ivy_nil*>(cdr))) {
+  if (!(dynamic_cast<hydra_cons*>(cdr) || dynamic_cast<hydra_nil*>(cdr))) {
     string err = "Non-list provided as second argument to cons";
     throw err;
   }
 
-  ivy_cons* out = new ivy_cons();
+  hydra_cons* out = new hydra_cons();
   out->car = car;
   out->cdr = cdr;
   return out;
 }
 
 op_cdr::op_cdr() { eval_args = true; }
-ivy_object *op_cdr::call (ivy_object* alist, runtime& r) {
-  list<ivy_object*> arg_list = get_arg_list(alist, r);
+hydra_object *op_cdr::call (hydra_object* alist, runtime& r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
   if (arg_list.size() != 1) {
     throw "invalid number of args to cdr";
   }
 
   try {
-    ivy_object *arg = arg_list.front();
-    ivy_cons* cons = dynamic_cast<ivy_cons*>(arg);
+    hydra_object *arg = arg_list.front();
+    hydra_cons* cons = dynamic_cast<hydra_cons*>(arg);
     return cons->cdr;
   } catch (bad_cast&) {
     string err = "Non-cons argument provided to cdr: " + arg_list.front()->to_string();
@@ -45,15 +45,15 @@ ivy_object *op_cdr::call (ivy_object* alist, runtime& r) {
 }
 
 op_car::op_car() { eval_args = true; }
-ivy_object *op_car::call (ivy_object* alist, runtime& r) {
-  list<ivy_object*> arg_list = get_arg_list(alist, r);
+hydra_object *op_car::call (hydra_object* alist, runtime& r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
   if (arg_list.size() != 1) {
     throw "invalid number of args to car";
   }
 
   try {
-    ivy_object *arg = arg_list.front();
-    ivy_cons* cons = dynamic_cast<ivy_cons*>(arg);
+    hydra_object *arg = arg_list.front();
+    hydra_cons* cons = dynamic_cast<hydra_cons*>(arg);
     return cons->car;
   } catch (bad_cast&) {
     string err = "Non-cons argument provided to car: " + arg_list.front()->to_string();
@@ -62,11 +62,11 @@ ivy_object *op_car::call (ivy_object* alist, runtime& r) {
 }
 
 op_arr::op_arr() { eval_args = true; }
-ivy_object *op_arr::call(ivy_object *alist, runtime &r) {
-  list<ivy_object*> arg_list = get_arg_list(alist, r);
+hydra_object *op_arr::call(hydra_object *alist, runtime &r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
 
-  ivy_array* out = new ivy_array;
-  for (ivy_object* o : arg_list)
+  hydra_array* out = new hydra_array;
+  for (hydra_object* o : arg_list)
     out->array.push_back(o);
   return out;
 }

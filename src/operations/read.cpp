@@ -9,36 +9,36 @@ using namespace std;
 
 class matching_paren_exception : public exception {};
 
-ivy_object *read(ivy_object *raw, runtime &r);
+hydra_object *read(hydra_object *raw, runtime &r);
 
-ivy_object *to_value(string token) {
+hydra_object *to_value(string token) {
   if (token == "nil")
-    return new ivy_nil();
+    return new hydra_nil();
   if (token == "t")
-    return new ivy_t;
+    return new hydra_t;
   if (token[0] == '"' && token.back() == '"') {
     token.pop_back();
-    ivy_string *str = new ivy_string;
+    hydra_string *str = new hydra_string;
     str->value = &token.c_str()[1];
     return str;
   }
   try {
     int num = stoi(token);
-    ivy_num *n = new ivy_num();
+    hydra_num *n = new hydra_num();
     n->val = num;
     return n;
   } catch (invalid_argument &) {
   }
-  ivy_symbol *sym = new ivy_symbol();
+  hydra_symbol *sym = new hydra_symbol();
   sym->symbol = token;
   return sym;
 }
 
-ivy_object *to_cons(list<ivy_object *> list) {
+hydra_object *to_cons(list<hydra_object *> list) {
   if (list.empty()) {
-    return new ivy_nil();
+    return new hydra_nil();
   } else {
-    ivy_cons *cns = new ivy_cons();
+    hydra_cons *cns = new hydra_cons();
     cns->car = list.front();
     list.pop_front();
     cns->cdr = to_cons(list);
@@ -46,10 +46,10 @@ ivy_object *to_cons(list<ivy_object *> list) {
   }
 }
 
-ivy_object *mac_lparen(ivy_object *raw, char c, runtime &r) {
-  ivy_istream *is = dynamic_cast<ivy_istream *>(raw);
+hydra_object *mac_lparen(hydra_object *raw, char c, runtime &r) {
+  hydra_istream *is = dynamic_cast<hydra_istream *>(raw);
   // continue to add tokens to list until we hit a ')'
-  list<ivy_object *> list;
+  list<hydra_object *> list;
 
   while (!is->stream->eof()) {
     c = is->stream->peek();
@@ -74,8 +74,8 @@ ivy_object *mac_lparen(ivy_object *raw, char c, runtime &r) {
   throw "( with no matching )!";
 }
 
-ivy_object *mac_token(ivy_object *raw, char c, runtime &r) {
-  ivy_istream *is = dynamic_cast<ivy_istream *>(raw);
+hydra_object *mac_token(hydra_object *raw, char c, runtime &r) {
+  hydra_istream *is = dynamic_cast<hydra_istream *>(raw);
   string token = string("") + c;
   while (!is->stream->eof()) {
     int ch = is->stream->peek();
@@ -101,13 +101,13 @@ ivy_object *mac_token(ivy_object *raw, char c, runtime &r) {
   return to_value(token);
 }
 
-ivy_object *read(ivy_object *raw, runtime &r) {
+hydra_object *read(hydra_object *raw, runtime &r) {
   // strings work too!
-  ivy_istream *is;
-  if (ivy_string *str = dynamic_cast<ivy_string *>(raw)) {
-    is = new ivy_istream();
+  hydra_istream *is;
+  if (hydra_string *str = dynamic_cast<hydra_string *>(raw)) {
+    is = new hydra_istream();
     is->stream = new stringstream(str->value);
-  } else if (!(is = dynamic_cast<ivy_istream*>(raw))) {
+  } else if (!(is = dynamic_cast<hydra_istream*>(raw))) {
     string err = "Non-stream type provided to read!";
     throw err;
   }
@@ -148,8 +148,8 @@ ivy_object *read(ivy_object *raw, runtime &r) {
 }
 
 op_read::op_read() { eval_args = true; }
-ivy_object *op_read::call(ivy_object *alist, runtime &r) {
-  list<ivy_object *> arg_list = get_arg_list(alist, r);
+hydra_object *op_read::call(hydra_object *alist, runtime &r) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r);
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments provided to read";
     throw err;

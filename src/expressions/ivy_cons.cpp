@@ -5,10 +5,10 @@
 
 using namespace std;
 
-ivy_object *ivy_cons::eval(runtime &r) {
-  ivy_object *oper = car->eval(r);
-  ivy_oper *op;
-  if ((op = dynamic_cast<ivy_oper*>(oper))) {
+hydra_object *hydra_cons::eval(runtime &r) {
+  hydra_object *oper = car->eval(r);
+  hydra_oper *op;
+  if ((op = dynamic_cast<hydra_oper*>(oper))) {
     return op->call(cdr, r);
   } else {
     string excp = "Attempted to call " + oper->to_string() +
@@ -17,11 +17,11 @@ ivy_object *ivy_cons::eval(runtime &r) {
   }
 }
 
-string ivy_cons::to_string() const {
+string hydra_cons::to_string() const {
   string out = "(";
-  const ivy_object *elt = this;
+  const hydra_object *elt = this;
   while (!elt->null()) {
-    if (const ivy_cons *obj = dynamic_cast<const ivy_cons *>(elt)) {
+    if (const hydra_cons *obj = dynamic_cast<const hydra_cons *>(elt)) {
       out += obj->car->to_string();
       if (!obj->cdr->null()) {
         out += " ";

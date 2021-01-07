@@ -10,17 +10,17 @@ using std::to_string;
 using std::list;
 
 op_plus::op_plus() { eval_args = true; }
-ivy_object *op_plus::call(ivy_object *alist, runtime &r) {
+hydra_object *op_plus::call(hydra_object *alist, runtime &r) {
   // we guarantee that this is a cons object
-  std::list<ivy_object *> arg_list = get_arg_list(alist, r);
+  std::list<hydra_object *> arg_list = get_arg_list(alist, r);
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '+' function";
   }
-  ivy_num *out = new ivy_num();
+  hydra_num *out = new hydra_num();
   out->val = 0;
 
-  for (ivy_object *o : arg_list) {
-    if (ivy_num *num = dynamic_cast<ivy_num *>(o)) {
+  for (hydra_object *o : arg_list) {
+    if (hydra_num *num = dynamic_cast<hydra_num *>(o)) {
       out->val += num->val;
     } else {
       string err = "Non-number provided to '+' function: " + o->to_string();
@@ -31,19 +31,19 @@ ivy_object *op_plus::call(ivy_object *alist, runtime &r) {
 }
 
 op_minus::op_minus() { eval_args = true; }
-ivy_object *op_minus::call(ivy_object *alist, runtime &r) {
-  list<ivy_object *> arg_list = get_arg_list(alist, r);
+hydra_object *op_minus::call(hydra_object *alist, runtime &r) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r);
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '-' function";
   }
   try {
-    ivy_num *out = new ivy_num();
-    out->val = dynamic_cast<ivy_num *>(arg_list.front())->val;
+    hydra_num *out = new hydra_num();
+    out->val = dynamic_cast<hydra_num *>(arg_list.front())->val;
     arg_list.pop_front();
 
-    for (ivy_object *arg : arg_list) {
+    for (hydra_object *arg : arg_list) {
       try {
-        ivy_num *num = dynamic_cast<ivy_num *>(arg);
+        hydra_num *num = dynamic_cast<hydra_num *>(arg);
         out->val -= num->val;
       } catch (std::bad_cast&) {
         string err = "Attempt to subtract non-number: " + arg->to_string();
@@ -59,18 +59,18 @@ ivy_object *op_minus::call(ivy_object *alist, runtime &r) {
 }
 
 op_multiply::op_multiply() { eval_args = true; }
-ivy_object *op_multiply::call(ivy_object *alist, runtime &r) {
-  list<ivy_object *> arg_list = get_arg_list(alist, r);
+hydra_object *op_multiply::call(hydra_object *alist, runtime &r) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r);
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '*' function";
   }
-  ivy_num *out = new ivy_num();
+  hydra_num *out = new hydra_num();
   out->val = 1;
   arg_list.pop_front();
 
-  for (ivy_object *arg : arg_list) {
+  for (hydra_object *arg : arg_list) {
     try {
-      ivy_num *num = dynamic_cast<ivy_num *>(arg);
+      hydra_num *num = dynamic_cast<hydra_num *>(arg);
       out->val *= num->val;
     } catch (bad_cast&) {
       string err = "Attempt to multiply non-numer: " + arg->to_string();
@@ -80,19 +80,19 @@ ivy_object *op_multiply::call(ivy_object *alist, runtime &r) {
 }
 
 op_divide::op_divide() { eval_args = true; }
-ivy_object *op_divide::call(ivy_object *alist, runtime &r) {
-  list<ivy_object *> arg_list = get_arg_list(alist, r);
+hydra_object *op_divide::call(hydra_object *alist, runtime &r) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r);
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '/' function";
   }
   try {
-    ivy_num *out = new ivy_num();
-    out->val = dynamic_cast<ivy_num *>(arg_list.front())->val;
+    hydra_num *out = new hydra_num();
+    out->val = dynamic_cast<hydra_num *>(arg_list.front())->val;
     arg_list.pop_front();
 
-    for (ivy_object *arg : arg_list) {
+    for (hydra_object *arg : arg_list) {
       try {
-        ivy_num *num = dynamic_cast<ivy_num *>(arg);
+        hydra_num *num = dynamic_cast<hydra_num *>(arg);
         out->val /= num->val;
       } catch (bad_cast&) {
         string err = "Attempt to divide non-number: " + arg->to_string();
@@ -108,8 +108,8 @@ ivy_object *op_divide::call(ivy_object *alist, runtime &r) {
 }
 
 op_geq::op_geq() { eval_args = true; }
-ivy_object *op_geq::call(ivy_object *alist, runtime &r) {
-  list<ivy_object *> arg_list = get_arg_list(alist, r);
+hydra_object *op_geq::call(hydra_object *alist, runtime &r) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r);
   if (arg_list.size() != 2) {
     string err = "incorrect number of arguments provided to operator >=: " +
       ::to_string(arg_list.size());
@@ -119,17 +119,17 @@ ivy_object *op_geq::call(ivy_object *alist, runtime &r) {
   // does it contain integers?
 
   try {
-    ivy_num *a1 = dynamic_cast<ivy_num *>(arg_list.front());
+    hydra_num *a1 = dynamic_cast<hydra_num *>(arg_list.front());
     arg_list.pop_front();
-    ivy_num *a2 = dynamic_cast<ivy_num *>(arg_list.front());
+    hydra_num *a2 = dynamic_cast<hydra_num *>(arg_list.front());
     // so arg_list is a list containing integers!
     int arg1 = a1->val;
     int arg2 = a2->val;
 
     if (arg1 >= arg2) {
-      return new ivy_t();
+      return new hydra_t();
     } else {
-      return new ivy_nil();
+      return new hydra_nil();
     }
   } catch (bad_cast&) {
     string err = "Non-numbers provided to >=";
