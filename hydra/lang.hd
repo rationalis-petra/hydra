@@ -1,0 +1,24 @@
+(progn
+
+(def defn
+  (mac (name arg-list body)
+    (def name (fn arg-list body))))
+
+(def defmac
+  (mac (name arg-list body)
+    (def name (mac arg-list body))))
+
+(defmac when (cond rest) (if cond rest nil))
+
+(defmac unless (cond rest) (if cond nil rest))
+
+(defn map (func list)
+  (unless (= nil list)
+    (cons (func (car list))
+    (map func (cdr list)))))
+
+(defn incf (x) (+ x 1))
+
+(def my-list (cons 1 (cons 2 (cons 3 nil))))
+
+)
