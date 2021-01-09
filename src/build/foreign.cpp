@@ -7,6 +7,11 @@
 
 using std::string;
 
+// dlopen (linux)
+// LoadLibrary (windows)
+
+
+
 int test() {
   ffi_cif cif;
   ffi_type *args[1];

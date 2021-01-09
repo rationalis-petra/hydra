@@ -1,5 +1,8 @@
 # Hydra
 A small interpreted language with a lisp-like syntax
+The goal of hydra is to make a sort of 'omni-language': support for multiple paradigms, in typing
+(static/dynamic), memory management (manual/gc) and style (functional/object-oriented).
+
 ## Syntax
 Hydra is composed of S-expressions, e.g.
 ```
@@ -8,11 +11,9 @@ Hydra is composed of S-expressions, e.g.
     "Three is bigger")
 ```
 
-The aim is to investigate & play with various type-systems.
-
 ## Values
 Values in hydra are like those of other languages: there are currently integers, strings, lists,
-input streams and characters. Currently, many have predictable literals, e.g. '"' for strings.
+input streams and characters. Many have predictable literals, e.g. '"' for strings.
 
 Values can be placed in the global namespace with `def`, e.g.
 ```
@@ -44,8 +45,25 @@ So, to get a global function, use `def`:
 
 The `lang.hd` file provides the `defn` convenience macro: 
 ```
-> (defn inc (x) (+ x 1))
+(defn inc (x) (+ x 1))
 ```
 
-## Compiling
-The project uses cmake as a build system
+# Try it out
+The project uses cmake, so to build/run:
+```sh
+git clone https://www.github.com/rationalis-petra/hydra
+mkdir hydra/build
+cd hydra/build
+cmake ..
+make
+```
+
+Then run with `./hydra`. IMPORTANT: currently, the language must be run out of the build folder,
+as it looks for various functions/macros in `hydra/lang.hd`, relative to the binary!
+
+## Future Goals
++ convenient ffi
++ complex types (objects/ADTs)
++ generic function machinery 
++ static typing
++ compiler/transpiler

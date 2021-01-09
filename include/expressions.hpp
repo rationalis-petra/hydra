@@ -1,5 +1,5 @@
-#ifndef __HYDRA_TYPES_HPP
-#define __HYDRA_TYPES_HPP
+#ifndef __HYDRA_EXPRESSIONS_HPP
+#define __HYDRA_EXPRESSIONS_HPP
 // TYPES defines the hydra_object, which is the internal representation of a
 // compiled ivy object: the primary purpose of it is 
 
@@ -8,7 +8,6 @@
 #include <vector>
 #include <iostream>
 #include <map>
-
 
 struct runtime;
 
@@ -121,4 +120,4 @@ struct runtime {
   std::map<char, hydra_oper*> readtable;
 };
 
-#endif // __HYDRA_TYPES_HPP
+#endif // __HYDRA_EXPRESSIONS_HPP
