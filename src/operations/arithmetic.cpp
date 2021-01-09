@@ -4,7 +4,6 @@
 #include "expressions.hpp"
 #include "operations.hpp"
 
-using std::bad_cast;
 using std::string;
 using std::to_string;
 using std::list;
@@ -17,11 +16,11 @@ hydra_object *op_plus::call(hydra_object *alist, runtime &r) {
     throw "Insufficient arguments provided to '+' function";
   }
   hydra_num *out = new hydra_num();
-  out->val = 0;
+  out->value = 0;
 
   for (hydra_object *o : arg_list) {
     if (hydra_num *num = dynamic_cast<hydra_num *>(o)) {
-      out->val += num->val;
+      out->value += num->value;
     } else {
       string err = "Non-number provided to '+' function: " + o->to_string();
       throw err;
@@ -36,22 +35,20 @@ hydra_object *op_minus::call(hydra_object *alist, runtime &r) {
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '-' function";
   }
-  try {
-    hydra_num *out = new hydra_num();
-    out->val = dynamic_cast<hydra_num *>(arg_list.front())->val;
+  if (hydra_num *out = new hydra_num()) {
+    out->value = dynamic_cast<hydra_num *>(arg_list.front())->value;
     arg_list.pop_front();
 
     for (hydra_object *arg : arg_list) {
-      try {
-        hydra_num *num = dynamic_cast<hydra_num *>(arg);
-        out->val -= num->val;
-      } catch (std::bad_cast&) {
+      if (hydra_num *num = dynamic_cast<hydra_num *>(arg)) {
+        out->value -= num->value;
+      } else {
         string err = "Attempt to subtract non-number: " + arg->to_string();
         throw err;
       }
     }
     return out;
-  } catch (bad_cast&) {
+  } else {
     string err =
         "Attempt to subtract non-number: " + arg_list.front()->to_string();
     throw err;
@@ -65,14 +62,13 @@ hydra_object *op_multiply::call(hydra_object *alist, runtime &r) {
     throw "Insufficient arguments provided to '*' function";
   }
   hydra_num *out = new hydra_num();
-  out->val = 1;
+  out->value = 1;
   arg_list.pop_front();
 
   for (hydra_object *arg : arg_list) {
-    try {
-      hydra_num *num = dynamic_cast<hydra_num *>(arg);
-      out->val *= num->val;
-    } catch (bad_cast&) {
+    if (hydra_num *num = dynamic_cast<hydra_num *>(arg)) {
+      out->value *= num->value;
+    } else {
       string err = "Attempt to multiply non-numer: " + arg->to_string();
     }
   }
@@ -85,22 +81,20 @@ hydra_object *op_divide::call(hydra_object *alist, runtime &r) {
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '/' function";
   }
-  try {
-    hydra_num *out = new hydra_num();
-    out->val = dynamic_cast<hydra_num *>(arg_list.front())->val;
+  if (hydra_num *out = new hydra_num()) {
+    out->value = dynamic_cast<hydra_num *>(arg_list.front())->value;
     arg_list.pop_front();
 
     for (hydra_object *arg : arg_list) {
-      try {
-        hydra_num *num = dynamic_cast<hydra_num *>(arg);
-        out->val /= num->val;
-      } catch (bad_cast&) {
+      if (hydra_num *num = dynamic_cast<hydra_num *>(arg)) {
+        out->value /= num->value;
+      } else {
         string err = "Attempt to divide non-number: " + arg->to_string();
         throw err;
       }
     }
     return out;
-  } catch (bad_cast&) {
+  } else {
     string err =
         "Attempt to subtract non-number: " + arg_list.front()->to_string();
     throw err;
@@ -118,20 +112,19 @@ hydra_object *op_geq::call(hydra_object *alist, runtime &r) {
   // we now ASSERT that arg_list is a list of length 2
   // does it contain integers?
 
-  try {
-    hydra_num *a1 = dynamic_cast<hydra_num *>(arg_list.front());
+  if (hydra_num *a1 = dynamic_cast<hydra_num *>(arg_list.front())) {
     arg_list.pop_front();
     hydra_num *a2 = dynamic_cast<hydra_num *>(arg_list.front());
     // so arg_list is a list containing integers!
-    int arg1 = a1->val;
-    int arg2 = a2->val;
+    int arg1 = a1->value;
+    int arg2 = a2->value;
 
     if (arg1 >= arg2) {
       return new hydra_t();
     } else {
       return new hydra_nil();
     }
-  } catch (bad_cast&) {
+  } else  {
     string err = "Non-numbers provided to >=";
     throw err;
   }

@@ -18,20 +18,32 @@ string hydra_string::to_string() const {
 string hydra_array::to_string() const {
   string out = "#A(";
 
-  for (hydra_object* elt : array) {
-    out += elt->to_string();
+  for (unsigned i = 0; i < array.size() ; i++) {
+    out += array[i]->to_string();
+    if (i != array.size() - 1)
+      out += " ";
   }
   out += ")";
   return out;
 }
 
+
+
+
+
+
+
+
+
 // single-words: integer, characters
 string hydra_num::to_string() const {
-  return ::to_string(val);
+  return ::to_string(value);
 }
 
+hydra_char::hydra_char() {}
+hydra_char::hydra_char(int c) : value(c) {}
 string hydra_char::to_string() const {
-  return string("") + value;
+  return string("") + ((char) value);
 }
 
 // nil

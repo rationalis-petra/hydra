@@ -22,4 +22,5 @@ add_subdirectory(src)
 add_executable(hydra src/main.cpp)
 
 
-target_link_libraries(hydra PUBLIC expressions operations memory)
+target_link_libraries(hydra expressions operations memory build)
+target_link_libraries(hydra ffi)

@@ -4,8 +4,8 @@
 #include "expressions.hpp"
 #include "operations.hpp"
 
-using namespace std;
-
+using std::list;
+using std::string;
 
 
 op_if::op_if() { eval_args = false; }
@@ -34,15 +34,15 @@ hydra_object *op_def::call(hydra_object* alist, runtime& r) {
   if (arg_list.size() != 2) {
     throw "arglist to def invalid size";
   }
-  try {
-    hydra_symbol *symbol = dynamic_cast<hydra_symbol*>(arg_list.front());
+  if (hydra_symbol *symbol = dynamic_cast<hydra_symbol*>(arg_list.front())) {
     arg_list.pop_front();
     hydra_object *value = arg_list.front()->eval(r);
 
     r.global_store[symbol->symbol] = value;
     return value;
-  } catch (bad_cast&) {
-    throw "Error: provided non-symbol as first argument of def";
+  } else {
+    string err = "Error: provided non-symbol as first argument of def";
+    throw err;
   }
 }
 
@@ -86,4 +86,9 @@ hydra_object *op_fn::call(hydra_object* alist, runtime& r) {
 op_mac::op_mac() { eval_args = false; }
 hydra_object *op_mac::call(hydra_object* alist, runtime& r) {
   return new user_oper(alist, false);
+}
+
+op_quit::op_quit() { eval_args = false; }
+hydra_object *op_quit::call(hydra_object* alist, runtime& r) {
+  exit(0);
 }

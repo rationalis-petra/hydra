@@ -17,6 +17,11 @@ void mark_obj(hydra_object* obj) {
       mark_obj(cns->car);
       mark_obj(cns->cdr);
     }
+    else if (hydra_array *arr = dynamic_cast<hydra_array*>(obj)) {
+      for (hydra_object* obj : arr->array) {
+        mark_obj(obj);
+      }
+    }
     else if (user_oper *op = dynamic_cast<user_oper*>(obj)) {
       mark_obj(op->expr);
     }

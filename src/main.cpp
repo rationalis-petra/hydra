@@ -10,6 +10,7 @@
 using namespace std;
 
 int main(int argc, char **argv) {
+  test();
   runtime r;
   // arithmetic
   r.global_store["+"] = new op_plus();
@@ -23,16 +24,20 @@ int main(int argc, char **argv) {
   r.global_store["cons"] = new op_cons();
   r.global_store["car"] = new op_car();
   r.global_store["cdr"] = new op_cdr();
+  r.global_store["elt"] = new op_elt();
 
   // io
   r.global_store["print"] = new op_print();
-  r.global_store["open"] = new op_open_file();
+  r.global_store["open-file"] = new op_open_file();
+  r.global_store["close-file"] = new op_close();
+  // streams
   r.global_store["peek"] = new op_peek();
   r.global_store["next"] = new op_next();
-  r.global_store["close"] = new op_close();
+  r.global_store["endp"] = new op_endp();
 
   r.global_store["eval"] = new op_eval();
   r.global_store["read"] = new op_read();
+  r.global_store["set-macro-character"] = new op_set_mac_char();
 
   // logic
   r.global_store["="] = new op_eq();
@@ -47,17 +52,23 @@ int main(int argc, char **argv) {
   r.global_store["def"] = new op_def();
   r.global_store["quote"] = new op_quote();
   r.global_store["progn"] = new op_progn();
+  r.global_store["quit"] = new op_quit();
 
-  // eval (def defn (mac (name arg-list body) (def name (fn arg-list body))))
-  string in = "(eval (read (open \"../hydra/lang.hd\")))";
+  hydra_istream *stm = new hydra_istream();
+  stm->stream = &cin;
+  r.global_store["cin"] = stm;
+
+  string in = "(eval (read (open-file \"../hydra/lang.hd\")))";
+  hydra_string *str = new hydra_string();
+  str->value = in;
+  hydra_object *ast = read(str, r);
+  hydra_object *out = ast->eval(r);
 
   while (!(in == "(quit)")) {
-    // cerr << ast << endl;
     try {
-      hydra_string* str = new hydra_string();
-      str->value = in;
-      hydra_object* ast = read(str, r);
-      hydra_object* out = ast->eval(r);
+      cout << "> ";
+      ast = read(stm, r);
+      out = ast->eval(r);
       cout << "* " << out << endl;
     } catch (string e) {
       cout << e << endl;
@@ -65,7 +76,6 @@ int main(int argc, char **argv) {
       cout << err << endl;
     }
 
-    cout << "> ";
     getline(cin, in);
     hydra_object::collect_garbage(r);
   }

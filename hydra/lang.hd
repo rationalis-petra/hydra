@@ -19,6 +19,19 @@
 
 (defn incf (x) (+ x 1))
 
-(def my-list (cons 1 (cons 2 (cons 3 nil))))
+(defn list (&rest args) args)
+
+(defn load (filename)
+  (eval (read (open-file filename))))
+
+(defn single-quote-reader (stream char) (list (quote quote) (read stream)))
+(set-macro-character #' single-quote-reader)
+
+(defn comment-character (stream char)
+  (if (= char #newline)
+      (read stream)
+      (comment-character stream (next stream))))
+
+(set-macro-character #; comment-character)
 
 )

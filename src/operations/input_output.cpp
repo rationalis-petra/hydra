@@ -6,7 +6,12 @@
 #include "expressions.hpp"
 #include "operations.hpp"
 
-using namespace std;
+using std::list;
+using std::string;
+using std::ifstream;
+using std::istream;
+using std::cout;
+using std::endl;
 
 op_print::op_print() { eval_args = true; }
 hydra_object *op_print::call(hydra_object *alist, runtime &r) {
@@ -25,13 +30,12 @@ hydra_object *op_open_file::call(hydra_object *alist, runtime &r) {
     throw "Invalid number of arguments to open-file: print takes 1 argument";
   }
 
-  hydra_object* filename = arg_list.front();
-  try {
-    hydra_string* strfilename = dynamic_cast<hydra_string*>(filename);
-    hydra_istream* out = new hydra_istream();
+  hydra_object *filename = arg_list.front();
+  if (hydra_string *strfilename = dynamic_cast<hydra_string *>(filename)) {
+    hydra_istream *out = new hydra_istream();
     out->stream = new ifstream(strfilename->value);
     return out;
-  } catch (bad_cast&) {
+  } else {
     string err = "Inavalid argument to open-file: " + filename->to_string();
     throw err;
   }
@@ -45,9 +49,9 @@ hydra_object *op_next::call(hydra_object* alist, runtime& r) {
   }
 
   if (hydra_istream* stream = dynamic_cast<hydra_istream*>(arg_list.front())) {
-    hydra_char* c = new hydra_char;
-    stream->stream->read(&c->value, 1);
-    return c;
+    char ch;
+    stream->stream->read(&ch, 1);
+    return new hydra_char(ch);
   } else {
     string err = "Non-istream argument provided to peek";
     throw err;
@@ -67,6 +71,27 @@ hydra_object *op_peek::call(hydra_object* alist, runtime& r) {
     return c;
   } else {
     string err = "Non-istream argument provided to peek";
+    throw err;
+  }
+}
+
+op_endp::op_endp() { eval_args = true; }
+hydra_object *op_endp::call(hydra_object* alist, runtime& r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
+  if (arg_list.size() != 1) {
+    string err = "Invalid number of arguments provided to endp"; 
+    throw err;
+  }
+
+  if (hydra_istream* stream = dynamic_cast<hydra_istream*>(arg_list.front())) {
+    istream* file = static_cast<istream*>(stream->stream);
+    if (file->eof()) {
+      return new hydra_t();
+    } else {
+      return new hydra_nil;
+    }
+  } else {
+    string err = "Non-istream argument provided to end";
     throw err;
   }
 }

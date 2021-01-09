@@ -5,6 +5,12 @@
 
 using namespace std;
 
+hydra_cons::hydra_cons() {}
+hydra_cons::hydra_cons(hydra_object* car, hydra_object* cdr) {
+  this->car = car;
+  this->cdr = cdr;
+}
+
 hydra_object *hydra_cons::eval(runtime &r) {
   hydra_object *oper = car->eval(r);
   hydra_oper *op;

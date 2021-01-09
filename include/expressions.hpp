@@ -1,6 +1,6 @@
-#ifndef __IVY_TYPES_HPP
-#define __IVY_TYPES_HPP
-// TYPES defines the ivy_object, which is the internal representation of a
+#ifndef __HYDRA_TYPES_HPP
+#define __HYDRA_TYPES_HPP
+// TYPES defines the hydra_object, which is the internal representation of a
 // compiled ivy object: the primary purpose of it is 
 
 #include <list>
@@ -9,14 +9,8 @@
 #include <iostream>
 #include <map>
 
-// the portable ivy standard libraries are written in terms
-// of a select group of types and operations
 
-struct hydra_object;
-struct runtime {
-  std::map<std::string, hydra_object*> global_store;
-  std::map<char, hydra_object*> readtable;
-};
+struct runtime;
 
 struct hydra_object {
   //std::string docstring;
@@ -45,6 +39,8 @@ struct hydra_nil : public hydra_object {
 
 struct hydra_cons : public hydra_object {
   std::string to_string() const;
+  hydra_cons();
+  hydra_cons(hydra_object* car, hydra_object* cdr);
   hydra_object* eval(runtime& r);
 
   hydra_object* car;
@@ -56,7 +52,7 @@ struct hydra_cons : public hydra_object {
 struct hydra_num : public hydra_object {
   std::string to_string() const;
 
-  int val;
+  int value;
 };
 
 struct hydra_oper : public hydra_object {
@@ -112,10 +108,17 @@ struct hydra_string : public hydra_object {
 };
 
 struct hydra_char : public hydra_object {
+  hydra_char();
+  hydra_char(int c);
   std::string to_string() const;
-  char value;
+  int value;
 };
 
 std::ostream &operator<<(std::ostream &os, const hydra_object *obj);
+
+struct runtime {
+  std::map<std::string, hydra_object*> global_store;
+  std::map<char, hydra_oper*> readtable;
+};
 
 #endif // __HYDRA_TYPES_HPP

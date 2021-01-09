@@ -5,27 +5,40 @@
 #include "expressions.hpp"
 #include "operations.hpp"
 
-using namespace std;
-
-class matching_paren_exception : public exception {};
+using std::list;
+using std::string;
+using std::invalid_argument;
+using std::stringstream;
 
 hydra_object *read(hydra_object *raw, runtime &r);
 
 hydra_object *to_value(string token) {
+  // boolean literals
   if (token == "nil")
     return new hydra_nil();
   if (token == "t")
     return new hydra_t;
-  if (token[0] == '"' && token.back() == '"') {
-    token.pop_back();
-    hydra_string *str = new hydra_string;
-    str->value = &token.c_str()[1];
-    return str;
+
+  // character literal
+  if (token[0] == '#') {
+    hydra_char* ch = new hydra_char;
+    if (token.size() == 2) {
+      ch->value = token[1];
+    } else {
+      if (token == "#newline") {
+        ch->value = '\n';
+      }
+      else {
+        string err = "non-regognized character: " + token;
+        throw err;
+      }
+    }
+    return ch;
   }
   try {
     int num = stoi(token);
     hydra_num *n = new hydra_num();
-    n->val = num;
+    n->value = num;
     return n;
   } catch (invalid_argument &) {
   }
@@ -46,8 +59,7 @@ hydra_object *to_cons(list<hydra_object *> list) {
   }
 }
 
-hydra_object *mac_lparen(hydra_object *raw, char c, runtime &r) {
-  hydra_istream *is = dynamic_cast<hydra_istream *>(raw);
+hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
   // continue to add tokens to list until we hit a ')'
   list<hydra_object *> list;
 
@@ -66,7 +78,7 @@ hydra_object *mac_lparen(hydra_object *raw, char c, runtime &r) {
     }
       break;
     default:
-      list.push_back(read(raw, r));
+      list.push_back(read(is, r));
       break;
     }
   }
@@ -74,15 +86,10 @@ hydra_object *mac_lparen(hydra_object *raw, char c, runtime &r) {
   throw "( with no matching )!";
 }
 
-hydra_object *mac_token(hydra_object *raw, char c, runtime &r) {
-  hydra_istream *is = dynamic_cast<hydra_istream *>(raw);
-  string token = string("") + c;
+hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
+  string token = string("");
+  bool cond = false;
   while (!is->stream->eof()) {
-    int ch = is->stream->peek();
-    if (ch == EOF)
-      return to_value(token);
-
-    c = ch;
     switch (c) {
     case ' ':
     case '\n':
@@ -91,14 +98,45 @@ hydra_object *mac_token(hydra_object *raw, char c, runtime &r) {
     case ')':
       return to_value(token);
       break;
+      // escape character!
+    case '\\': // treat the next character as normal
+      token += is->stream->peek();
+      is->stream->read(&c, 1);
+      break;
+      // the hash is used for various literals
+
     default:
       token += c;
+      break;
     }
 
-    is->stream->read(&c, 1);
+    if (cond) {
+      is->stream->read(&c, 1);
+    }
+    cond = true;
+    int ch = is->stream->peek();
+    if (ch == EOF)
+      return to_value(token);
+    c = ch;
   }
 
   return to_value(token);
+}
+
+hydra_object *mac_string(hydra_istream* is, char c, runtime& r) {
+  is->stream->read(&c, 1);
+  hydra_string *str = new hydra_string;
+  while (!is->stream->eof()) {
+    if (c == '"') {
+      return str;
+    }
+    else {
+      str->value += c;
+      is->stream->read(&c, 1);
+    }
+  }
+  string err = "non-terminated string";
+  throw err;
 }
 
 hydra_object *read(hydra_object *raw, runtime &r) {
@@ -116,8 +154,15 @@ hydra_object *read(hydra_object *raw, runtime &r) {
   is->stream->read(&c, 1);
   while (!is->stream->eof()) {
 
-    // if (macro_characters.contains(c));
-    // return macro_characters[c]->read(raw, r);
+    if (r.readtable.find(c) != r.readtable.end()){
+      hydra_cons* cns = new hydra_cons;
+      cns->car = new hydra_char(c);
+      cns->cdr = new hydra_nil;
+      hydra_cons* cns2 = new hydra_cons;
+      cns2->car = is;
+      cns2->cdr = cns;
+      return r.readtable[c]->call(cns2, r);
+    }
     switch (c) {
       // whitespace characters
     case '\t':
@@ -134,6 +179,9 @@ hydra_object *read(hydra_object *raw, runtime &r) {
       throw err;
     }
       break;
+    case '"': {
+      return mac_string(is, c, r);
+    }
 
     default:
       return mac_token(is, c, r);
@@ -155,4 +203,25 @@ hydra_object *op_read::call(hydra_object *alist, runtime &r) {
     throw err;
   }
   return read(arg_list.front(), r);
+}
+
+op_set_mac_char::op_set_mac_char() { eval_args = true; }
+hydra_object* op_set_mac_char::call(hydra_object *alist, runtime &r) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r);
+  if (arg_list.size() != 2) {
+    string err = "Incorrect number of arguments provided to set-macro-character";
+    throw err;
+  }
+  hydra_char* character = dynamic_cast<hydra_char *>(arg_list.front());
+  hydra_oper* function = dynamic_cast<hydra_oper *>(arg_list.back());
+  if (!character) {
+    string err = "set-macro-character expects character as first argument";
+    throw err;
+  }
+  if (!function) {
+    string err = "set-macro-character expects function as second argument";
+    throw err;
+  }
+  r.readtable[character->value] = function;
+  return function;
 }
