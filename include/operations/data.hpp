@@ -1,5 +1,5 @@
-#ifndef __DATA_HPP
-#define __DATA_HPP
+#ifndef __HYDRA_DATA_HPP
+#define __HYDRA_DATA_HPP
 
 #include "expressions.hpp"
 
@@ -24,4 +24,4 @@ struct op_elt : hydra_oper {
   hydra_object *call(hydra_object *body, runtime &r);
 };
 
-#endif // __DATA_HPP
+#endif // __HYDRA_DATA_HPP

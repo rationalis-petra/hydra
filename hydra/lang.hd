@@ -1,12 +1,14 @@
 (progn
 
-(def defn
-  (mac (name arg-list body)
-    (def name (fn arg-list body))))
+(def list (fn (:rest args) args))
+
+(def defn (mac (name arg-list body)
+  (def name (fn arg-list body))))
 
 (def defmac
   (mac (name arg-list body)
     (def name (mac arg-list body))))
+
 
 (defmac when (cond rest) (if cond rest nil))
 
@@ -19,7 +21,6 @@
 
 (defn incf (x) (+ x 1))
 
-(defn list (&rest args) args)
 
 (defn load (filename)
   (eval (read (open-file filename))))
@@ -33,5 +34,6 @@
       (comment-character stream (next stream))))
 
 (set-macro-character #; comment-character)
+
 
 )

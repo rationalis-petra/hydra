@@ -15,8 +15,7 @@ hydra_object *op_plus::call(hydra_object *alist, runtime &r) {
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '+' function";
   }
-  hydra_num *out = new hydra_num();
-  out->value = 0;
+  hydra_num *out = new hydra_num(0);
 
   for (hydra_object *o : arg_list) {
     if (hydra_num *num = dynamic_cast<hydra_num *>(o)) {
@@ -35,7 +34,7 @@ hydra_object *op_minus::call(hydra_object *alist, runtime &r) {
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '-' function";
   }
-  if (hydra_num *out = new hydra_num()) {
+  if (hydra_num *out = new hydra_num(0)) {
     out->value = dynamic_cast<hydra_num *>(arg_list.front())->value;
     arg_list.pop_front();
 
@@ -61,9 +60,7 @@ hydra_object *op_multiply::call(hydra_object *alist, runtime &r) {
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '*' function";
   }
-  hydra_num *out = new hydra_num();
-  out->value = 1;
-  arg_list.pop_front();
+  hydra_num *out = new hydra_num(1);
 
   for (hydra_object *arg : arg_list) {
     if (hydra_num *num = dynamic_cast<hydra_num *>(arg)) {
@@ -81,7 +78,7 @@ hydra_object *op_divide::call(hydra_object *alist, runtime &r) {
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '/' function";
   }
-  if (hydra_num *out = new hydra_num()) {
+  if (hydra_num *out = new hydra_num(0)) {
     out->value = dynamic_cast<hydra_num *>(arg_list.front())->value;
     arg_list.pop_front();
 

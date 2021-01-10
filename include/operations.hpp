@@ -8,18 +8,8 @@
 #include "operations/logic.hpp"
 #include "operations/data.hpp"
 #include "operations/io.hpp"
-#include "operations/ffi.hpp"
+#include "operations/foreign.hpp"
 
 int test();
 
-
-// logic
-
-
-
-// types...
-
-// data: cons basically pointers!
-
-// io
 #endif // __EXPRESSIONS_HPP

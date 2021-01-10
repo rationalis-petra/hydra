@@ -37,9 +37,7 @@ hydra_object *to_value(string token) {
   }
   try {
     int num = stoi(token);
-    hydra_num *n = new hydra_num();
-    n->value = num;
-    return n;
+    return new hydra_num(num);
   } catch (invalid_argument &) {
   }
   hydra_symbol *sym = new hydra_symbol();

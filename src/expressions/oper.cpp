@@ -21,10 +21,10 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
     while (!name_list->null()) {
       if (hydra_cons *name_elt = dynamic_cast<hydra_cons *>(name_list)) {
         if (hydra_symbol *name = dynamic_cast<hydra_symbol *>(name_elt->car)) {
-          if (name->symbol == "&rest") {
+          if (name->symbol == ":rest") {
             name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
             if (!name_elt) {
-              string err = "No name provided to &rest!";
+              string err = "No name provided to :rest!";
               throw err;
             }
             name = dynamic_cast<hydra_symbol *>(name_elt->car);
@@ -33,6 +33,20 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
               throw err;
             }
             rest = name->symbol;
+            name_list = name_elt->cdr;
+          }
+          else if (name->symbol == ":self") {
+            name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
+            if (!name_elt) {
+              string err = "No name provided to :self!";
+              throw err;
+            }
+            name = dynamic_cast<hydra_symbol *>(name_elt->car);
+            if (!name) {
+              string err = "non-symbol provided to fn/mac";
+              throw err;
+            }
+            self = name->symbol;
             name_list = name_elt->cdr;
           }
           else {
@@ -96,6 +110,9 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
       rlist->cdr = new hydra_nil;
       subst_map[rest] = root;
     }
+  }
+  if (self != "") {
+    subst_map[self] = this;
   }
   return lexical_subst(expr, subst_map, eval_args)->eval(r);
 }

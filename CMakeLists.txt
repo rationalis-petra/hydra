@@ -23,4 +23,4 @@ add_executable(hydra src/main.cpp)
 
 
 target_link_libraries(hydra expressions operations memory build)
-target_link_libraries(hydra ffi)
+target_link_libraries(hydra ffi ltdl)

@@ -10,10 +10,10 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-  test();
   runtime r;
+  r.active_module = new hydra_module;
   // arithmetic
-  r.global_store["+"] = new op_plus();
+  r.global_store["+"] = new op_plus;
   r.global_store["-"] = new op_minus();
   r.global_store["*"] = new op_multiply();
   r.global_store["/"] = new op_divide();
@@ -54,6 +54,11 @@ int main(int argc, char **argv) {
   r.global_store["progn"] = new op_progn();
   r.global_store["quit"] = new op_quit();
 
+  // ffi
+  r.global_store["load-foreign-library"] = new op_foreign_lib();
+  r.global_store["get-foreign-symbol"] = new op_foreign_sym();
+  r.global_store["internalize"] = new op_internalize();
+
   hydra_istream *stm = new hydra_istream();
   stm->stream = &cin;
   r.global_store["cin"] = stm;
@@ -61,8 +66,15 @@ int main(int argc, char **argv) {
   string in = "(eval (read (open-file \"../hydra/lang.hd\")))";
   hydra_string *str = new hydra_string();
   str->value = in;
-  hydra_object *ast = read(str, r);
-  hydra_object *out = ast->eval(r);
+  hydra_object *ast;
+  hydra_object *out;
+
+  try {
+  ast = read(str, r);
+  out = ast->eval(r);
+  } catch (string e) {
+    cout << e << endl;
+  }
 
   while (!(in == "(quit)")) {
     try {
