@@ -3,24 +3,30 @@
 (def list (fn (:rest args) args))
 
 (def defn (mac (name arg-list body)
-  (def name (fn arg-list body))))
+  (list (quote def) name
+    (list (quote fn)
+          (cons (quote :self) (cons name arg-list))
+          body))))
 
 (def defmac
   (mac (name arg-list body)
-    (def name (mac arg-list body))))
+    (list (quote def) name
+      (list (quote mac)
+            (cons (quote :self) (cons name arg-list))
+            body))))
 
+(defmac when (cond rest)
+  (list (quote if) cond rest (quote nil)))
 
-(defmac when (cond rest) (if cond rest nil))
+(defmac unless (cond rest)
+  (list (quote if) cond (quote nil) rest))
 
-(defmac unless (cond rest) (if cond nil rest))
-
-(defn map (func list)
+(defn map (func seq)
   (unless (= nil list)
     (cons (func (car list))
     (map func (cdr list)))))
 
 (defn incf (x) (+ x 1))
-
 
 (defn load (filename)
   (eval (read (open-file filename))))
@@ -34,6 +40,5 @@
       (comment-character stream (next stream))))
 
 (set-macro-character #; comment-character)
-
 
 )

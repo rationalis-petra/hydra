@@ -7,8 +7,7 @@
 using namespace std;
 
 hydra_object *lexical_subst(hydra_object *expr,
-                            map<string, hydra_object *> subst_map,
-                            bool quote_args);
+                            map<string, hydra_object *> subst_map);
 
 user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
   eval_args = _eval_args;
@@ -114,17 +113,20 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
   if (self != "") {
     subst_map[self] = this;
   }
-  return lexical_subst(expr, subst_map, eval_args)->eval(r);
+  if (eval_args) {
+    return lexical_subst(expr, subst_map)->eval(r);
+  } else {
+    return lexical_subst(expr, subst_map)->eval(r)->eval(r);
+  }
 }
 
 hydra_object *lexical_subst(hydra_object *expr,
-                            map<string, hydra_object *> subst_map,
-                            bool quote_args) {
+                            map<string, hydra_object *> subst_map) {
   // we want to assert that len(arg_list) = len(vals)
   // we can now assume that conslen(arg_list) = conslen(vals)
   if (hydra_symbol *sym = dynamic_cast<hydra_symbol *>(expr)) {
     if (subst_map.find(sym->symbol) != subst_map.end()) {
-      if (quote_args) {
+      if (true) { 
         hydra_symbol *qsym = new hydra_symbol;
         qsym->symbol = "quote";
 
@@ -143,8 +145,19 @@ hydra_object *lexical_subst(hydra_object *expr,
     return expr;
   } else if (hydra_cons *cns = dynamic_cast<hydra_cons *>(expr)) {
     hydra_cons *out = new hydra_cons();
-    out->car = lexical_subst(cns->car, subst_map, quote_args);
-    out->cdr = lexical_subst(cns->cdr, subst_map, quote_args);
+    out->car = lexical_subst(cns->car, subst_map);
+
+    // don't substitute quoted arguments
+    if (hydra_symbol *qte = dynamic_cast<hydra_symbol *>(out->car)) {
+      if (qte->symbol == "quote") {
+        out->cdr = cns->cdr;
+      } else {
+        out->cdr = lexical_subst(cns->cdr, subst_map);
+      }
+    } else {
+      out->cdr = lexical_subst(cns->cdr, subst_map);
+    }
+
     return out;
   } else {
     return expr;

@@ -1,31 +1,32 @@
+#include <iostream>
+
+#include <stdlib.h>
 #include <string>
 #include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <vector>
 
-#include "ltdl.h"
 #include "ffi.h"
+#include "ltdl.h"
 
 #include "expressions.hpp"
 #include "operations/foreign.hpp"
 
+using std::list;
 using std::string;
 using std::to_string;
-using std::list;
-using std::vector;
 
 // dlopen (linux)
 // LoadLibrary (windows)
 
 op_foreign_lib::op_foreign_lib() { eval_args = true; }
 hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r) {
-  list<hydra_object*> arg_list = get_arg_list(body, r);
+  list<hydra_object *> arg_list = get_arg_list(body, r);
   if (arg_list.size() != 1) {
-    string err = "Incorrect number of arguments provided to function load-foreign-lib";
+    string err =
+        "Incorrect number of arguments provided to function load-foreign-lib";
     throw err;
   }
-  hydra_string* str = dynamic_cast<hydra_string*>(arg_list.front());
+  hydra_string *str = dynamic_cast<hydra_string *>(arg_list.front());
   if (!str) {
     string err = "load-foreign-lib requires a string argument";
     throw err;
@@ -46,22 +47,24 @@ hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r) {
 
 op_foreign_sym::op_foreign_sym() { eval_args = true; }
 hydra_object *op_foreign_sym::call(hydra_object *body, runtime &r) {
-  list<hydra_object*> arg_list = get_arg_list(body, r);
+  list<hydra_object *> arg_list = get_arg_list(body, r);
   if (arg_list.size() != 2) {
-    string err = "Incorrect number of arguments provided to function get-foreign-symbol";
+    string err =
+        "Incorrect number of arguments provided to function get-foreign-symbol";
     throw err;
   }
-  hydra_foreign_lib* lib = dynamic_cast<hydra_foreign_lib*>(arg_list.front());
-  hydra_string* str = dynamic_cast<hydra_string*>(arg_list.back());
+  hydra_foreign_lib *lib = dynamic_cast<hydra_foreign_lib *>(arg_list.front());
+  hydra_string *str = dynamic_cast<hydra_string *>(arg_list.back());
   if (!lib) {
-    string err = "First argument to get-foreign-symbol must be of type foreign-library";
+    string err =
+        "First argument to get-foreign-symbol must be of type foreign-library";
     throw err;
   }
   if (!str) {
     string err = "Second argumetn to get-foreign-symbol must be of type string";
     throw err;
   }
-  void* addr = lt_dlsym(lib->lib, str->value.c_str());
+  void *addr = lt_dlsym(lib->lib, str->value.c_str());
   if (addr == nullptr) {
     return new hydra_nil;
   } else {
@@ -78,10 +81,11 @@ hydra_object *op_internalize::call(hydra_object *body, runtime &r) {
         ::to_string(arg_list.size());
     throw err;
   }
-  hydra_foreign_sym *sym = dynamic_cast<hydra_foreign_sym*>(arg_list.front());
-  hydra_cons *type = dynamic_cast<hydra_cons*>(arg_list.back());
+  hydra_foreign_sym *sym = dynamic_cast<hydra_foreign_sym *>(arg_list.front());
+  hydra_cons *type = dynamic_cast<hydra_cons *>(arg_list.back());
   if (sym == nullptr) {
-    string err = "Expected first argument to internalize to be a foreign symbol";
+    string err =
+        "Expected first argument to internalize to be a foreign symbol";
     throw err;
   }
   if (type == nullptr) {
@@ -89,47 +93,47 @@ hydra_object *op_internalize::call(hydra_object *body, runtime &r) {
     throw err;
   }
 
+
   // for now, we assume we're creating a function
-  hydra_foreign_oper* op = new hydra_foreign_oper();
-  op->fn_address = (void(*)(void)) sym->address;
-  hydra_object* arglst = dynamic_cast<hydra_cons*>(type->cdr)->car;
+  hydra_foreign_oper *op = new hydra_foreign_oper();
+  op->fn_address = (void (*)(void))sym->address;
+  hydra_object *arglst = dynamic_cast<hydra_cons *>(type->cdr)->car;
   while (!arglst->null()) {
-    arglst = dynamic_cast<hydra_cons*>(arglst)->cdr;
     // type-check here
-    op->arg_types.push_back(Int32);
-  }
-  hydra_object* return_type = dynamic_cast<hydra_cons*>(dynamic_cast<hydra_cons*>(type->cdr)->cdr)->car;
-  hydra_symbol* return_sym = dynamic_cast<hydra_symbol*>(return_type);
-  if(return_sym == nullptr) {
-    string err = "no return type provided!";
-    throw err;
+    hydra_cons *cell = dynamic_cast<hydra_cons *>(arglst);
+    hydra_symbol *sym = dynamic_cast<hydra_symbol *>(cell->car);
+    if (sym->symbol == "void") {
+      op->arg_types.push_back(Void);
+    } else if (sym->symbol == "int-32") {
+      op->arg_types.push_back(Int32);
+    } else if (sym->symbol == "pointer") {
+      op->arg_types.push_back(Pointer);
+    } else if (sym->symbol == "string") {
+      op->arg_types.push_back(String);
+    } else {
+      string err = "type of foreign argument not recognized";
+      throw err;
+    }
+    arglst = cell->cdr;
   }
 
 
-  ffi_type* rettype;
-  if (return_sym->symbol == "void") {
-    op->return_type = Int32;
-    rettype = &ffi_type_sint32;
-  } else if (return_sym->symbol == "int-32") {
-    op->return_type = Int32;
-    rettype = &ffi_type_void;
-  } else {
-    string err = "type of return symbol not recognized";
-    throw err;
-  }
 
   // arg_list[0] = foreign symbol
-  // create a foreign function given a symbol and a type list 
+  // create a foreign function given a symbol and a type list
   // caller interface structure
   // array of types
-  ffi_type **arg_types = new ffi_type*[op->arg_types.size()];
+  ffi_type **arg_types = new ffi_type *[op->arg_types.size()];
   unsigned i = 0;
   for (foreign_type t : op->arg_types) {
     switch (t) {
     case Int32:
-      arg_types[i] = &ffi_type_sint32;
+      arg_types[i] = &ffi_type_sint;
       break;
     case Pointer:
+      arg_types[i] = &ffi_type_pointer;
+      break;
+    case String:
       arg_types[i] = &ffi_type_pointer;
       break;
     case Void:
@@ -138,47 +142,92 @@ hydra_object *op_internalize::call(hydra_object *body, runtime &r) {
     }
     i++;
   }
+
+  hydra_object *return_type =
+      dynamic_cast<hydra_cons *>(dynamic_cast<hydra_cons *>(type->cdr)->cdr)
+          ->car;
+  hydra_symbol *return_sym = dynamic_cast<hydra_symbol *>(return_type);
+  if (return_sym == nullptr) {
+    string err = "no return type provided!";
+    throw err;
+  }
+
+  ffi_type *rettype;
+  if (return_sym->symbol == "void") {
+    op->return_type = Void;
+    rettype = &ffi_type_void;
+  } else if (return_sym->symbol == "int-32") {
+    op->return_type = Int32;
+    rettype = &ffi_type_sint;
+  } else if (return_sym->symbol == "pointer") {
+    op->return_type = Pointer;
+    rettype = &ffi_type_pointer;
+  } else if (return_sym->symbol == "string") {
+    op->return_type = String;
+    rettype = &ffi_type_pointer;
+  } else {
+    string err = "type of return symbol not recognized";
+    throw err;
+  }
+
   // TODO: what is ffi_default_abi??
-  if (ffi_prep_cif(&op->fn_def, FFI_DEFAULT_ABI, op->arg_types.size(), rettype, arg_types) == FFI_OK) {
+  // now call function
+  if (ffi_prep_cif(&(op->fn_def), FFI_DEFAULT_ABI, op->arg_types.size(), rettype,
+                   arg_types) == FFI_OK) {
     return op;
   } else {
     return new hydra_nil;
   }
 }
 
-
-
 hydra_foreign_oper::hydra_foreign_oper() { eval_args = true; }
-hydra_object* hydra_foreign_oper::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+hydra_object *hydra_foreign_oper::call(hydra_object *alist, runtime &r) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r);
   if (arg_list.size() != arg_types.size()) {
-    string err = "Error in foreign function call: arg list is not of expected size";
+    string err =
+        "Error in foreign function call: arg list is not of expected size";
     throw err;
   }
-  void **arg_values = new void*[arg_list.size()];
-  list<hydra_object*>::iterator vals = arg_list.begin();
-  auto types = arg_types.begin();
+
+  void *mynull = nullptr;
+  void **arg_values = new void *[arg_list.size()];
+
+  list<hydra_object *>::iterator vals = arg_list.begin();
+  list<foreign_type>::iterator types = arg_types.begin();
   for (unsigned i = 0; i < arg_list.size(); i++) {
     hydra_object *val = *vals;
     foreign_type type = *types;
-    switch(type) {
+
+    switch (type) {
     case Int32: {
-      hydra_num *num = dynamic_cast<hydra_num*>(val);
+      hydra_num *num = dynamic_cast<hydra_num *>(val);
       if (num == nullptr) {
         string err = "Provided non-num type to function!";
         throw err;
       }
       arg_values[i] = &num->value;
-    }
-      break;
+    } break;
     case Pointer:
       if (val->null()) {
-        arg_values[i] = nullptr;
+        arg_values[i] = &mynull;
+      } else if (hydra_foreign_sym* ptr = dynamic_cast<hydra_foreign_sym*>(val)) {
+        arg_values[i] = &ptr->address;
       } else {
         string err = "Haven't properly implemented pointers yet...";
         throw err;
       }
       break;
+    case String: {
+      hydra_string *str = dynamic_cast<hydra_string *>(val);
+      if (str == nullptr) {
+        string err = "Provided non-num type to function!";
+        throw err;
+      } else {
+        char* cstr = new char[str->value.length() + 1];
+        strcpy(cstr, str->value.c_str());
+        arg_values[i] = &cstr;
+      }
+    } break;
     case Void:
       string err = "Void in arg_list?";
       throw err;
@@ -190,17 +239,25 @@ hydra_object* hydra_foreign_oper::call(hydra_object* alist, runtime& r) {
   }
 
   ffi_arg result;
+
   ffi_call(&fn_def, fn_address, &result, arg_values);
-  switch(return_type)  {
+  switch (return_type) {
   case Void:
     return new hydra_nil;
     break;
   case Int32:
     return new hydra_num((int) result);
     break;
+  case String: {
+    const char *str = (const char *)result;
+    hydra_string *out = new hydra_string();
+    out->value = str;
+    return out;
+  } break;
   case Pointer: {
-    string err = "Attempt to return pointer in foreign funtion!";
-    throw err;
+    return new hydra_foreign_sym((void*) result);
   } break;
   }
+  string err = "reached end of foreign call??";
+  throw err;
 }

@@ -6,9 +6,12 @@
 enum foreign_type {
   Int32,
   Pointer,
+  String,
   Void
 };
 
+void test_glfw_init();
+void test_glfw_window();
 // struct hydra_type {
 //   bool typep(hydra_object* obj);
 // };

@@ -34,7 +34,6 @@ int main(int argc, char **argv) {
   r.global_store["peek"] = new op_peek();
   r.global_store["next"] = new op_next();
   r.global_store["endp"] = new op_endp();
-
   r.global_store["eval"] = new op_eval();
   r.global_store["read"] = new op_read();
   r.global_store["set-macro-character"] = new op_set_mac_char();
@@ -47,6 +46,7 @@ int main(int argc, char **argv) {
 
   // language
   r.global_store["if"] = new op_if();
+  r.global_store["while"] = new op_while();
   r.global_store["fn"] = new op_fn();
   r.global_store["mac"] = new op_mac();
   r.global_store["def"] = new op_def();
@@ -69,11 +69,16 @@ int main(int argc, char **argv) {
   hydra_object *ast;
   hydra_object *out;
 
+  // test_glfw_init();
+  // test_glfw_window();
+
   try {
   ast = read(str, r);
   out = ast->eval(r);
   } catch (string e) {
     cout << e << endl;
+  } catch (const char *err) {
+    cout << err << endl;
   }
 
   while (!(in == "(quit)")) {

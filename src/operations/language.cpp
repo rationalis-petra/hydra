@@ -28,6 +28,27 @@ hydra_object* op_if::call(hydra_object* alist, runtime& r) {
   return arg_list.front()->eval(r);
 }
 
+op_while::op_while() { eval_args = false; }
+hydra_object* op_while::call(hydra_object* alist, runtime& r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
+  // assert that list length is 3
+  int len = arg_list.size();
+  if (len < 2) {
+    throw "arglist to while invalid size!";
+  }
+  // we now assume that arg_list is a list of length 3
+
+  hydra_object* condition = arg_list.front();
+  arg_list.pop_front();
+  // is nil?
+  while (!condition->eval(r)->null()) {
+    for (hydra_object* o : arg_list) {
+      o->eval(r);
+    }
+  }
+  // otherwise
+  return new hydra_nil;
+}
 op_def::op_def() { eval_args = false; }
 hydra_object *op_def::call(hydra_object* alist, runtime& r) {
   list<hydra_object*> arg_list = get_arg_list(alist, r);

@@ -8,6 +8,10 @@ struct op_if : hydra_oper {
   op_if();
   hydra_object *call(hydra_object *arg_list, runtime &r);
 };
+struct op_while : hydra_oper {
+  op_while();
+  hydra_object *call(hydra_object *arg_list, runtime &r);
+};
 struct op_def : hydra_oper {
   op_def();
   hydra_object *call(hydra_object *arg_list, runtime &r);

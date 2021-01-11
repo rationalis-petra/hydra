@@ -1,2 +1,2 @@
 
-add_library(build SHARED foreign.cpp)
+add_library(build SHARED foreign.cpp test.cpp)
