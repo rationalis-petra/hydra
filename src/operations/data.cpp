@@ -23,8 +23,6 @@ hydra_object *op_cons::call(hydra_object *alist, runtime &r) {
   }
 
   hydra_cons* out = new hydra_cons(car, cdr);
-  // out->car = car;
-  // out->cdr = cdr;
   return out;
 }
 

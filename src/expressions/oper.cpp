@@ -7,10 +7,12 @@
 using namespace std;
 
 hydra_object *lexical_subst(hydra_object *expr,
-                            map<string, hydra_object *> subst_map);
+                            map<hydra_symbol *, hydra_object *> subst_map);
 
 user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
   eval_args = _eval_args;
+  rest = nullptr;
+  self = nullptr;
 
   // operations have the form:
   // (fn/mac <optional name> <arg_list> rest)
@@ -20,7 +22,7 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
     while (!name_list->null()) {
       if (hydra_cons *name_elt = dynamic_cast<hydra_cons *>(name_list)) {
         if (hydra_symbol *name = dynamic_cast<hydra_symbol *>(name_elt->car)) {
-          if (name->symbol == ":rest") {
+          if (name->name == ":rest") {
             name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
             if (!name_elt) {
               string err = "No name provided to :rest!";
@@ -31,10 +33,10 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
               string err = "non-symbol provided to fn/mac";
               throw err;
             }
-            rest = name->symbol;
+            rest = name;
             name_list = name_elt->cdr;
           }
-          else if (name->symbol == ":self") {
+          else if (name->name == ":self") {
             name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
             if (!name_elt) {
               string err = "No name provided to :self!";
@@ -45,11 +47,11 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
               string err = "non-symbol provided to fn/mac";
               throw err;
             }
-            self = name->symbol;
+            self = name;
             name_list = name_elt->cdr;
           }
           else {
-            arg_names.push_back(name->symbol);
+            arg_names.push_back(name);
             name_list = name_elt->cdr;
           }
         } else {
@@ -64,8 +66,8 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
     hydra_object *expr_body = cns->cdr;
     hydra_cons *texpr = new hydra_cons();
     texpr->cdr = expr_body;
-    hydra_symbol *progn = new hydra_symbol();
-    progn->symbol = "progn";
+    hydra_symbol *progn = language_module->intern("progn");
+    progn->name = "progn";
     texpr->car = progn;
     expr = texpr;
   } else {
@@ -78,18 +80,18 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
   // if eval_args is true, it will be taken care of
   list<hydra_object *> arg_list = get_arg_list(alist, r);
 
-  if ((arg_list.size() != arg_names.size()) && rest == "") {
+  if ((arg_list.size() != arg_names.size()) && rest == nullptr) {
     string err = "Error: function called with incorrect arg_count!";
     throw err;
   }
 
   // so, all we need to to is perform lexical substitution!
-  map<string, hydra_object *> subst_map;
-  for (string s : arg_names) {
+  map<hydra_symbol*, hydra_object *> subst_map;
+  for (hydra_symbol* s : arg_names) {
     subst_map[s] = arg_list.front();
     arg_list.pop_front();
   }
-  if (rest != "") {
+  if (rest) {
     // generate a list containing the rest of the arg_list
     // if list is empty, use nil!
     if (arg_list.empty()) {
@@ -110,7 +112,7 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
       subst_map[rest] = root;
     }
   }
-  if (self != "") {
+  if (self) {
     subst_map[self] = this;
   }
   if (eval_args) {
@@ -121,17 +123,16 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
 }
 
 hydra_object *lexical_subst(hydra_object *expr,
-                            map<string, hydra_object *> subst_map) {
+                            map<hydra_symbol*, hydra_object *> subst_map) {
   // we want to assert that len(arg_list) = len(vals)
   // we can now assume that conslen(arg_list) = conslen(vals)
   if (hydra_symbol *sym = dynamic_cast<hydra_symbol *>(expr)) {
-    if (subst_map.find(sym->symbol) != subst_map.end()) {
+    if (subst_map.find(sym) != subst_map.end()) {
       if (true) { 
-        hydra_symbol *qsym = new hydra_symbol;
-        qsym->symbol = "quote";
+        hydra_symbol *qsym = language_module->intern("quote");
 
         hydra_cons *quoted_arg = new hydra_cons();
-        quoted_arg->car = subst_map.at(sym->symbol);
+        quoted_arg->car = subst_map.at(sym);
         quoted_arg->cdr = new hydra_nil();
 
         hydra_cons *quote = new hydra_cons();
@@ -139,7 +140,7 @@ hydra_object *lexical_subst(hydra_object *expr,
         quote->cdr = quoted_arg;
         return quote;
       } else {
-        return subst_map.at(sym->symbol);
+        return subst_map.at(sym);
       }
     }
     return expr;
@@ -149,7 +150,7 @@ hydra_object *lexical_subst(hydra_object *expr,
 
     // don't substitute quoted arguments
     if (hydra_symbol *qte = dynamic_cast<hydra_symbol *>(out->car)) {
-      if (qte->symbol == "quote") {
+      if (qte->name == "quote") {
         out->cdr = cns->cdr;
       } else {
         out->cdr = lexical_subst(cns->cdr, subst_map);

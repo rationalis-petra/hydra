@@ -10,6 +10,4 @@
 #include "operations/io.hpp"
 #include "operations/foreign.hpp"
 
-int test();
-
 #endif // __EXPRESSIONS_HPP

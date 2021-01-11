@@ -87,7 +87,7 @@ hydra_object *op_not::call(hydra_object* alist, runtime& r) {
     string err = "Invalid number of arguments to macro not";
     throw err;
   }
-  if (alist->null()) {
+  if (arg_list.front()->null()) {
     return new hydra_t();
   } else {
     return new hydra_nil();

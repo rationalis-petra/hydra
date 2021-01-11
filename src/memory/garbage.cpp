@@ -25,13 +25,21 @@ void mark_obj(hydra_object* obj) {
     else if (user_oper *op = dynamic_cast<user_oper*>(obj)) {
       mark_obj(op->expr);
     }
+    else if (hydra_symbol *sym = dynamic_cast<hydra_symbol*>(obj)) {
+      if (sym->value) {
+        mark_obj(sym->value);
+      }
+    }
   }
 }
 
 void mark(runtime& r) {
-  for (auto it = r.global_store.begin(); it != r.global_store.end(); it++) {
-    hydra_object* obj = it->second;
-    mark_obj(obj);
+  for (auto storepair : r.modules) {
+    mark_obj(storepair.second);
+    for (auto valpair : storepair.second->symbols) {
+      hydra_symbol* sym = valpair.second;
+      mark_obj(sym);
+    }
   }
 }
 

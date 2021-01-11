@@ -18,12 +18,8 @@ hydra_object *op_plus::call(hydra_object *alist, runtime &r) {
   hydra_num *out = new hydra_num(0);
 
   for (hydra_object *o : arg_list) {
-    if (hydra_num *num = dynamic_cast<hydra_num *>(o)) {
-      out->value += num->value;
-    } else {
-      string err = "Non-number provided to '+' function: " + o->to_string();
-      throw err;
-    }
+    hydra_num* num = hydra_cast<hydra_num>(o);
+    out->value += num->value;
   }
   return out;
 }
@@ -34,24 +30,15 @@ hydra_object *op_minus::call(hydra_object *alist, runtime &r) {
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '-' function";
   }
-  if (hydra_num *out = new hydra_num(0)) {
-    out->value = dynamic_cast<hydra_num *>(arg_list.front())->value;
-    arg_list.pop_front();
+  hydra_num *out = new hydra_num(0);
+  out->value = hydra_cast<hydra_num>(arg_list.front())->value;
+  arg_list.pop_front();
 
-    for (hydra_object *arg : arg_list) {
-      if (hydra_num *num = dynamic_cast<hydra_num *>(arg)) {
-        out->value -= num->value;
-      } else {
-        string err = "Attempt to subtract non-number: " + arg->to_string();
-        throw err;
-      }
-    }
-    return out;
-  } else {
-    string err =
-        "Attempt to subtract non-number: " + arg_list.front()->to_string();
-    throw err;
+  for (hydra_object *arg : arg_list) {
+    hydra_num *num = hydra_cast<hydra_num>(arg);
+    out->value -= num->value;
   }
+  return out;
 }
 
 op_multiply::op_multiply() { eval_args = true; }

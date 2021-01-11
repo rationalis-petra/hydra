@@ -19,6 +19,15 @@ struct hydra_cons : public hydra_object {
   hydra_cons(hydra_object* car, hydra_object* cdr);
   hydra_object* eval(runtime& r);
 
+  // iterators for looping over a list
+  // struct iterator {
+  //   using iterator_category = std::input_iterator_tag;
+  //   using difference_type = std::ptrdiff_t;
+  //   using value_type = hydra_object*; 
+  //   using pointer = hydra_object**;
+  //   using reference = hydra_object*&;
+  // };
+
   hydra_object* car;
   hydra_object* cdr;
 
@@ -50,12 +59,6 @@ struct hydra_array : public hydra_object {
   std::vector<hydra_object*> array;
 };
 
-struct hydra_symbol : public hydra_object {
-  std::string to_string() const;
-  std::string symbol;
-
-  hydra_object* eval(runtime& r);
-};
 
 struct hydra_string : public hydra_object {
   std::string to_string() const;

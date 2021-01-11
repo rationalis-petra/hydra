@@ -3,15 +3,19 @@
 using std::string;
 
 string hydra_symbol::to_string() const {
-  return symbol;
+  return name;
+}
+
+hydra_symbol::hydra_symbol(string _name) {
+  name = _name;
+  value = nullptr;
 }
 
 hydra_object* hydra_symbol::eval(runtime& r) {
-  if (r.global_store.find(symbol) != r.global_store.end()) {
-    return r.global_store[symbol];
-  }
-  else {
-    string err = "error: symbol: " + symbol + " cannot be found";
+  if (value == nullptr) {
+    string err = "Error: symbol: " + name + "holds no value!";
     throw err;
+  } else {
+    return value;
   }
 }

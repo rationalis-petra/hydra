@@ -4,5 +4,6 @@ add_library(operations SHARED arithmetic.cpp
                        input_output.cpp
                        language.cpp
                        logic.cpp
-                       read.cpp)
+                       read.cpp
+                       foreign.cpp)
                        

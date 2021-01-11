@@ -16,14 +16,13 @@
 struct runtime {
   hydra_object* resolve_symbol(hydra_symbol* sym);
 
-  std::map<std::string, hydra_module> modules;
+  std::map<std::string, hydra_module*> modules;
   hydra_module* active_module;
-
-  std::map<std::string, hydra_object*> global_store;
 
   std::map<char, hydra_oper*> readtable;
 };
 
 
+extern hydra_module* language_module;
 
 #endif // __HYDRA_EXPRESSIONS_HPP

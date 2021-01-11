@@ -10,19 +10,32 @@ enum foreign_type {
   Void
 };
 
-void test_glfw_init();
-void test_glfw_window();
-// struct hydra_type {
-//   bool typep(hydra_object* obj);
-// };
+template<typename T> T* hydra_cast(hydra_object* inp) {
+  T* obj = dynamic_cast<T*>(inp);
+  if (obj == nullptr) {
+    std::string err = "Failed typecast";
+    throw err;
+  }
+  return obj;
+}
 
-// struct type_t : public hydra_type {};
+struct hydra_type {
+  bool is_type(hydra_object* o);
+};
 
-// struct type_num : public hydra_type {};
+struct hydra_type_num {
+};
 
-// struct type_istream : public hydra_type {};
+struct hydra_type_list {
+};
 
-// struct type_ostream : public hydra_type {};
+struct hydra_type_fn {
+  std::list<hydra_object*> typed_arglist(hydra_object* o);
+};
 
+
+struct fn_type_signature {
+  
+};
 
 #endif //__HYDRA_TYPES_HPP

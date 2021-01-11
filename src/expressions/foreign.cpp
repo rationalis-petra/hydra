@@ -3,7 +3,9 @@
 
 #include "expressions.hpp"
 
+using std::list;
 using std::string;
+using std::to_string;
 
 hydra_foreign_lib::hydra_foreign_lib(lt_dlhandle _lib) : lib(_lib){}
 
@@ -20,3 +22,5 @@ string hydra_foreign_sym::to_string() const {
   sprintf(buffer, "<foreign symbol: %p>", address);
   return string(buffer);
 }
+
+

@@ -12,7 +12,7 @@ using std::stringstream;
 
 hydra_object *read(hydra_object *raw, runtime &r);
 
-hydra_object *to_value(string token) {
+hydra_object *to_value(string token, runtime & r) {
   // boolean literals
   if (token == "nil")
     return new hydra_nil();
@@ -40,9 +40,7 @@ hydra_object *to_value(string token) {
     return new hydra_num(num);
   } catch (invalid_argument &) {
   }
-  hydra_symbol *sym = new hydra_symbol();
-  sym->symbol = token;
-  return sym;
+  return r.active_module->intern(token);
 }
 
 hydra_object *to_cons(list<hydra_object *> list) {
@@ -94,7 +92,7 @@ hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
     case '\t':
     case '(':
     case ')':
-      return to_value(token);
+      return to_value(token, r);
       break;
       // escape character!
     case '\\': // treat the next character as normal
@@ -114,11 +112,11 @@ hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
     cond = true;
     int ch = is->stream->peek();
     if (ch == EOF)
-      return to_value(token);
+      return to_value(token, r);
     c = ch;
   }
 
-  return to_value(token);
+  return to_value(token, r);
 }
 
 hydra_object *mac_string(hydra_istream* is, char c, runtime& r) {
@@ -189,8 +187,8 @@ hydra_object *read(hydra_object *raw, runtime &r) {
     is->stream->read(&c, 1);
   }
 
-  string err = "Nothing provided to read!";
-  throw err;
+  // todo: more advanced read options!
+  return new hydra_nil;
 }
 
 op_read::op_read() { eval_args = true; }

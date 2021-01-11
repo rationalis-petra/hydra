@@ -22,14 +22,30 @@
   (list (quote if) cond (quote nil) rest))
 
 (defn map (func seq)
-  (unless (= nil list)
-    (cons (func (car list))
-    (map func (cdr list)))))
+  (unless (= nil seq)
+    (cons (func (car seq))
+    (map func (cdr seq)))))
 
 (defn incf (x) (+ x 1))
 
+(defmac let (arg-list :rest body)
+  (cons 
+    (list (quote fn)
+          ((fn (binding :self get-names)
+            (when binding
+              (cons (car (car binding)) (get-names (cdr binding)))))
+            arg-list)
+          (cons (quote progn) body))
+    ((fn (binding :self get-vals)
+        (when binding
+          (cons (car (cdr (car binding))) (get-vals (cdr binding)))))
+     arg-list)))
+
 (defn load (filename)
-  (eval (read (open-file filename))))
+  (let ((fstream (open-file filename)))
+   (while (not (endp fstream))
+     (eval (read fstream)))
+   (close-file fstream)))
 
 (defn single-quote-reader (stream char) (list (quote quote) (read stream)))
 (set-macro-character #' single-quote-reader)

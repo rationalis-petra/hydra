@@ -59,7 +59,7 @@ hydra_object *op_def::call(hydra_object* alist, runtime& r) {
     arg_list.pop_front();
     hydra_object *value = arg_list.front()->eval(r);
 
-    r.global_store[symbol->symbol] = value;
+    symbol->value = value;
     return value;
   } else {
     string err = "Error: provided non-symbol as first argument of def";
