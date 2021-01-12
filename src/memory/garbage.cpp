@@ -16,31 +16,26 @@ void mark_obj(hydra_object* obj) {
     if (hydra_cons *cns = dynamic_cast<hydra_cons *>(obj)) {
       mark_obj(cns->car);
       mark_obj(cns->cdr);
-    }
-    else if (hydra_array *arr = dynamic_cast<hydra_array*>(obj)) {
+    } else if (hydra_array *arr = dynamic_cast<hydra_array*>(obj)) {
       for (hydra_object* obj : arr->array) {
         mark_obj(obj);
       }
-    }
-    else if (user_oper *op = dynamic_cast<user_oper*>(obj)) {
+    } else if (user_oper *op = dynamic_cast<user_oper*>(obj)) {
       mark_obj(op->expr);
-    }
-    else if (hydra_symbol *sym = dynamic_cast<hydra_symbol*>(obj)) {
+    } else if (hydra_symbol *sym = dynamic_cast<hydra_symbol*>(obj)) {
       if (sym->value) {
         mark_obj(sym->value);
+      }
+    } else if (hydra_module *mod = dynamic_cast<hydra_module*>(obj)) {
+      for (auto valpair : mod->symbols) {
+        mark_obj(valpair.second);
       }
     }
   }
 }
 
 void mark(runtime& r) {
-  for (auto storepair : r.modules) {
-    mark_obj(storepair.second);
-    for (auto valpair : storepair.second->symbols) {
-      hydra_symbol* sym = valpair.second;
-      mark_obj(sym);
-    }
-  }
+  mark_obj(r.root);
 }
 
 void sweep() {

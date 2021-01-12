@@ -55,11 +55,12 @@ int main(int argc, char **argv) {
      make_pair("progn", new op_progn),
      make_pair("quit", new op_quit),
 
-     // r.active_module->store["make-symbol"] = new op_in_module();
-     // r.active_module->store["in-module"] = new op_in_module();
-     // r.active_module->store["make-module"] = new op_make_module();
-     // r.active_module->store["insert"] = new op_insert_symbol();
-     // r.active_module->store["remove"] = new op_remove_symbol();
+     make_pair("make-symbol", new op_in_module),
+     make_pair("in-module", new op_in_module),
+     make_pair("make-module", new op_make_module),
+     make_pair("insert", new op_insert),
+     make_pair("get", new op_get),
+     //make_pair("remove", new op_remove_symbol),
 
      // ffi
      make_pair("load-foreign-library", new op_foreign_lib),
@@ -67,7 +68,9 @@ int main(int argc, char **argv) {
      make_pair("internalize", new op_internalize)};
 
   runtime r;
-  r.modules["hydra"] = language_module;
+  r.root = new hydra_module("");
+  hydra_symbol* sym = r.root->intern("hydra");
+  sym->value = language_module;
   r.active_module = language_module;
   // arithmetic
 
@@ -79,7 +82,7 @@ int main(int argc, char **argv) {
 
   hydra_istream *stm = new hydra_istream();
   stm->stream = &cin;
-  hydra_symbol* sym = r.active_module->intern("cin");
+  sym = r.active_module->intern("cin");
   sym->value = stm;
 
   string in = "(eval (read (open-file \"../hydra/lang.hd\")))";

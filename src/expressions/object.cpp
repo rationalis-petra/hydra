@@ -5,6 +5,7 @@ using std::ostream;
 
 hydra_object::hydra_object() {
   node_list.push_front(this);
+  marked = false;
 }
 
 hydra_object::~hydra_object() {

@@ -13,7 +13,7 @@ hydra_symbol::hydra_symbol(string _name) {
 
 hydra_object* hydra_symbol::eval(runtime& r) {
   if (value == nullptr) {
-    string err = "Error: symbol: " + name + "holds no value!";
+    string err = "Error: symbol: " + name + " holds no value!";
     throw err;
   } else {
     return value;

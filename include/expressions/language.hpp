@@ -31,6 +31,7 @@ struct user_oper : public hydra_oper {
 
 // modules are like packages or namepsaces in other languages
 struct hydra_module : public hydra_object {
+  hydra_module();
   hydra_module(std::string name);
   std::string to_string() const;
   std::map<std::string, hydra_symbol*> symbols;
@@ -38,7 +39,9 @@ struct hydra_module : public hydra_object {
   std::string name;
 
   hydra_object* get(std::string str);
+  hydra_object* get(std::list<std::string> str);
   hydra_symbol* intern(std::string str);
+  hydra_symbol* intern(std::list<std::string> str);
 };
 
 struct hydra_symbol : public hydra_object {

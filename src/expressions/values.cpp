@@ -40,7 +40,8 @@ string hydra_num::to_string() const {
   return ::to_string(value);
 }
 
-hydra_num::hydra_num(int num) : value(num) {}
+hydra_num::hydra_num(int num) : value(num) {
+}
 
 hydra_char::hydra_char() {}
 hydra_char::hydra_char(int c) : value(c) {}

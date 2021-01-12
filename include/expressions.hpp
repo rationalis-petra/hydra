@@ -14,9 +14,7 @@
 #include "expressions/foreign.hpp"
 
 struct runtime {
-  hydra_object* resolve_symbol(hydra_symbol* sym);
-
-  std::map<std::string, hydra_module*> modules;
+  hydra_module* root;
   hydra_module* active_module;
 
   std::map<char, hydra_oper*> readtable;

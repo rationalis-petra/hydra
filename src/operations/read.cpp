@@ -40,7 +40,27 @@ hydra_object *to_value(string token, runtime & r) {
     return new hydra_num(num);
   } catch (invalid_argument &) {
   }
-  return r.active_module->intern(token);
+  //it is a symbol, first split based on ':'
+  list<string> path;
+  string current = "";
+  for (char c : token) {
+    if (c == ':') {
+      path.push_back(current);
+      current = "";
+    } else {
+      current += c;
+    }
+  }
+  path.push_back(current);
+
+  if (path.front() == "&") {
+    path.pop_front();
+    hydra_object* obj = r.root->intern(path);
+    return obj;
+  } else {
+    hydra_object* obj = r.active_module->intern(path);
+    return obj;
+  }
 }
 
 hydra_object *to_cons(list<hydra_object *> list) {
