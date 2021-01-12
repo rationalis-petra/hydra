@@ -72,6 +72,8 @@ int main(int argc, char **argv) {
   hydra_symbol* sym = r.root->intern("hydra");
   sym->value = language_module;
   r.active_module = language_module;
+  sym = r.root->intern("keyword");
+  sym->value = new hydra_module("keyword");
   // arithmetic
 
   for (auto p : inbuilts) {

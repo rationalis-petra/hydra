@@ -53,12 +53,21 @@ hydra_object *to_value(string token, runtime & r) {
   }
   path.push_back(current);
 
+  // & = root package
   if (path.front() == "&") {
     path.pop_front();
     hydra_object* obj = r.root->intern(path);
     return obj;
+    // ':' at beginning is implicit ketword package
+  } else if (path.front() == "") {
+    path.pop_front();
+    path.push_front("keyword");
+    hydra_symbol* obj = r.root->intern(path);
+    obj->value = obj;
+    return obj;
+    // keyword
   } else {
-    hydra_object* obj = r.active_module->intern(path);
+    hydra_object *obj = r.active_module->intern(path);
     return obj;
   }
 }

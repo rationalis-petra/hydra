@@ -19,10 +19,11 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
   if (hydra_cons *cns = dynamic_cast<hydra_cons *>(op_def)) {
     hydra_object *name_list = cns->car;
 
+    // TODO: actually test for keyword!!!
     while (!name_list->null()) {
       if (hydra_cons *name_elt = dynamic_cast<hydra_cons *>(name_list)) {
         if (hydra_symbol *name = dynamic_cast<hydra_symbol *>(name_elt->car)) {
-          if (name->name == ":rest") {
+          if (name->name == "rest" && name->value == name) {
             name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
             if (!name_elt) {
               string err = "No name provided to :rest!";
@@ -36,7 +37,7 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
             rest = name;
             name_list = name_elt->cdr;
           }
-          else if (name->name == ":self") {
+          else if (name->name == "self" && name->value == name) {
             name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
             if (!name_elt) {
               string err = "No name provided to :self!";
