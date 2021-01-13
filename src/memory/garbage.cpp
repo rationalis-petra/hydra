@@ -4,12 +4,6 @@
 
 using std::list;
 
-list<hydra_object*> hydra_object::node_list;
-
-hydra_object::hydra_object() {
-  node_list.push_front(this);
-}
-
 void mark_obj(hydra_object* obj) {
   if (!obj->marked) {
     obj->marked = true;

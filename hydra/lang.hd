@@ -1,6 +1,11 @@
 (progn
 
-(def list (fn (:rest args) args))
+(set (quote list) (fn (:rest args) args))
+
+(set (quote def) (mac (symbol value)
+  (list (quote set) 
+        (list (quote quote) symbol)
+        (eval value))))
 
 (def defn (mac (name arg-list body)
   (list (quote def) name

@@ -1,5 +1,5 @@
 
-add_library(operations SHARED arithmetic.cpp
+add_library(operations OBJECT arithmetic.cpp
                        data.cpp
                        input_output.cpp
                        language.cpp

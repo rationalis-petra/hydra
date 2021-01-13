@@ -13,7 +13,11 @@ hydra_module::hydra_module(string _name) {
 }
 
 string hydra_module::to_string() const {
-  return "<module: " + name + " >";
+  if (name == "") {
+    return "<anonymous module>";
+  } else {
+    return "<module: " + name + ">";
+  }
 }
 
 hydra_symbol *hydra_module::intern(string str) {

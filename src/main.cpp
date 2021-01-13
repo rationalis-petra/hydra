@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
      make_pair("while", new op_while),
      make_pair("fn", new op_fn),
      make_pair("mac", new op_mac),
-     make_pair("def", new op_def),
+     make_pair("set", new op_set),
      make_pair("quote", new op_quote),
      make_pair("progn", new op_progn),
      make_pair("quit", new op_quit),

@@ -1,5 +1,5 @@
 
-add_library(expressions SHARED object.cpp
+add_library(expressions OBJECT object.cpp
                         cons.cpp
                         custom.cpp
                         oper.cpp

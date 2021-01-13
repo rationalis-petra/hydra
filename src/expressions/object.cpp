@@ -2,6 +2,9 @@
 
 using std::string;
 using std::ostream;
+using std::list;
+
+list<hydra_object*> hydra_object::node_list;
 
 hydra_object::hydra_object() {
   node_list.push_front(this);

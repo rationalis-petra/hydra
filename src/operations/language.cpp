@@ -49,15 +49,14 @@ hydra_object* op_while::call(hydra_object* alist, runtime& r) {
   // otherwise
   return new hydra_nil;
 }
-op_def::op_def() { eval_args = false; }
-hydra_object *op_def::call(hydra_object* alist, runtime& r) {
+op_set::op_set() { eval_args = true; }
+hydra_object *op_set::call(hydra_object* alist, runtime& r) {
   list<hydra_object*> arg_list = get_arg_list(alist, r);
   if (arg_list.size() != 2) {
-    throw "arglist to def invalid size";
+    throw "arglist to set invalid size";
   }
   if (hydra_symbol *symbol = dynamic_cast<hydra_symbol*>(arg_list.front())) {
-    arg_list.pop_front();
-    hydra_object *value = arg_list.front()->eval(r);
+    hydra_object *value = arg_list.back();
 
     symbol->value = value;
     return value;

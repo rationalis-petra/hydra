@@ -12,10 +12,14 @@ struct op_while : hydra_oper {
   op_while();
   hydra_object *call(hydra_object *arg_list, runtime &r);
 };
-struct op_def : hydra_oper {
-  op_def();
+struct op_set : hydra_oper {
+  op_set();
   hydra_object *call(hydra_object *arg_list, runtime &r);
 };
+// struct op_def : hydra_oper {
+//   op_def();
+//   hydra_object *call(hydra_object *arg_list, runtime &r);
+// };
 struct op_fn : hydra_oper {
   op_fn();
   hydra_object *call(hydra_object *body, runtime &r);
