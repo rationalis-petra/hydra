@@ -71,9 +71,18 @@ Then, depending on your os:
 cmake .. -G "Visual Studio 16"
 cmake --build . --config Release
 ```
-```
+```sh
 (linux, osx)
 $ cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 $ cmake --build .
+```
+
+If you'd prefer not to use conan, you'll need to get the libraries ffi (libffi) and ltdl (libtool), e.g. via a package manager, so that your compiler can link to them with `-ltdl` and `-lffi` respectively. Then run:
+```sh
+git clone https://www.github.com/rationalis-petra/hydra
+mkdir hydra/build
+cd hydra/build
+cmake .. -DUseConan=OFF -G "<replace-this-with-your-target>"
+cmake --build .
 ```
 
