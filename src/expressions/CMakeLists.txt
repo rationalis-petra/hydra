@@ -1,5 +1,6 @@
 
-add_library(expressions OBJECT object.cpp
+add_library(expressions OBJECT
+                        object.cpp
                         cons.cpp
                         custom.cpp
                         oper.cpp
@@ -7,3 +8,4 @@ add_library(expressions OBJECT object.cpp
                         values.cpp
                         module.cpp
                         foreign.cpp)
+

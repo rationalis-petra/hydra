@@ -19,11 +19,3 @@ include_directories(${PROJECT_SOURCE_DIR}/include/ ${PROJECT_SOURCE_DIR}/include
 
 add_subdirectory(src)
 
-add_executable(hydra src/main.cpp)
-
-target_link_libraries(hydra $<TARGET_OBJECTS:expressions>
-                            $<TARGET_OBJECTS:operations>
-                            $<TARGET_OBJECTS:types>
-                            $<TARGET_OBJECTS:memory>)
-
-target_link_libraries(hydra ffi ltdl)

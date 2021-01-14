@@ -1,11 +1,9 @@
 #include <string>
-#include <printf.h>
+#include <stdio.h>
 
 #include "expressions.hpp"
 
-using std::list;
 using std::string;
-using std::to_string;
 
 hydra_foreign_lib::hydra_foreign_lib(lt_dlhandle _lib) : lib(_lib){}
 

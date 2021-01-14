@@ -10,6 +10,8 @@
 
 using namespace std;
 
+extern string lang;
+
 hydra_module* language_module;
 
 int main(int argc, char **argv) {
@@ -87,7 +89,7 @@ int main(int argc, char **argv) {
   sym = r.active_module->intern("cin");
   sym->value = stm;
 
-  string in = "(eval (read (open-file \"../hydra/lang.hd\")))";
+  string in = lang;
   hydra_string *str = new hydra_string();
   str->value = in;
   hydra_object *ast;
