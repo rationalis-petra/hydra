@@ -11,4 +11,8 @@ target_link_libraries(hydra expressions
                             types
                             memory)
 
+if (UseConan)
 target_link_libraries(hydra ${CONAN_LIBS})
+else ()
+target_link_libraries(hydra ffi ltdl)
+endif()
