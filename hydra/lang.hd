@@ -7,24 +7,29 @@
         (list (quote quote) symbol)
         (eval value))))
 
-(def defn (mac (name arg-list body)
+(def defn (mac (name arg-list :rest body)
   (list (quote def) name
-    (list (quote fn)
-          (cons (quote :self) (cons name arg-list))
-          body))))
+    (cons (quote fn)
+      (cons
+        (cons (quote :self) (cons name arg-list))
+         body)))))
 
-(def defmac
-  (mac (name arg-list body)
-    (list (quote def) name
-      (list (quote mac)
-            (cons (quote :self) (cons name arg-list))
-            body))))
+(def defmac (mac (name arg-list :rest body)
+  (list (quote def) name
+    (cons (quote mac)
+      (cons
+        (cons (quote :self) (cons name arg-list))
+         body)))))
 
-(defmac when (cond rest)
-  (list (quote if) cond rest (quote nil)))
+(defmac when (cond :rest body)
+  (list (quote if) cond 
+    (cons (quote progn) body)
+    (quote nil)))
 
-(defmac unless (cond rest)
-  (list (quote if) cond (quote nil) rest))
+(defmac unless (cond :rest body)
+  (list (quote if) cond
+    (quote nil)
+    (cons progn body)))
 
 (defn map (func seq)
   (unless (= nil seq)
