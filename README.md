@@ -17,16 +17,22 @@ input streams and characters. Many have predictable literals, e.g. '"' for strin
 
 Values can be placed in the global namespace with `def`, e.g.
 ```
-(def x 2)
+> (def x 2)
+* 2
 ```
 
 The primary composite data structure is the list, which is formed from cons cells, e.g.
 ```
-(cons 1 (cons 2 nil))
+> (def lst (cons 1 (cons 2 nil)))
+* (1 2)
 ```
-The first value in the cons cell is called the `car`, and accessibel by the same name
-
-Custom values (ADTs/classes) WIP
+The first value in the cons cell is called the `car`, and the second the `cdr`. They are and accessible by functions of the same name:
+```
+> (car lst)
+* 1
+> (cdr list)
+* (2)
+```
 
 ## Functions
 
@@ -48,22 +54,26 @@ The `lang.hd` file provides the `defn` convenience macro:
 (defn inc (x) (+ x 1))
 ```
 
+The language also has macros, ffi and modules. I am currently working on the [wiki](https://github.com/rationalis-petra/hydra/wiki).
+
+
 # Try it out
-The project uses cmake, so to build/run:
+The project uses [cmake](https://cmake.org/) to build, and [conan](https://conan.io/) for dependencies. To install:
 ```sh
 git clone https://www.github.com/rationalis-petra/hydra
 mkdir hydra/build
 cd hydra/build
-cmake ..
-make
+conan install ..
+```
+Then, depending on your os:
+```sh
+(windows)
+cmake .. -G "Visual Studio 16"
+cmake --build . --config Release
+```
+```
+(linux, osx)
+$ cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+$ cmake --build .
 ```
 
-Then run with `./hydra`. IMPORTANT: currently, the language must be run out of the build folder,
-as it looks for various functions/macros in `hydra/lang.hd`, relative to the binary!
-
-## Future Goals
-+ convenient ffi
-+ complex types (objects/ADTs)
-+ generic function machinery 
-+ static typing
-+ compiler/transpiler
