@@ -1,0 +1,6 @@
+[requires]
+libffi/3.3 
+libtool/2.4.6
+
+[generators]
+cmake

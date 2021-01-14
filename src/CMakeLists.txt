@@ -11,4 +11,4 @@ target_link_libraries(hydra expressions
                             types
                             memory)
 
-target_link_libraries(hydra ffi ltdl)
+target_link_libraries(hydra ${CONAN_LIBS})
