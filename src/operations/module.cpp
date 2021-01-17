@@ -43,6 +43,19 @@ hydra_object *op_in_module::call(hydra_object* alist, runtime& r) {
   return new hydra_t;
 }
 
+op_intern::op_intern() { eval_args = true; }
+hydra_object *op_intern::call(hydra_object* alist, runtime &r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
+  if (arg_list.size() != 2) {
+    string err = "invalid number of arguments provided to intern";
+    throw err;
+  }
+  hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
+  hydra_string* str = hydra_cast<hydra_string>(arg_list.back());
+
+  return mod->intern(str->value);
+}
+
 op_insert::op_insert() { eval_args = true; }
 hydra_object *op_insert::call(hydra_object* alist, runtime &r) {
   list<hydra_object*> arg_list = get_arg_list(alist, r);
@@ -51,9 +64,14 @@ hydra_object *op_insert::call(hydra_object* alist, runtime &r) {
     throw err;
   }
   hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
-  hydra_string* str = hydra_cast<hydra_string>(arg_list.back());
+  hydra_symbol* sym = hydra_cast<hydra_symbol>(arg_list.back());
 
-  return mod->intern(str->value);
+  if (!mod->get(sym->name)->null()) {
+    string err = "Cannot import symbol " + sym->name + " there is already a symbol of that name";
+    throw err;
+  }
+  mod->symbols[sym->name] = sym;
+  return sym;
 }
 
 op_get::op_get() { eval_args = true; }
@@ -67,4 +85,69 @@ hydra_object *op_get::call(hydra_object* alist, runtime& r) {
   hydra_string* str = hydra_cast<hydra_string>(arg_list.back());
 
   return mod->get(str->value);
+}
+
+op_get_module::op_get_module() { eval_args = true; }
+hydra_object *op_get_module::call(hydra_object* alist, runtime& r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
+  if (arg_list.size() != 0) {
+    string err = "invalid number of arguments provided to current-module";
+    throw err;
+  }
+  return r.active_module;
+}
+
+
+op_get_symbols::op_get_symbols() { eval_args = true; }
+hydra_object *op_get_symbols::call(hydra_object* alist, runtime& r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
+  if (arg_list.size() != 1) {
+    string err = "invalid number of arguments provided to get-symbols";
+    throw err;
+  }
+  hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
+  hydra_object* out = new hydra_nil;
+  for (auto sym : mod->exported_symbols) {
+    hydra_cons* cns = new hydra_cons(sym.second, out);
+    out = cns;
+  }
+  return out;
+}
+
+// op_get_all_symbols::op_get_call_symbols() { eval_args = true; }
+// hydra_object *op_get_all_symbols::call(hydra_object* alist, runtime& r) {
+//   list<hydra_object*> arg_list = get_arg_list(alist, r);
+//   if (arg_list.size() != 1) {
+//     string err = "invalid number of arguments provided to get-symbols";
+//     throw err;
+//   }
+//   hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
+//   hydra_object* out = new hydra_nil;
+//   for (auto sym : mod->symbols) {
+//     hydra_cons* cns = new hydra_cons(sym.second, out);
+//     out = cns;
+//   }
+//   return out;
+// }
+
+op_export::op_export() { eval_args = true; }
+hydra_object *op_export::call(hydra_object* alist, runtime& r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
+  if (arg_list.size() != 2) {
+    string err = "invalid number of arguments provided to current-module";
+    throw err;
+  }
+  hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
+  hydra_symbol* sym = hydra_cast<hydra_symbol>(arg_list.back());
+
+  if (mod->symbols.find(sym->name) == mod->symbols.end()) {
+    string err = "trying to export symbol " + sym->name +
+                 " which is not in package " + mod->name;
+    throw err;
+  }
+  else {
+    mod->exported_symbols[sym->name] = sym;
+  }
+
+  return mod;
 }

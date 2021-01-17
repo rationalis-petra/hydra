@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <map>
 #include <variant>
@@ -16,58 +17,71 @@ hydra_module* language_module;
 
 int main(int argc, char **argv) {
   language_module = new hydra_module("hydra");
-  pair<string, hydra_object*> inbuilts[] =
-    {
+  pair<string, hydra_module*> inbuilts[] = {
+      // other modules
+      make_pair("core", new hydra_module("core")),
+      make_pair("io", new hydra_module("io")),
+      make_pair("foreign", new hydra_module("foreign")),
+      make_pair("concurrent", new hydra_module("concurrent"))};
+
+  pair<string, hydra_object*> core[] = {
       // arithmetic
-     make_pair("+", new op_plus),
-     make_pair("-", new op_minus),
-     make_pair("*", new op_multiply),
-     make_pair("/", new op_divide),
-     make_pair(">=", new op_geq),
-     // data
-     make_pair("array", new op_arr),
-     make_pair("cons", new op_cons),
-     make_pair("car", new op_car),
-     make_pair("cdr", new op_cdr),
-     make_pair("elt", new op_elt),
-     // io
-     make_pair("print", new op_print),
-     make_pair("open-file", new op_open_file),
-     make_pair("close-file", new op_close),
+      make_pair("+", new op_plus),
+      make_pair("-", new op_minus),
+      make_pair("*", new op_multiply),
+      make_pair("/", new op_divide),
+      make_pair(">=", new op_geq),
+      // data
+      make_pair("array", new op_arr),
+      make_pair("cons", new op_cons),
+      make_pair("car", new op_car),
+      make_pair("cdr", new op_cdr),
+      make_pair("elt", new op_elt),
 
-     // streams
-     make_pair("peek", new op_peek),
-     make_pair("next", new op_next),
-     make_pair("endp", new op_endp),
-     make_pair("eval", new op_eval),
-     make_pair("read", new op_read),
-     make_pair("set-macro-character", new op_set_mac_char),
-     // logic
-     make_pair("=", new op_eq),
-     make_pair("or", new op_or),
-     make_pair("and", new op_and),
-     make_pair("not", new op_not),
-     // language
-     make_pair("if", new op_if),
-     make_pair("while", new op_while),
-     make_pair("fn", new op_fn),
-     make_pair("mac", new op_mac),
-     make_pair("set", new op_set),
-     make_pair("quote", new op_quote),
-     make_pair("progn", new op_progn),
-     make_pair("quit", new op_quit),
+      // streams
+      make_pair("peek", new op_peek),
+      make_pair("next", new op_next),
+      make_pair("endp", new op_endp),
+      make_pair("eval", new op_eval),
+      make_pair("read", new op_read),
+      make_pair("set-macro-character", new op_set_mac_char),
+      // logic
+      make_pair("=", new op_eq),
+      make_pair("or", new op_or),
+      make_pair("and", new op_and),
+      make_pair("not", new op_not),
+      // language
+      make_pair("if", new op_if),
+      make_pair("while", new op_while),
+      make_pair("fn", new op_fn),
+      make_pair("mac", new op_mac),
+      make_pair("set", new op_set),
+      make_pair("quote", new op_quote),
+      make_pair("progn", new op_progn),
+      make_pair("quit", new op_quit),
 
-     make_pair("make-symbol", new op_in_module),
-     make_pair("in-module", new op_in_module),
-     make_pair("make-module", new op_make_module),
-     make_pair("insert", new op_insert),
-     make_pair("get", new op_get),
-     //make_pair("remove", new op_remove_symbol),
+      make_pair("make-symbol", new op_in_module),
+      make_pair("in-module", new op_in_module),
+      make_pair("make-module", new op_make_module),
+      make_pair("current-module", new op_get_module),
+      make_pair("get-symbols", new op_get_symbols),
+      make_pair("export", new op_export),
+      make_pair("insert", new op_insert),
+      make_pair("intern", new op_intern),
+    make_pair("get", new op_get)};
+      //make_pair("remove", new op_remove_symbol),
 
-     // ffi
-     make_pair("load-foreign-library", new op_foreign_lib),
-     make_pair("get-foreign-symbol", new op_foreign_sym),
-     make_pair("internalize", new op_internalize)};
+  pair<string, hydra_object*> foreign[] = {
+      // ffi
+      make_pair("load-foreign-library", new op_foreign_lib),
+      make_pair("get-foreign-symbol", new op_foreign_sym),
+      make_pair("internalize", new op_internalize)};
+
+  pair<string, hydra_object*> io[] = {
+      // io
+      make_pair("print", new op_print),
+      make_pair("open-file", new op_open_file),
+      make_pair("close-file", new op_close)};
 
   runtime r;
   r.root = new hydra_module("");
@@ -78,35 +92,75 @@ int main(int argc, char **argv) {
   sym->value = new hydra_module("keyword");
   // arithmetic
 
+  hydra_module *mod = language_module;
   for (auto p : inbuilts) {
-    hydra_symbol* sym = r.active_module->intern(p.first);
+    hydra_symbol* sym = mod->intern(p.first);
     sym->value = p.second;
   }
 
+  mod = hydra_cast<hydra_module>(
+      hydra_cast<hydra_symbol>(language_module->get("core"))->value);
+  for (auto p : core) {
+    hydra_symbol *sym = mod->intern(p.first);
+    mod->exported_symbols[p.first] = sym;
+    sym->value = p.second;
+  }
+  mod = hydra_cast<hydra_module>(
+      hydra_cast<hydra_symbol>(language_module->get("io"))->value);
+  for (auto p : io) {
+    hydra_symbol *sym = mod->intern(p.first);
+    mod->exported_symbols[p.first] = sym;
+    sym->value = p.second;
+  }
+  mod = hydra_cast<hydra_module>(
+      hydra_cast<hydra_symbol>(language_module->get("foreign"))->value);
+  for (auto p : foreign) {
+    hydra_symbol *sym = mod->intern(p.first);
+    mod->exported_symbols[p.first] = sym;
+    sym->value = p.second;
+  }
+  // mod =
+  // hydra_cast<hydra_module>(hydra_cast<hydra_symbol>(language_module->get("concurrent"))->value);
+  // for (auto p : concurrent) {
+  //   hydra_symbol *sym = mod->intern(p.first);
+  //   sym->value = p.second;
+  // }
 
   hydra_istream *stm = new hydra_istream();
   stm->stream = &cin;
-  sym = r.active_module->intern("cin");
+  sym = r.active_module->intern("+cin+");
   sym->value = stm;
 
   string in = lang;
-  hydra_string *str = new hydra_string();
-  str->value = in;
+  hydra_istream *prog = new hydra_istream();
+  // prog->stream = new stringstream(lang);
+  prog->stream = new ifstream("../hydra/lang.hd");
   hydra_object *ast;
   hydra_object *out;
 
-  try {
-  ast = read(str, r);
-  out = ast->eval(r);
-  } catch (string e) {
-    cout << e << endl;
-  } catch (const char *err) {
-    cout << err << endl;
+  // if argc > 1, assume they are file names
+  int count = argc;
+  while (count > 0) {
+    try {
+      while (!prog->stream->eof()) {
+        ast = read(prog, r);
+        out = ast->eval(r);
+      }
+    } catch (string e) {
+      cout << e << endl;
+    } catch (const char *err) {
+      cout << err << endl;
+    }
+    count--;
+    if (count != 0) {
+      delete prog->stream;
+      prog->stream = new stringstream("(eval (load \"" + string(argv[argc - count]) + "\"))");
+    }
   }
 
   while (!(in == "(quit)")) {
     try {
-      cout << "> ";
+      cout << r.active_module->name << "> ";
       ast = read(stm, r);
       out = ast->eval(r);
       cout << "* " << out << endl;

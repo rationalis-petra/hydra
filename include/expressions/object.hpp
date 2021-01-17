@@ -15,6 +15,8 @@ struct hydra_object {
   hydra_object();
   virtual ~hydra_object();
 
+  // mutability
+  bool mut;
 
   // mark & sweep garbage collection
   bool marked;

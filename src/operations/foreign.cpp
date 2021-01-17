@@ -18,9 +18,9 @@ hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r) {
         "Incorrect number of arguments provided to function load-foreign-lib";
     throw err;
   }
-  hydra_string *str = dynamic_cast<hydra_string *>(arg_list.front());
+  hydra_string *str = dynamic_cast<hydra_string *>(arg_list.back());
   if (!str) {
-    string err = "load-foreign-lib requires a string argument";
+    string err = "load-foreign-lib requires a string second argument";
     throw err;
   }
   int open_succ = lt_dlinit();
@@ -53,9 +53,10 @@ hydra_object *op_foreign_sym::call(hydra_object *body, runtime &r) {
     throw err;
   }
   if (!str) {
-    string err = "Second argumetn to get-foreign-symbol must be of type string";
+    string err = "Second argument to get-foreign-symbol must be of type string";
     throw err;
   }
+
   void *addr = lt_dlsym(lib->lib, str->value.c_str());
   if (addr == nullptr) {
     return new hydra_nil;

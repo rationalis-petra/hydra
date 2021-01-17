@@ -155,6 +155,11 @@ hydra_object *mac_string(hydra_istream* is, char c, runtime& r) {
     if (c == '"') {
       return str;
     }
+    if (c == '\\') {
+      is->stream->read(&c, 1);
+      str->value += c;
+      is->stream->read(&c, 1);
+    }
     else {
       str->value += c;
       is->stream->read(&c, 1);

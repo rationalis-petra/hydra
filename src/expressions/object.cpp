@@ -9,6 +9,7 @@ list<hydra_object*> hydra_object::node_list;
 hydra_object::hydra_object() {
   node_list.push_front(this);
   marked = false;
+  mut = false;
 }
 
 hydra_object::~hydra_object() {

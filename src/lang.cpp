@@ -2,7 +2,7 @@
 
 // copied straight from lang.hd
 std::string lang = R"(
-(progn
+(core:in-module core)
 
 (set (quote list) (fn (:rest args) args))
 
@@ -16,7 +16,7 @@ std::string lang = R"(
     (cons (quote fn)
       (cons
         (cons (quote :self) (cons name arg-list))
-         body)))))
+         (cons (quote progn) body))))))
 
 (def defmac (mac (name arg-list :rest body)
   (list (quote def) name
@@ -34,7 +34,7 @@ std::string lang = R"(
   (list (quote if) cond
     (quote nil)
     (cons progn body)))
-
+  
 (defn map (func seq)
   (unless (= nil seq)
     (cons (func (car seq))
@@ -56,10 +56,12 @@ std::string lang = R"(
      arg-list)))
 
 (defn load (filename)
-  (let ((fstream (open-file filename)))
+  (let ((fstream (open-file filename))
+        ((module (current-module))))
    (while (not (endp fstream))
      (eval (read fstream)))
-   (close-file fstream)))
+   (close-file fstream)
+   (in-module module)))
 
 (defn single-quote-reader (stream char) (list (quote quote) (read stream)))
 (set-macro-character #' single-quote-reader)
@@ -70,6 +72,4 @@ std::string lang = R"(
       (comment-character stream (next stream))))
 
 (set-macro-character #; comment-character)
-
-)
 )";

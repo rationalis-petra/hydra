@@ -67,7 +67,10 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
     hydra_object *expr_body = cns->cdr;
     hydra_cons *texpr = new hydra_cons();
     texpr->cdr = expr_body;
-    hydra_symbol *progn = language_module->intern("progn");
+    hydra_symbol *progn = hydra_cast<hydra_symbol>(
+        hydra_cast<hydra_module>(
+            hydra_cast<hydra_symbol>(language_module->get("core"))->value)
+            ->get("progn"));
     progn->name = "progn";
     texpr->car = progn;
     expr = texpr;
@@ -87,8 +90,8 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
   }
 
   // so, all we need to to is perform lexical substitution!
-  map<hydra_symbol*, hydra_object *> subst_map;
-  for (hydra_symbol* s : arg_names) {
+  map<hydra_symbol *, hydra_object *> subst_map;
+  for (hydra_symbol *s : arg_names) {
     subst_map[s] = arg_list.front();
     arg_list.pop_front();
   }
@@ -97,10 +100,9 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
     // if list is empty, use nil!
     if (arg_list.empty()) {
       subst_map[rest] = new hydra_nil;
-    }
-    else {
-      hydra_cons* rlist = new hydra_cons;
-      hydra_cons* root = rlist;
+    } else {
+      hydra_cons *rlist = new hydra_cons;
+      hydra_cons *root = rlist;
       rlist->car = arg_list.front();
       arg_list.pop_front();
       while (!arg_list.empty()) {
@@ -124,22 +126,16 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
 }
 
 hydra_object *lexical_subst(hydra_object *expr,
-                            map<hydra_symbol*, hydra_object *> subst_map) {
+                            map<hydra_symbol *, hydra_object *> subst_map) {
   // we want to assert that len(arg_list) = len(vals)
   // we can now assume that conslen(arg_list) = conslen(vals)
   if (hydra_symbol *sym = dynamic_cast<hydra_symbol *>(expr)) {
     if (subst_map.find(sym) != subst_map.end()) {
-      if (true) { 
-        hydra_symbol *qsym = language_module->intern("quote");
+      if (true) {
+        hydra_symbol *ssym = new hydra_symbol(sym->name);
+        ssym->value = subst_map.at(sym);
 
-        hydra_cons *quoted_arg = new hydra_cons();
-        quoted_arg->car = subst_map.at(sym);
-        quoted_arg->cdr = new hydra_nil();
-
-        hydra_cons *quote = new hydra_cons();
-        quote->car = qsym;
-        quote->cdr = quoted_arg;
-        return quote;
+        return ssym;
       } else {
         return subst_map.at(sym);
       }

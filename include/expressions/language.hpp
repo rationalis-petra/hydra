@@ -35,6 +35,7 @@ struct hydra_module : public hydra_object {
   hydra_module(std::string name);
   std::string to_string() const;
   std::map<std::string, hydra_symbol*> symbols;
+  std::map<std::string, hydra_symbol*> exported_symbols;
 
   std::string name;
 
