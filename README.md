@@ -2,6 +2,7 @@
 A small interpreted language with a lisp-like syntax
 The goal of hydra is to make a sort of 'omni-language': support for multiple paradigms, in typing
 (static/dynamic), memory management (manual/gc) and style (functional/object-oriented).
+A very basic [wiki](https://github.com/rationalis-petra/hydra/wiki) is currently a WIP.
 
 ## Syntax
 Hydra is composed of S-expressions, e.g.
@@ -54,9 +55,6 @@ The `lang.hd` file provides the `defn` convenience macro:
 (defn inc (x) (+ x 1))
 ```
 
-The language also has macros, ffi and modules. I am currently working on the [wiki](https://github.com/rationalis-petra/hydra/wiki).
-
-
 # Try it out
 The project uses [cmake](https://cmake.org/) to build, and [conan](https://conan.io/) for dependencies. To install:
 ```sh
@@ -71,9 +69,18 @@ Then, depending on your os:
 cmake .. -G "Visual Studio 16"
 cmake --build . --config Release
 ```
-```
+```sh
 (linux, osx)
 $ cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 $ cmake --build .
+```
+
+If you'd prefer not to use conan, you'll need to get the libraries ffi (libffi) and ltdl (libtool), e.g. via a package manager, so that your compiler can link to them with `-ltdl` and `-lffi` respectively. Then run:
+```sh
+git clone https://www.github.com/rationalis-petra/hydra
+mkdir hydra/build
+cd hydra/build
+cmake .. -DUseConan=OFF -G "<replace-this-with-your-target>"
+cmake --build .
 ```
 
