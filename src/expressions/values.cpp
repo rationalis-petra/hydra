@@ -12,7 +12,7 @@ string hydra_t::to_string() const {
 }
 
 string hydra_string::to_string() const {
-  return value;
+  return '"' + value + '"';
 }
 
 string hydra_array::to_string() const {

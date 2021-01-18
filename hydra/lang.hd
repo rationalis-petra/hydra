@@ -2,21 +2,18 @@
 
 
 (set (quote list) (fn (:rest args) args))
-(export (current-module) (quote list))
 
 (set (quote def) (mac (symbol value)
   (list (quote set) 
         (list (quote quote) symbol)
          value)))
-(export (current-module) (quote def))
 
 (def defn (mac (name arg-list :rest body)
   (list (quote def) name
     (cons (quote fn)
       (cons
         (cons (quote :self) (cons name arg-list))
-         (cons (quote progn) body))))))
-(export (current-module) (quote defn))
+         body)))))
 
 (def defmac (mac (name arg-list :rest body)
   (list (quote def) name
@@ -24,7 +21,6 @@
       (cons
         (cons (quote :self) (cons name arg-list))
          body)))))
-(export (current-module) (quote defmac))
 
 (defn single-quote-reader (stream char) (list (quote quote) (read stream)))
 (set-macro-character #' single-quote-reader)
@@ -38,18 +34,31 @@
 
 
 ;; we now have commentcharacters!
+;; exports
+(export (current-module) (quote def))
+(export (current-module) (quote defn))
+(export (current-module) (quote defmac))
+(export (current-module) 'let)
+
+(export (current-module) 'use-module)
+
+(export (current-module) 'when)
+(export (current-module) 'unless)
+(export (current-module) 'map)
+(export (current-module) 'list)
+
+(export (current-module) '++)
+
 ;; logic
 (defmac when (cond :rest body)
   (list (quote if) cond 
     (cons (quote progn) body)
     (quote nil)))
-(export (current-module) 'when)
 
 (defmac unless (cond :rest body)
   (list (quote if) cond
     (quote nil)
     (cons progn body)))
-(export (current-module) 'unless)
   
 ;; scope stuff
 (defmac let (arg-list :rest body)
@@ -64,17 +73,14 @@
         (when binding
           (cons (car (cdr (car binding))) (get-vals (cdr binding)))))
      arg-list)))
-(export (current-module) 'let)
 
 ;; utility
 (defn map (func seq)
   (unless (= nil seq)
     (cons (func (car seq))
     (map func (cdr seq)))))
-(export (current-module) 'map)
 
 (defn ++ (x) (+ x 1))
-(export (current-module) '++)
 
 ;; import
 (defn use-module (module1 module2)
@@ -83,22 +89,22 @@
         (insert module1 (car syms))
         (dolist (cdr syms))))
    (get-symbols module2)))
-(export (current-module) 'use-module)
 
 (use-module &:hydra:io (current-module))
 (in-module &:hydra:io)
 
+(export (current-module) 'load)
+
 (defn load (filename)
   (let ((fstream (open-file filename))
-        ((module (current-module))))
+        (module (current-module)))
    (while (not (endp fstream))
      (eval (read fstream)))
    (close-file fstream)
    (in-module module)))
-(export (current-module) 'load)
 
 (in-module &:hydra:core)
-(def &:user (make-module "user"))
+(def &:user (module "user"))
 (use-module &:user &:hydra:core)
 (use-module &:user &:hydra:io)
 (use-module &:user &:hydra:foreign)

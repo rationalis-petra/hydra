@@ -114,6 +114,26 @@ hydra_object *op_get_symbols::call(hydra_object* alist, runtime& r) {
   return out;
 }
 
+op_remove::op_remove() { eval_args = true; }
+hydra_object *op_remove::call(hydra_object* alist, runtime& r) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r);
+  if (arg_list.size() != 2) {
+    string err = "invalid number of arguments provided to remove";
+    throw err;
+  }
+  hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
+  hydra_symbol* s = hydra_cast<hydra_symbol>(arg_list.back());
+  auto it = mod->symbols.find(s->name);
+  if (it != mod->symbols.end()) {
+    mod->symbols.erase(it);
+  }
+  it = mod->exported_symbols.find(s->name);
+  if (it != mod->exported_symbols.end()) {
+    mod->exported_symbols.erase(it);
+  }
+  return mod;
+}
+
 // op_get_all_symbols::op_get_call_symbols() { eval_args = true; }
 // hydra_object *op_get_all_symbols::call(hydra_object* alist, runtime& r) {
 //   list<hydra_object*> arg_list = get_arg_list(alist, r);

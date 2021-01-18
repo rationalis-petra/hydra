@@ -100,12 +100,12 @@ hydra_object *op_progn::call(hydra_object* alist, runtime&r) {
 
 op_fn::op_fn() { eval_args = false; }
 hydra_object *op_fn::call(hydra_object* alist, runtime& r) {
-  return new user_oper(alist, true);
+  return new user_oper(alist, true, r);
 }
 
 op_mac::op_mac() { eval_args = false; }
 hydra_object *op_mac::call(hydra_object* alist, runtime& r) {
-  return new user_oper(alist, false);
+  return new user_oper(alist, false, r);
 }
 
 op_quit::op_quit() { eval_args = false; }

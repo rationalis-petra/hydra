@@ -60,21 +60,21 @@ int main(int argc, char **argv) {
       make_pair("progn", new op_progn),
       make_pair("quit", new op_quit),
 
-      make_pair("make-symbol", new op_in_module),
+      make_pair("module", new op_make_module),
+      make_pair("symbol", new op_make_symbol),
       make_pair("in-module", new op_in_module),
-      make_pair("make-module", new op_make_module),
       make_pair("current-module", new op_get_module),
       make_pair("get-symbols", new op_get_symbols),
       make_pair("export", new op_export),
       make_pair("insert", new op_insert),
       make_pair("intern", new op_intern),
-    make_pair("get", new op_get)};
-      //make_pair("remove", new op_remove_symbol),
+      make_pair("get", new op_get),
+      make_pair("remove", new op_remove)};
 
   pair<string, hydra_object*> foreign[] = {
       // ffi
-      make_pair("load-foreign-library", new op_foreign_lib),
-      make_pair("get-foreign-symbol", new op_foreign_sym),
+      make_pair("load-c-library", new op_foreign_lib),
+      make_pair("get-c-symbol", new op_foreign_sym),
       make_pair("internalize", new op_internalize)};
 
   pair<string, hydra_object*> io[] = {
@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
   string in = lang;
   hydra_istream *prog = new hydra_istream();
   // prog->stream = new stringstream(lang);
-  prog->stream = new ifstream("../hydra/lang.hd");
+  prog->stream = new stringstream(lang);
   hydra_object *ast;
   hydra_object *out;
 

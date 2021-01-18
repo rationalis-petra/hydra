@@ -35,10 +35,10 @@ struct op_export : hydra_oper {
   op_export();
   hydra_object *call(hydra_object *arg_list, runtime &r);
 };
-// struct op_remove : hydra_oper {
-//   op_remove();
-//   hydra_object *call(hydra_object *arg_list, runtime &r);
-// };
+struct op_remove : hydra_oper {
+  op_remove();
+  hydra_object *call(hydra_object *arg_list, runtime &r);
+};
 struct op_get : hydra_oper {
   op_get();
   hydra_object *call(hydra_object *arg_list, runtime &r);

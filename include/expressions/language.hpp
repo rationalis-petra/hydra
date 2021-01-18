@@ -25,7 +25,7 @@ struct user_oper : public hydra_oper {
 
   std::list<hydra_symbol*> arg_names;
   hydra_object* expr;
-  user_oper(hydra_object* op_def, bool eval_args);
+  user_oper(hydra_object* op_def, bool eval_args, runtime& r);
 };
 
 

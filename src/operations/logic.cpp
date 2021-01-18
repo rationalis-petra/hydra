@@ -33,6 +33,14 @@ hydra_object *op_eq::call(hydra_object* alist, runtime& r) {
     }
     return new hydra_nil();
   }
+  if (hydra_symbol* sym1 = dynamic_cast<hydra_symbol*>(arg1)) {
+    if (hydra_symbol* sym2 = dynamic_cast<hydra_symbol*>(arg2)) {
+      if (sym1 == sym2)
+        return new hydra_t();
+      return new hydra_nil();
+    }
+    return new hydra_nil();
+  }
   if (dynamic_cast<hydra_nil*>(arg1)) {
     if (dynamic_cast<hydra_nil*>(arg2))
       return new hydra_t();

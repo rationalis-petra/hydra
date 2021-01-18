@@ -9,7 +9,7 @@ using namespace std;
 hydra_object *lexical_subst(hydra_object *expr,
                             map<hydra_symbol *, hydra_object *> subst_map);
 
-user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
+user_oper::user_oper(hydra_object *op_def, bool _eval_args, runtime& r) {
   eval_args = _eval_args;
   rest = nullptr;
   self = nullptr;
@@ -23,7 +23,8 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
     while (!name_list->null()) {
       if (hydra_cons *name_elt = dynamic_cast<hydra_cons *>(name_list)) {
         if (hydra_symbol *name = dynamic_cast<hydra_symbol *>(name_elt->car)) {
-          if (name->name == "rest" && name->value == name) {
+          if (name == hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+                          ->get("rest")) {
             name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
             if (!name_elt) {
               string err = "No name provided to :rest!";
@@ -36,8 +37,9 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
             }
             rest = name;
             name_list = name_elt->cdr;
-          }
-          else if (name->name == "self" && name->value == name) {
+          } else if (name ==
+                     hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+                         ->get("self")) {
             name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
             if (!name_elt) {
               string err = "No name provided to :self!";
@@ -50,8 +52,7 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args) {
             }
             self = name;
             name_list = name_elt->cdr;
-          }
-          else {
+          } else {
             arg_names.push_back(name);
             name_list = name_elt->cdr;
           }
