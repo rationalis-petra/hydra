@@ -1,10 +1,22 @@
 #include <map>
 #include <string>
 #include <typeinfo>
+#include <iostream>
 
 #include "expressions.hpp"
+#include "operations.hpp"
 
 using namespace std;
+
+list<hydra_object*> make_list(hydra_object* obj) {
+  list<hydra_object*> lst;
+  if (!obj->null()) {
+    hydra_cons *cns = hydra_cast<hydra_cons>(obj);
+    lst.push_back(cns->car);
+    obj = cns->cdr;
+  }
+  return lst;
+}
 
 hydra_object *lexical_subst(hydra_object *expr,
                             map<hydra_symbol *, hydra_object *> subst_map);
@@ -146,10 +158,28 @@ hydra_object *lexical_subst(hydra_object *expr,
     hydra_cons *out = new hydra_cons();
     out->car = lexical_subst(cns->car, subst_map);
 
-    // don't substitute quoted arguments
-    if (hydra_symbol *qte = dynamic_cast<hydra_symbol *>(out->car)) {
-      if (qte->name == "quote") {
+    if (hydra_symbol *sym = dynamic_cast<hydra_symbol *>(out->car)) {
+      // don't substitute quoted arguments
+      if (dynamic_cast<op_quote*>(sym->value)) {
         out->cdr = cns->cdr;
+      } else if (dynamic_cast<op_fn *>(sym->value)) {
+        // assume cdr = arg-list
+        if (hydra_cons* cns2 = dynamic_cast<hydra_cons *>(cns->cdr)) {
+          // now, we can make a new subst_map!
+          map<hydra_symbol*, hydra_object*> new_map = subst_map;
+          list<hydra_object *> lst = make_list(cns2->car);
+          for (hydra_object *o : lst) {
+            if (hydra_symbol *var = dynamic_cast<hydra_symbol *>(o)) {
+              if (new_map.find(var) != new_map.end()) {
+                new_map.erase(var);
+              }
+            }
+          }
+          out->cdr = new hydra_cons(cns2->car,
+                                    lexical_subst(cns2->cdr, new_map));
+        } else {
+          out->cdr = lexical_subst(cns->cdr, subst_map);
+        }
       } else {
         out->cdr = lexical_subst(cns->cdr, subst_map);
       }

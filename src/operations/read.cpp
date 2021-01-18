@@ -56,6 +56,10 @@ hydra_object *to_value(string token, runtime & r) {
   // & = root package
   if (path.front() == "&") {
     path.pop_front();
+    // if path is empty, we get the root object itself!
+    if (path.empty()) {
+      return r.root;
+    }
     hydra_object* obj = r.root->intern(path);
     return obj;
     // ':' at beginning is implicit ketword package
