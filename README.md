@@ -1,8 +1,7 @@
 # Hydra
 A small interpreted language with a lisp-like syntax
-The goal of hydra is to make a sort of 'omni-language': support for multiple paradigms, in typing
-(static/dynamic), memory management (manual/gc) and style (functional/object-oriented).
-A very basic [wiki](https://github.com/rationalis-petra/hydra/wiki) is available, but everything is currently in a very early stage.
+The goal of hydra is to make a language which is highly customizable, and so it provides many metaprogramming facilities.
+A [wiki](https://github.com/rationalis-petra/hydra/wiki) is available, but everything is currently quite small.
 
 If you are looking at the source-code, the [readme-source](README_SOURCE.md) should help, being as there are relatively few comments.
 
@@ -56,6 +55,8 @@ The `hydra:core` module (enabled by default) provides the `defn` convenience mac
 ```
 (defn inc (x) (+ x 1))
 ```
+
+For more examples and syntax, check the [wiki](https://github.com/rationalis-petra/hydra/wiki)
 
 # How to Build
 The project uses [cmake](https://cmake.org/) to build, and [conan](https://conan.io/) for dependencies. To install:
