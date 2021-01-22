@@ -8,10 +8,10 @@ using std::string;
 using std::to_string;
 using std::list;
 
-op_plus::op_plus() { eval_args = true; }
-hydra_object *op_plus::call(hydra_object *alist, runtime &r) {
+op_plus::op_plus() { is_fn = true; }
+hydra_object *op_plus::call(hydra_object *alist, runtime &r, lexical_scope& s) {
   // we guarantee that this is a cons object
-  std::list<hydra_object *> arg_list = get_arg_list(alist, r);
+  std::list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '+' function";
   }
@@ -24,9 +24,9 @@ hydra_object *op_plus::call(hydra_object *alist, runtime &r) {
   return out;
 }
 
-op_minus::op_minus() { eval_args = true; }
-hydra_object *op_minus::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_minus::op_minus() { is_fn = true; }
+hydra_object *op_minus::call(hydra_object *alist, runtime &r, lexical_scope& s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '-' function";
   }
@@ -41,9 +41,9 @@ hydra_object *op_minus::call(hydra_object *alist, runtime &r) {
   return out;
 }
 
-op_multiply::op_multiply() { eval_args = true; }
-hydra_object *op_multiply::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_multiply::op_multiply() { is_fn = true; }
+hydra_object *op_multiply::call(hydra_object *alist, runtime &r, lexical_scope& s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '*' function";
   }
@@ -59,9 +59,9 @@ hydra_object *op_multiply::call(hydra_object *alist, runtime &r) {
   return out;
 }
 
-op_divide::op_divide() { eval_args = true; }
-hydra_object *op_divide::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_divide::op_divide() { is_fn = true; }
+hydra_object *op_divide::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '/' function";
   }
@@ -85,9 +85,9 @@ hydra_object *op_divide::call(hydra_object *alist, runtime &r) {
   }
 }
 
-op_geq::op_geq() { eval_args = true; }
-hydra_object *op_geq::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_gr::op_gr() { is_fn = true; }
+hydra_object *op_gr::call(hydra_object *alist, runtime &r, lexical_scope& s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "incorrect number of arguments provided to operator >=: " +
       ::to_string(arg_list.size());

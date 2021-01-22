@@ -6,9 +6,9 @@
 using std::list;
 using std::string;
 
-op_cons::op_cons() { eval_args = true; }
-hydra_object *op_cons::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_cons::op_cons() { is_fn = true; }
+hydra_object *op_cons::call(hydra_object *alist, runtime &r, lexical_scope& s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     throw "invalid number of args to cons";
   }
@@ -26,9 +26,9 @@ hydra_object *op_cons::call(hydra_object *alist, runtime &r) {
   return out;
 }
 
-op_cdr::op_cdr() { eval_args = true; }
-hydra_object *op_cdr::call (hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_cdr::op_cdr() { is_fn = true; }
+hydra_object *op_cdr::call (hydra_object* alist, runtime& r, lexical_scope& s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     throw "invalid number of args to cdr";
   }
@@ -41,9 +41,9 @@ hydra_object *op_cdr::call (hydra_object* alist, runtime& r) {
   }
 }
 
-op_car::op_car() { eval_args = true; }
-hydra_object *op_car::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_car::op_car() { is_fn = true; }
+hydra_object *op_car::call(hydra_object *alist, runtime &r, lexical_scope& s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     throw "invalid number of args to car";
   }
@@ -57,9 +57,9 @@ hydra_object *op_car::call(hydra_object *alist, runtime &r) {
   }
 }
 
-op_arr::op_arr() { eval_args = true; }
-hydra_object *op_arr::call(hydra_object *alist, runtime &r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_arr::op_arr() { is_fn = true; }
+hydra_object *op_arr::call(hydra_object *alist, runtime &r, lexical_scope& s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
 
   hydra_array* out = new hydra_array;
   for (hydra_object* o : arg_list)
@@ -67,9 +67,9 @@ hydra_object *op_arr::call(hydra_object *alist, runtime &r) {
   return out;
 }
 
-op_elt::op_elt() { eval_args = true; }
-hydra_object* op_elt::call(hydra_object *alist, runtime &r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_elt::op_elt() { is_fn = true; }
+hydra_object* op_elt::call(hydra_object *alist, runtime &r, lexical_scope& s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "invalid number of args to elt";
     throw err;

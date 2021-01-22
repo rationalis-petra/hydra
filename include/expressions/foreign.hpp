@@ -25,7 +25,7 @@ struct hydra_foreign_sym : public hydra_object {
 };
 
 struct hydra_foreign_oper : public hydra_oper {
-  hydra_object* call(hydra_object* args, runtime& r);
+  hydra_object* call(hydra_object* args, runtime& r, lexical_scope &s);
   hydra_foreign_oper();
 
   std::list<foreign_type> arg_types;

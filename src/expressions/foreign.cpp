@@ -1,6 +1,7 @@
 #include <string>
 #include <stdio.h>
 
+#include "ltdl.h"
 #include "expressions.hpp"
 
 using std::string;

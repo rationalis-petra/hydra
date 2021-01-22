@@ -6,17 +6,17 @@
 struct hydra_symbol;
 struct hydra_oper : public hydra_object {
   std::string to_string() const;
-  bool eval_args;
+  bool is_fn;
 
-  virtual hydra_object* call(hydra_object* arg_list, runtime& r) = 0; 
+  virtual hydra_object* call(hydra_object* arg_list, runtime& r, lexical_scope& s) = 0; 
 
 protected:
-  std::list<hydra_object*> get_arg_list(hydra_object* arg_list, runtime& r);
+  std::list<hydra_object*> get_arg_list(hydra_object* arg_list, runtime& r, lexical_scope& s);
 };
 
 struct user_oper : public hydra_oper {
   std::string to_string() const;
-  hydra_object* call(hydra_object* arg_list, runtime& r);
+  hydra_object* call(hydra_object* arg_list, runtime& r, lexical_scope& s);
 
   hydra_symbol* rest; // for accepting variable arguments
   hydra_symbol* self; // name of function within function's scope
@@ -25,7 +25,9 @@ struct user_oper : public hydra_oper {
 
   std::list<hydra_symbol*> arg_names;
   hydra_object* expr;
-  user_oper(hydra_object* op_def, bool eval_args, runtime& r);
+  // captured scope for closures
+  lexical_scope* scope;
+  user_oper(hydra_object* op_def, bool eval_args, runtime& r, lexical_scope &s);
 };
 
 
@@ -53,5 +55,5 @@ struct hydra_symbol : public hydra_object {
 
   hydra_symbol(std::string name);
   std::string to_string() const;
-  hydra_object* eval(runtime& r);
+  hydra_object* eval(runtime& r, lexical_scope& s);
 };

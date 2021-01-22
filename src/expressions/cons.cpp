@@ -11,11 +11,11 @@ hydra_cons::hydra_cons(hydra_object* car, hydra_object* cdr) {
   this->cdr = cdr;
 }
 
-hydra_object *hydra_cons::eval(runtime &r) {
-  hydra_object *oper = car->eval(r);
+hydra_object *hydra_cons::eval(runtime &r, lexical_scope& s) {
+  hydra_object *oper = car->eval(r, s);
   hydra_oper *op;
   if ((op = dynamic_cast<hydra_oper*>(oper))) {
-    return op->call(cdr, r);
+    return op->call(cdr, r, s);
   } else {
     string excp = "Attempted to call " + oper->to_string() +
                   " which is not an operation!";

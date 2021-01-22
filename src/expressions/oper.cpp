@@ -18,13 +18,12 @@ list<hydra_object*> make_list(hydra_object* obj) {
   return lst;
 }
 
-hydra_object *lexical_subst(hydra_object *expr,
-                            map<hydra_symbol *, hydra_object *> subst_map);
 
-user_oper::user_oper(hydra_object *op_def, bool _eval_args, runtime& r) {
-  eval_args = _eval_args;
+user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime& r, lexical_scope &s) {
+  is_fn = _is_fn;
   rest = nullptr;
   self = nullptr;
+  scope = new lexical_scope(s);
 
   // operations have the form:
   // (fn/mac <optional name> <arg_list> rest)
@@ -93,9 +92,9 @@ user_oper::user_oper(hydra_object *op_def, bool _eval_args, runtime& r) {
   }
 }
 
-hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
+hydra_object *user_oper::call(hydra_object *alist, runtime &r, lexical_scope& s) {
   // if eval_args is true, it will be taken care of
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
 
   if ((arg_list.size() != arg_names.size()) && rest == nullptr) {
     string err = "Error: function called with incorrect arg_count!";
@@ -103,16 +102,15 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
   }
 
   // so, all we need to to is perform lexical substitution!
-  map<hydra_symbol *, hydra_object *> subst_map;
   for (hydra_symbol *s : arg_names) {
-    subst_map[s] = arg_list.front();
+    scope->map[s] = arg_list.front();
     arg_list.pop_front();
   }
   if (rest) {
     // generate a list containing the rest of the arg_list
     // if list is empty, use nil!
     if (arg_list.empty()) {
-      subst_map[rest] = new hydra_nil;
+      scope->map[rest] = new hydra_nil;
     } else {
       hydra_cons *rlist = new hydra_cons;
       hydra_cons *root = rlist;
@@ -125,82 +123,27 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r) {
         arg_list.pop_front();
       }
       rlist->cdr = new hydra_nil;
-      subst_map[rest] = root;
+      scope->map[rest] = root;
     }
   }
   if (self) {
-    subst_map[self] = this;
+    scope->map[self] = this;
   }
-  if (eval_args) {
-    return lexical_subst(expr, subst_map)->eval(r);
+  if (is_fn) {
+    return expr->eval(r, *scope);
   } else {
-    return lexical_subst(expr, subst_map)->eval(r)->eval(r);
-  }
-}
-
-hydra_object *lexical_subst(hydra_object *expr,
-                            map<hydra_symbol *, hydra_object *> subst_map) {
-  // we want to assert that len(arg_list) = len(vals)
-  // we can now assume that conslen(arg_list) = conslen(vals)
-  if (hydra_symbol *sym = dynamic_cast<hydra_symbol *>(expr)) {
-    if (subst_map.find(sym) != subst_map.end()) {
-      if (true) {
-        hydra_symbol *ssym = new hydra_symbol(sym->name);
-        ssym->value = subst_map.at(sym);
-
-        return ssym;
-      } else {
-        return subst_map.at(sym);
-      }
-    }
-    return expr;
-  } else if (hydra_cons *cns = dynamic_cast<hydra_cons *>(expr)) {
-    hydra_cons *out = new hydra_cons();
-    out->car = lexical_subst(cns->car, subst_map);
-
-    if (hydra_symbol *sym = dynamic_cast<hydra_symbol *>(out->car)) {
-      // don't substitute quoted arguments
-      if (dynamic_cast<op_quote*>(sym->value)) {
-        out->cdr = cns->cdr;
-      } else if (dynamic_cast<op_fn *>(sym->value)) {
-        // assume cdr = arg-list
-        if (hydra_cons* cns2 = dynamic_cast<hydra_cons *>(cns->cdr)) {
-          // now, we can make a new subst_map!
-          map<hydra_symbol*, hydra_object*> new_map = subst_map;
-          list<hydra_object *> lst = make_list(cns2->car);
-          for (hydra_object *o : lst) {
-            if (hydra_symbol *var = dynamic_cast<hydra_symbol *>(o)) {
-              if (new_map.find(var) != new_map.end()) {
-                new_map.erase(var);
-              }
-            }
-          }
-          out->cdr = new hydra_cons(cns2->car,
-                                    lexical_subst(cns2->cdr, new_map));
-        } else {
-          out->cdr = lexical_subst(cns->cdr, subst_map);
-        }
-      } else {
-        out->cdr = lexical_subst(cns->cdr, subst_map);
-      }
-    } else {
-      out->cdr = lexical_subst(cns->cdr, subst_map);
-    }
-
-    return out;
-  } else {
-    return expr;
+    return expr->eval(r, *scope)->eval(r, s);
   }
 }
 
 list<hydra_object *> hydra_oper::get_arg_list(hydra_object *arg_list,
-                                              runtime &r) {
+                                              runtime &r, lexical_scope& s) {
   list<hydra_object *> out_list;
   while (!arg_list->null()) {
     hydra_cons *list_elt = dynamic_cast<hydra_cons *>(arg_list);
     hydra_object *arg = list_elt->car;
-    if (eval_args) {
-      out_list.push_back(arg->eval(r));
+    if (is_fn) {
+      out_list.push_back(arg->eval(r, s));
     } else {
       out_list.push_back(arg);
     }

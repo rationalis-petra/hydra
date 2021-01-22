@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
       make_pair("-", new op_minus),
       make_pair("*", new op_multiply),
       make_pair("/", new op_divide),
-      make_pair(">=", new op_geq),
+      make_pair(">", new op_gr),
       // data
       make_pair("array", new op_arr),
       make_pair("cons", new op_cons),
@@ -143,8 +143,9 @@ int main(int argc, char **argv) {
   while (count > 0) {
     try {
       while (!prog->stream->eof()) {
+        lexical_scope s;
         ast = read(prog, r);
-        out = ast->eval(r);
+        out = ast->eval(r, s);
       }
     } catch (string e) {
       cout << e << endl;
@@ -161,8 +162,9 @@ int main(int argc, char **argv) {
   while (!(in == "(quit)")) {
     try {
       cout << r.active_module->name << "> ";
+      lexical_scope s;
       ast = read(stm, r);
-      out = ast->eval(r);
+      out = ast->eval(r, s);
       cout << "* " << out << endl;
     } catch (string e) {
       cout << e << endl;

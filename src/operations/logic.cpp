@@ -7,9 +7,9 @@ using std::list;
 using std::string;
 
 
-op_eq::op_eq() { eval_args = true; }
-hydra_object *op_eq::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_eq::op_eq() { is_fn = true; }
+hydra_object *op_eq::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     string err = "Invalid number of arguments to macro =: expects 2";
     throw err;
@@ -49,25 +49,25 @@ hydra_object *op_eq::call(hydra_object* alist, runtime& r) {
   return new hydra_nil();
 }
 
-op_or::op_or() { eval_args = false; }
-hydra_object *op_or::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_or::op_or() { is_fn = false; }
+hydra_object *op_or::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     string err = "Invalid number of arguments to macro or";
     throw err;
   }
 
   for (hydra_object* arg : arg_list) {
-    hydra_object* cond = arg->eval(r);
+    hydra_object* cond = arg->eval(r, s);
     if (!cond->null())
       return cond;
   }
   return new hydra_nil;
 }
 
-op_and::op_and() { eval_args = false; }
-hydra_object *op_and::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_and::op_and() { is_fn = false; }
+hydra_object *op_and::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     string err = "Invalid number of arguments to macro and";
     throw err;
@@ -75,7 +75,7 @@ hydra_object *op_and::call(hydra_object* alist, runtime& r) {
 
   hydra_object* out = nullptr;
   for (hydra_object* arg : arg_list) {
-    hydra_object* cond = arg->eval(r);
+    hydra_object* cond = arg->eval(r, s);
     if (cond->null()) {
       return new hydra_nil();
     }
@@ -88,9 +88,9 @@ hydra_object *op_and::call(hydra_object* alist, runtime& r) {
   return out;
 }
 
-op_not::op_not() { eval_args = true; }
-hydra_object *op_not::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_not::op_not() { is_fn = true; }
+hydra_object *op_not::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments to macro not";
     throw err;

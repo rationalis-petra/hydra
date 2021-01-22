@@ -195,7 +195,10 @@ hydra_object *read(hydra_object *raw, runtime &r) {
       hydra_cons* cns2 = new hydra_cons;
       cns2->car = is;
       cns2->cdr = cns;
-      return r.readtable[c]->call(cns2, r);
+
+      // generate a blank 'dummy' scope
+      lexical_scope s;
+      return r.readtable[c]->call(cns2, r, s);
     }
     switch (c) {
       // whitespace characters
@@ -229,9 +232,9 @@ hydra_object *read(hydra_object *raw, runtime &r) {
   return new hydra_nil;
 }
 
-op_read::op_read() { eval_args = true; }
-hydra_object *op_read::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_read::op_read() { is_fn = true; }
+hydra_object *op_read::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments provided to read";
     throw err;
@@ -239,9 +242,9 @@ hydra_object *op_read::call(hydra_object *alist, runtime &r) {
   return read(arg_list.front(), r);
 }
 
-op_set_mac_char::op_set_mac_char() { eval_args = true; }
-hydra_object* op_set_mac_char::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_set_mac_char::op_set_mac_char() { is_fn = true; }
+hydra_object* op_set_mac_char::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "Incorrect number of arguments provided to set-macro-character";
     throw err;

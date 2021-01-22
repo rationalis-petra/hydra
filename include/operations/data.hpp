@@ -5,23 +5,23 @@
 
 struct op_cons : hydra_oper {
   op_cons();
-  hydra_object *call(hydra_object *body, runtime &r);
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 struct op_car : hydra_oper {
   op_car();
-  hydra_object *call(hydra_object *body, runtime &r);
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 struct op_cdr : hydra_oper {
   op_cdr();
-  hydra_object *call(hydra_object *body, runtime &r);
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 struct op_arr : hydra_oper {
   op_arr();
-  hydra_object *call(hydra_object *body, runtime &r);
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 struct op_elt : hydra_oper {
   op_elt();
-  hydra_object *call(hydra_object *body, runtime &r);
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 
 #endif // __HYDRA_DATA_HPP

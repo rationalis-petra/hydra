@@ -16,10 +16,12 @@
 struct runtime {
   hydra_module* root;
   hydra_module* active_module;
-
   std::map<char, hydra_oper*> readtable;
 };
 
+struct lexical_scope {
+  std::map<hydra_symbol*, hydra_object*> map;
+};
 
 extern hydra_module* language_module;
 

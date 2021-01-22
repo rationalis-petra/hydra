@@ -20,7 +20,7 @@ bool hydra_object::null() const {
 }
 
 // the default behaviour is to self-evaluate
-hydra_object* hydra_object::eval(runtime& r) {
+hydra_object* hydra_object::eval(runtime& r, lexical_scope& s) {
   return this;
 }
 

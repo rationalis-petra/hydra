@@ -5,13 +5,14 @@
 #include <list>
 
 struct runtime;
+struct lexical_scope;
 
 struct hydra_object {
   //std::string docstring;
 
   virtual bool null() const;
   virtual std::string to_string() const = 0;
-  virtual hydra_object* eval(runtime& r);
+  virtual hydra_object* eval(runtime& r, lexical_scope& s);
   hydra_object();
   virtual ~hydra_object();
 

@@ -51,9 +51,24 @@ std::string lang = R"(
 (export (current-module) 'map)
 (export (current-module) 'list)
 
+(export (current-module) '>)
+(export (current-module) '<)
+(export (current-module) '>=)
+(export (current-module) '<=)
+
 (export (current-module) '++)
 
 ;; logic
+(defn >= (l r)
+  (or (> l r) (= l r)))
+
+(defn < (l r)
+  (> r l))
+
+(defn <= (l r)
+  (>= r l))
+  
+;; control flow
 (defmac when (cond :rest body)
   (list (quote if) cond 
     (cons (quote progn) body)
@@ -65,7 +80,7 @@ std::string lang = R"(
     (cons progn body)))
   
 ;; scope stuff
-(defmac let (arg-list :rest body)
+(defn let (arg-list :rest body)
   (cons 
     (list (quote fn)
           ((fn (binding :self get-names)

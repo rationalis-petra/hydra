@@ -6,9 +6,9 @@
 using std::list;
 using std::string;
 
-op_make_symbol::op_make_symbol() { eval_args = true; }
-hydra_object *op_make_symbol::call(hydra_object *alist, runtime &r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_make_symbol::op_make_symbol() { is_fn = true; }
+hydra_object *op_make_symbol::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments to make-symbol";
     throw err;
@@ -17,9 +17,9 @@ hydra_object *op_make_symbol::call(hydra_object *alist, runtime &r) {
   return new hydra_symbol(name);
 }
 
-op_make_module::op_make_module() { eval_args = true; }
-hydra_object *op_make_module::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_make_module::op_make_module() { is_fn = true; }
+hydra_object *op_make_module::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() > 1) {
     string err = "invalid number of arguments to make-module";
     throw err;
@@ -31,9 +31,9 @@ hydra_object *op_make_module::call(hydra_object* alist, runtime& r) {
   return new hydra_module(name);
 }
 
-op_in_module::op_in_module() { eval_args = true; }
-hydra_object *op_in_module::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_in_module::op_in_module() { is_fn = true; }
+hydra_object *op_in_module::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments to in-module";
     throw err;
@@ -43,9 +43,9 @@ hydra_object *op_in_module::call(hydra_object* alist, runtime& r) {
   return new hydra_t;
 }
 
-op_intern::op_intern() { eval_args = true; }
-hydra_object *op_intern::call(hydra_object* alist, runtime &r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_intern::op_intern() { is_fn = true; }
+hydra_object *op_intern::call(hydra_object* alist, runtime &r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to intern";
     throw err;
@@ -56,9 +56,9 @@ hydra_object *op_intern::call(hydra_object* alist, runtime &r) {
   return mod->intern(str->value);
 }
 
-op_insert::op_insert() { eval_args = true; }
-hydra_object *op_insert::call(hydra_object* alist, runtime &r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_insert::op_insert() { is_fn = true; }
+hydra_object *op_insert::call(hydra_object* alist, runtime &r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to insert";
     throw err;
@@ -74,9 +74,9 @@ hydra_object *op_insert::call(hydra_object* alist, runtime &r) {
   return sym;
 }
 
-op_get::op_get() { eval_args = true; }
-hydra_object *op_get::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_get::op_get() { is_fn = true; }
+hydra_object *op_get::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to get";
     throw err;
@@ -87,9 +87,9 @@ hydra_object *op_get::call(hydra_object* alist, runtime& r) {
   return mod->get(str->value);
 }
 
-op_get_module::op_get_module() { eval_args = true; }
-hydra_object *op_get_module::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_get_module::op_get_module() { is_fn = true; }
+hydra_object *op_get_module::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 0) {
     string err = "invalid number of arguments provided to current-module";
     throw err;
@@ -98,9 +98,9 @@ hydra_object *op_get_module::call(hydra_object* alist, runtime& r) {
 }
 
 
-op_get_symbols::op_get_symbols() { eval_args = true; }
-hydra_object *op_get_symbols::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_get_symbols::op_get_symbols() { is_fn = true; }
+hydra_object *op_get_symbols::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments provided to get-symbols";
     throw err;
@@ -114,20 +114,20 @@ hydra_object *op_get_symbols::call(hydra_object* alist, runtime& r) {
   return out;
 }
 
-op_remove::op_remove() { eval_args = true; }
-hydra_object *op_remove::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_remove::op_remove() { is_fn = true; }
+hydra_object *op_remove::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to remove";
     throw err;
   }
   hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
-  hydra_symbol* s = hydra_cast<hydra_symbol>(arg_list.back());
-  auto it = mod->symbols.find(s->name);
+  hydra_symbol* sym = hydra_cast<hydra_symbol>(arg_list.back());
+  auto it = mod->symbols.find(sym->name);
   if (it != mod->symbols.end()) {
     mod->symbols.erase(it);
   }
-  it = mod->exported_symbols.find(s->name);
+  it = mod->exported_symbols.find(sym->name);
   if (it != mod->exported_symbols.end()) {
     mod->exported_symbols.erase(it);
   }
@@ -150,9 +150,9 @@ hydra_object *op_remove::call(hydra_object* alist, runtime& r) {
 //   return out;
 // }
 
-op_export::op_export() { eval_args = true; }
-hydra_object *op_export::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_export::op_export() { is_fn = true; }
+hydra_object *op_export::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to current-module";
     throw err;

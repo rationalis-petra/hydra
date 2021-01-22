@@ -10,9 +10,9 @@ using std::list;
 using std::string;
 using std::to_string;
 
-op_foreign_lib::op_foreign_lib() { eval_args = true; }
-hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(body, r);
+op_foreign_lib::op_foreign_lib() { is_fn = true; }
+hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(body, r, s);
   if (arg_list.size() != 1) {
     string err =
         "Incorrect number of arguments provided to function load-foreign-lib";
@@ -37,9 +37,9 @@ hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r) {
   }
 }
 
-op_foreign_sym::op_foreign_sym() { eval_args = true; }
-hydra_object *op_foreign_sym::call(hydra_object *body, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(body, r);
+op_foreign_sym::op_foreign_sym() { is_fn = true; }
+hydra_object *op_foreign_sym::call(hydra_object *body, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(body, r, s);
   if (arg_list.size() != 2) {
     string err =
         "Incorrect number of arguments provided to function get-foreign-symbol";
@@ -65,9 +65,9 @@ hydra_object *op_foreign_sym::call(hydra_object *body, runtime &r) {
   }
 }
 // define-foreign-function
-op_internalize::op_internalize() { eval_args = true; }
-hydra_object *op_internalize::call(hydra_object *body, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(body, r);
+op_internalize::op_internalize() { is_fn = true; }
+hydra_object *op_internalize::call(hydra_object *body, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(body, r, s);
   if (arg_list.size() != 2) {
     string err =
         "Expected 2 arguments when internalizing foreign symbol, got + " +
@@ -175,9 +175,9 @@ hydra_object *op_internalize::call(hydra_object *body, runtime &r) {
 
 
 
-hydra_foreign_oper::hydra_foreign_oper() { eval_args = true; }
-hydra_object *hydra_foreign_oper::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+hydra_foreign_oper::hydra_foreign_oper() { is_fn = true; }
+hydra_object *hydra_foreign_oper::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != arg_types.size()) {
     string err =
         "Error in foreign function call: arg list is not of expected size";

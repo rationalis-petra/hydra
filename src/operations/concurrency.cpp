@@ -12,7 +12,7 @@ void opcall(hydra_oper* o, hydra_object* args, runtime& r) {
   o->call(args, r);
 }
 
-op_thread::op_thread() { eval_args = true; }
+op_thread::op_thread() { is_fn = true; }
 hydra_object *op_thread::call(hydra_object *alist, runtime &r) {
   list<hydra_object *> arg_list = get_arg_list(alist, r);
 

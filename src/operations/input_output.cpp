@@ -13,9 +13,9 @@ using std::istream;
 using std::cout;
 using std::endl;
 
-op_print::op_print() { eval_args = true; }
-hydra_object *op_print::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_print::op_print() { is_fn = true; }
+hydra_object *op_print::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     throw "Invalid number of arguments to print: print takes 1 argument";
   }
@@ -23,9 +23,9 @@ hydra_object *op_print::call(hydra_object *alist, runtime &r) {
   return arg_list.front();
 }
 
-op_open_file::op_open_file() { eval_args = true; }
-hydra_object *op_open_file::call(hydra_object *alist, runtime &r) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r);
+op_open_file::op_open_file() { is_fn = true; }
+hydra_object *op_open_file::call(hydra_object *alist, runtime &r, lexical_scope& s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     throw "Invalid number of arguments to open-file: print takes 1 argument";
   }
@@ -41,9 +41,9 @@ hydra_object *op_open_file::call(hydra_object *alist, runtime &r) {
   }
 }
 
-op_next::op_next() { eval_args = true; }
-hydra_object *op_next::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_next::op_next() { is_fn = true; }
+hydra_object *op_next::call(hydra_object* alist, runtime& r, lexical_scope& s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments provided to next"; 
   }
@@ -58,9 +58,9 @@ hydra_object *op_next::call(hydra_object* alist, runtime& r) {
   }
 }
 
-op_peek::op_peek() { eval_args = true; }
-hydra_object *op_peek::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_peek::op_peek() { is_fn = true; }
+hydra_object *op_peek::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments provided to peek"; 
     throw err;
@@ -75,9 +75,9 @@ hydra_object *op_peek::call(hydra_object* alist, runtime& r) {
   }
 }
 
-op_endp::op_endp() { eval_args = true; }
-hydra_object *op_endp::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_endp::op_endp() { is_fn = true; }
+hydra_object *op_endp::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments provided to endp"; 
     throw err;
@@ -96,9 +96,9 @@ hydra_object *op_endp::call(hydra_object* alist, runtime& r) {
   }
 }
 
-op_close::op_close() { eval_args = true; }
-hydra_object *op_close::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_close::op_close() { is_fn = true; }
+hydra_object *op_close::call(hydra_object* alist, runtime& r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments provided to close"; 
     throw err;

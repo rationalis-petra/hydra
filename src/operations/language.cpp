@@ -1,5 +1,5 @@
-#include <variant>
 #include <iostream>
+#include <variant>
 
 #include "expressions.hpp"
 #include "operations.hpp"
@@ -7,10 +7,9 @@
 using std::list;
 using std::string;
 
-
-op_if::op_if() { eval_args = false; }
-hydra_object* op_if::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_if::op_if() { is_fn = false; }
+hydra_object *op_if::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   // aseert that list length is 3
   int len = arg_list.size();
   if (len != 3) {
@@ -18,19 +17,20 @@ hydra_object* op_if::call(hydra_object* alist, runtime& r) {
   }
   // we now assume that arg_list is a list of length 3
 
-  hydra_object* condition = arg_list.front()->eval(r);
+  hydra_object *condition = arg_list.front()->eval(r, s);
   arg_list.pop_front();
   // is nil?
   if (condition->null()) {
-    return arg_list.back()->eval(r);
+    return arg_list.back()->eval(r, s);
   }
   // otherwise
-  return arg_list.front()->eval(r);
+  return arg_list.front()->eval(r, s);
 }
 
-op_while::op_while() { eval_args = false; }
-hydra_object* op_while::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_while::op_while() { is_fn = false; }
+hydra_object *op_while::call(hydra_object *alist, runtime &r,
+                             lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   // assert that list length is 3
   int len = arg_list.size();
   if (len < 2) {
@@ -38,24 +38,24 @@ hydra_object* op_while::call(hydra_object* alist, runtime& r) {
   }
   // we now assume that arg_list is a list of length 3
 
-  hydra_object* condition = arg_list.front();
+  hydra_object *condition = arg_list.front();
   arg_list.pop_front();
   // is nil?
-  while (!condition->eval(r)->null()) {
-    for (hydra_object* o : arg_list) {
-      o->eval(r);
+  while (!condition->eval(r, s)->null()) {
+    for (hydra_object *o : arg_list) {
+      o->eval(r, s);
     }
   }
   // otherwise
   return new hydra_nil;
 }
-op_set::op_set() { eval_args = true; }
-hydra_object *op_set::call(hydra_object* alist, runtime& r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_set::op_set() { is_fn = true; }
+hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     throw "arglist to set invalid size";
   }
-  if (hydra_symbol *symbol = dynamic_cast<hydra_symbol*>(arg_list.front())) {
+  if (hydra_symbol *symbol = dynamic_cast<hydra_symbol *>(arg_list.front())) {
     hydra_object *value = arg_list.back();
 
     symbol->value = value;
@@ -66,9 +66,10 @@ hydra_object *op_set::call(hydra_object* alist, runtime& r) {
   }
 }
 
-op_quote::op_quote() { eval_args = false; }
-hydra_object *op_quote::call(hydra_object *alist, runtime &r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_quote::op_quote() { is_fn = false; }
+hydra_object *op_quote::call(hydra_object *alist, runtime &r,
+                             lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments to quote";
     throw err;
@@ -76,39 +77,56 @@ hydra_object *op_quote::call(hydra_object *alist, runtime &r) {
   return arg_list.front();
 }
 
-op_eval::op_eval() { eval_args = true; }
-hydra_object *op_eval::call(hydra_object* alist, runtime &r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
+op_eval::op_eval() { is_fn = true; }
+hydra_object *op_eval::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments to eval";
     throw err;
   }
-  return arg_list.front()->eval(r);
+  // eval evaluates within the lexical scope of parent!
+  return arg_list.front()->eval(r, s);
 }
 
-op_progn::op_progn() { eval_args = false; }
-hydra_object *op_progn::call(hydra_object* alist, runtime&r) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r);
-  hydra_object* out = nullptr;
-  for (hydra_object* arg : arg_list) {
-    out = arg->eval(r);
+op_progn::op_progn() { is_fn = false; }
+hydra_object *op_progn::call(hydra_object *alist, runtime &r,
+                             lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+  hydra_object *out = nullptr;
+  for (hydra_object *arg : arg_list) {
+    out = arg->eval(r, s);
   }
   if (!out)
     out = new hydra_nil();
   return out;
 }
 
-op_fn::op_fn() { eval_args = false; }
-hydra_object *op_fn::call(hydra_object* alist, runtime& r) {
-  return new user_oper(alist, true, r);
+op_fn::op_fn() { is_fn = false; }
+hydra_object *op_fn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  return new user_oper(alist, true, r, s);
 }
 
-op_mac::op_mac() { eval_args = false; }
-hydra_object *op_mac::call(hydra_object* alist, runtime& r) {
-  return new user_oper(alist, false, r);
+op_mac::op_mac() { is_fn = false; }
+hydra_object *op_mac::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  return new user_oper(alist, false, r, s);
 }
 
-op_quit::op_quit() { eval_args = false; }
-hydra_object *op_quit::call(hydra_object* alist, runtime& r) {
+op_quit::op_quit() { is_fn = false; }
+hydra_object *op_quit::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   exit(0);
 }
+
+// hydra_object* macroexpand(hydra_object* args) {
+// if (hydra_cons* cns = dynamic_cast<hydra_cons*>(args)) {
+//   if () {
+//   } else if {
+//   }
+// } else {
+//   return args;
+// }
+//}
+
+// op_macroexpand::op_macroexpand() { is_macro = false; }
+// hydra_object *op_macroexpand::call(hydra_object* alist, runtime& r) {
+//   macroexpand(alist);
+// }
