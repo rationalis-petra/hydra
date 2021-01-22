@@ -4,6 +4,8 @@ The goal of hydra is to make a sort of 'omni-language': support for multiple par
 (static/dynamic), memory management (manual/gc) and style (functional/object-oriented).
 A very basic [wiki](https://github.com/rationalis-petra/hydra/wiki) is currently a WIP.
 
+If you are looking at the source-code, the [readme-source](README_SOURCE.md) should help, being as there are relatively few comments.
+
 ## Syntax
 Hydra is composed of S-expressions, e.g.
 ```

@@ -84,8 +84,9 @@ hydra_object *op_eval::call(hydra_object *alist, runtime &r, lexical_scope &s) {
     string err = "invalid number of arguments to eval";
     throw err;
   }
-  // eval evaluates within the lexical scope of parent!
-  return arg_list.front()->eval(r, s);
+  // eval evaluates in a null lexical scope!
+  lexical_scope new_scope;
+  return arg_list.front()->eval(r, new_scope);
 }
 
 op_progn::op_progn() { is_fn = false; }
