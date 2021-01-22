@@ -80,7 +80,7 @@ std::string lang = R"(
     (cons progn body)))
   
 ;; scope stuff
-(defn let (arg-list :rest body)
+(defmac let (arg-list :rest body)
   (cons 
     (list (quote fn)
           ((fn (binding :self get-names)
