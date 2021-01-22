@@ -52,12 +52,12 @@ So, to get a global function, use `def`:
 * 2
 ```
 
-The `lang.hd` file provides the `defn` convenience macro: 
+The `hydra:core` module (enabled by default) provides the `defn` convenience macro: 
 ```
 (defn inc (x) (+ x 1))
 ```
 
-# Try it out
+# How to Build
 The project uses [cmake](https://cmake.org/) to build, and [conan](https://conan.io/) for dependencies. To install:
 ```sh
 git clone https://www.github.com/rationalis-petra/hydra
