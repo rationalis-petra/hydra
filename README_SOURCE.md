@@ -6,7 +6,7 @@ The Include Directory has four main components
   + concurrency: headers for (unimplemented) concurrency primitives
   + data: data objects like number, symbol, ...
   + foreign: for representing foreign types/values
-  + language
+  + language: my miscellaneous category - operations, modules, symbols
   + object: the base `hydra_object` class
 + operations (operations.hpp, operations/*) There is a class `inbuilt_oper`, which is inherited
   by inbuilt operations with operations being both functinos (+, -, >) and language syntax 
