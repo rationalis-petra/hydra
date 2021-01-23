@@ -10,7 +10,7 @@ using namespace std;
 
 list<hydra_object*> make_list(hydra_object* obj) {
   list<hydra_object*> lst;
-  if (!obj->null()) {
+  while (!obj->null()) {
     hydra_cons *cns = hydra_cast<hydra_cons>(obj);
     lst.push_back(cns->car);
     obj = cns->cdr;
@@ -31,49 +31,45 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime& r, lexical_scop
     hydra_object *name_list = cns->car;
 
     // TODO: actually test for keyword!!!
-    while (!name_list->null()) {
-      if (hydra_cons *name_elt = dynamic_cast<hydra_cons *>(name_list)) {
-        if (hydra_symbol *name = dynamic_cast<hydra_symbol *>(name_elt->car)) {
-          if (name == hydra_cast<hydra_module>(r.root->intern("keyword")->value)
-                          ->get("rest")) {
-            name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
-            if (!name_elt) {
-              string err = "No name provided to :rest!";
-              throw err;
-            }
-            name = dynamic_cast<hydra_symbol *>(name_elt->car);
-            if (!name) {
-              string err = "non-symbol provided to fn/mac";
-              throw err;
-            }
-            rest = name;
-            name_list = name_elt->cdr;
-          } else if (name ==
-                     hydra_cast<hydra_module>(r.root->intern("keyword")->value)
-                         ->get("self")) {
-            name_elt = dynamic_cast<hydra_cons *>(name_elt->cdr);
-            if (!name_elt) {
-              string err = "No name provided to :self!";
-              throw err;
-            }
-            name = dynamic_cast<hydra_symbol *>(name_elt->car);
-            if (!name) {
-              string err = "non-symbol provided to fn/mac";
-              throw err;
-            }
-            self = name;
-            name_list = name_elt->cdr;
-          } else {
-            arg_names.push_back(name);
-            name_list = name_elt->cdr;
-          }
+    list<hydra_object*> lst  = make_list(name_list);
+    bool optional = false;
+
+    for (auto it = lst.begin(); it != lst.end(); it++) {
+      hydra_symbol *name = hydra_cast<hydra_symbol>(*it);
+      // :self keyword
+      if (name == hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+          ->get("self")) {
+        if (++it != lst.end()) {
+          self = hydra_cast<hydra_symbol>(*it);
         } else {
-          string err = "non-name provided to fn";
+          string err = "No self argument name!"; 
           throw err;
         }
-      } else {
-        string err = "list parsing error in user_oper!";
-        throw err;
+      }
+
+      // :rest arguments
+      else if (name == hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+                      ->get("rest")) {
+        if (++it != lst.end()) {
+          rest = hydra_cast<hydra_symbol>(*it);
+        } else {
+          string err = "No rest argument name provided!"; 
+          throw err;
+        }
+      }
+
+      // :optional arguments
+      else if (name == hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+                      ->get("optional")) {
+        optional = true;
+      }
+
+      else {
+        if (optional) {
+          optionals.push_back(name);
+        } else {
+          arg_names.push_back(name);
+        }
       }
     }
     hydra_object *expr_body = cns->cdr;
@@ -92,12 +88,16 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime& r, lexical_scop
   }
 }
 
-hydra_object *user_oper::call(hydra_object *alist, runtime &r, lexical_scope& s) {
+hydra_object *user_oper::call(hydra_object *alist, runtime &r,
+                              lexical_scope &s) {
   // if eval_args is true, it will be taken care of
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
 
-  if ((arg_list.size() != arg_names.size()) && rest == nullptr) {
-    string err = "Error: function called with incorrect arg_count!";
+  // too few arguments OR too many arguments
+  if ((arg_list.size() < arg_names.size()) ||
+      (((arg_list.size() > arg_names.size() + optionals.size()) &&
+        rest == nullptr))) {
+    string err = "Error: operation called with incorrect arg_count!";
     throw err;
   }
 
@@ -105,6 +105,14 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r, lexical_scope& s)
   for (hydra_symbol *s : arg_names) {
     scope->map[s] = arg_list.front();
     arg_list.pop_front();
+  }
+  for (hydra_symbol *s : optionals) {
+    if (arg_list.empty()) {
+      scope->map[s] = new hydra_nil;
+    } else {
+      scope->map[s] = arg_list.front();
+      arg_list.pop_front();
+    }
   }
   if (rest) {
     // generate a list containing the rest of the arg_list

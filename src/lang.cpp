@@ -37,7 +37,7 @@ std::string lang = R"(
 (set-macro-character #; comment-character)
 
 
-;; we now have commentcharacters!
+;; we now can do comments!
 ;; exports
 (export (current-module) (quote def))
 (export (current-module) (quote defn))

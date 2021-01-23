@@ -20,7 +20,7 @@ struct user_oper : public hydra_oper {
 
   hydra_symbol* rest; // for accepting variable arguments
   hydra_symbol* self; // name of function within function's scope
-  // std::list<std::string> optionals
+  std::list<hydra_symbol*> optionals;
   // std::list<std::string> keyword-args
 
   std::list<hydra_symbol*> arg_names;
