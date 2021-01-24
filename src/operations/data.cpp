@@ -18,7 +18,7 @@ hydra_object *op_cons::call(hydra_object *alist, runtime &r, lexical_scope& s) {
   hydra_object *cdr = arg_list.front();
 
   if (!(dynamic_cast<hydra_cons*>(cdr) || dynamic_cast<hydra_nil*>(cdr))) {
-    string err = "Non-list provided as second argument to cons";
+    string err = "Non-list provided as second argument to cons: " + cdr->to_string();
     throw err;
   }
 

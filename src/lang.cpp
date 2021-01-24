@@ -51,20 +51,19 @@ std::string lang = R"(
 (export (current-module) 'map)
 (export (current-module) 'list)
 
-(export (current-module) '>)
-(export (current-module) '<)
-(export (current-module) '>=)
-(export (current-module) '<=)
 
-(export (current-module) '++)
 
 ;; logic
+(export (current-module) '>)
+(export (current-module) '>=)
 (defn >= (l r)
   (or (> l r) (= l r)))
 
+(export (current-module) '<)
 (defn < (l r)
   (> r l))
 
+(export (current-module) '<=)
 (defn <= (l r)
   (>= r l))
   
@@ -94,11 +93,45 @@ std::string lang = R"(
      arg-list)))
 
 ;; utility
-(defn map (func seq)
-  (unless (= nil seq)
-    (cons (func (car seq))
-    (map func (cdr seq)))))
+(defn ref (value)
+  (let ((sym (make-symbol "")))
+    (set sym value)
+     sym))
 
+(defn apply (fnc values)
+  (let ((quotify (fn (lst :self quotify)
+          (when lst 
+            (cons (list 'quote (car lst))
+                  (quotify (cdr lst)))))))
+  (eval (cons fnc (quotify values)))))
+(export (current-module) 'apply)
+
+(export (current-module) 'zip)
+(defn zip (:rest lists) 
+ (let ((zip-head
+          (fn (lst :self zip-head)
+             (when (and lst (car lst))
+               (cons (car (car lst))
+                     (zip-head (cdr lst))))))
+       (zip-tail
+          (fn (lst :self zip-tail)
+             (when (and lst (car lst))
+               (cons (cdr (car lst))
+                     (zip-tail (cdr lst)))))))
+   (let ((head (zip-head lists))
+         (tail (zip-tail lists)))
+     (when (apply and lists)
+       (cons head (apply zip tail))))))
+
+(defn map (func :rest arg-vec)
+  (let ((simple-map 
+          (fn (func args :self simple-map)
+            (when args 
+              (cons (apply func (car args))
+                    (simple-map func (cdr args)))))))
+    (simple-map func (apply zip arg-vec))))
+
+(export (current-module) '++)
 (defn ++ (x) (+ x 1))
 
 ;; import
