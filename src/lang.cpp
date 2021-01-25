@@ -93,11 +93,13 @@ std::string lang = R"(
      arg-list)))
 
 ;; utility
+(export (current-module) 'ref)
 (defn ref (value)
-  (let ((sym (make-symbol "")))
+  (let ((sym (symbol "")))
     (set sym value)
      sym))
 
+;; hiher-order functions
 (defn apply (fnc values)
   (let ((quotify (fn (lst :self quotify)
           (when lst 

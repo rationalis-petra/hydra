@@ -58,10 +58,15 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   if (hydra_symbol *symbol = dynamic_cast<hydra_symbol *>(arg_list.front())) {
     hydra_object *value = arg_list.back();
 
+    // if there is a lexical scope with the value
+    if (s.map.find(symbol) != s.map.end()) {
+      s.map[symbol] = value;
+    }
+
     symbol->value = value;
     return value;
   } else {
-    string err = "Error: provided non-symbol as first argument of def";
+    string err = "Error: provided non-symbol as first argument of set";
     throw err;
   }
 }

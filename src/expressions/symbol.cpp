@@ -3,6 +3,12 @@
 using std::string;
 
 string hydra_symbol::to_string() const {
+  if (name == "") {
+    if (value)
+      return "<ref: " + value->to_string() + ">";
+    else
+      return "<ref: null";
+  }
   return name;
 }
 

@@ -90,7 +90,7 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime& r, lexical_scop
 
 hydra_object *user_oper::call(hydra_object *alist, runtime &r,
                               lexical_scope &s) {
-  // if eval_args is true, it will be taken care of
+  // if this is a macro or function, argument evaluation (or lack thereof) is taken care of
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
 
   // too few arguments OR too many arguments
