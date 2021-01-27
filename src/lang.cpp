@@ -63,7 +63,7 @@ std::string lang = R"(
                      (zip-tail (cdr lst)))))))
    (let ((head (zip-head lists))
          (tail (zip-tail lists)))
-     (when (apply and lists)
+     (when (and lists (apply and lists))
        (cons head (apply zip tail))))))
 
 

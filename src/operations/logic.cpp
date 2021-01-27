@@ -41,6 +41,13 @@ hydra_object *op_eq::call(hydra_object* alist, runtime& r, lexical_scope &s) {
     }
     return new hydra_nil();
   }
+  if (hydra_string* str1 = dynamic_cast<hydra_string*>(arg1)) {
+    if (hydra_string* str2 = dynamic_cast<hydra_string*>(arg2)) {
+      if (str1->value == str2->value) 
+        return new hydra_t;
+      return new hydra_nil;
+    }
+  }
   if (dynamic_cast<hydra_nil*>(arg1)) {
     if (dynamic_cast<hydra_nil*>(arg2))
       return new hydra_t;

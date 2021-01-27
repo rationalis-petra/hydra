@@ -1,9 +1,7 @@
 (core:in-module core)
 
-
 (export (current-module) (quote list))
 (set (quote list) (fn (:rest args) args))
-
 
 (export (current-module) (quote def))
 (set (quote def) (mac (symbol value)
@@ -59,7 +57,7 @@
                      (zip-tail (cdr lst)))))))
    (let ((head (zip-head lists))
          (tail (zip-tail lists)))
-     (when (apply and lists)
+     (when (and lists (apply and lists))
        (cons head (apply zip tail))))))
 
 
