@@ -15,7 +15,7 @@ struct hydra_nil : public hydra_object {
 };
 
 struct hydra_cons : public hydra_object {
-  std::string to_string() const; hydra_cons();
+  std::string to_string() const; 
   hydra_cons(hydra_object* car, hydra_object* cdr);
   hydra_object* eval(runtime& r, lexical_scope& s);
 

@@ -2,6 +2,7 @@
 #include <string>
 #include <typeinfo>
 #include <iostream>
+#include <functional>
 
 #include "expressions.hpp"
 #include "operations.hpp"
@@ -73,15 +74,14 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime& r, lexical_scop
       }
     }
     hydra_object *expr_body = cns->cdr;
-    hydra_cons *texpr = new hydra_cons();
-    texpr->cdr = expr_body;
+    hydra_object* cdr = expr_body;
     hydra_symbol *progn = hydra_cast<hydra_symbol>(
         hydra_cast<hydra_module>(
             hydra_cast<hydra_symbol>(language_module->get("core"))->value)
             ->get("progn"));
     progn->name = "progn";
-    texpr->car = progn;
-    expr = texpr;
+    hydra_object* car = progn;
+    expr = new hydra_cons(car, cdr);
   } else {
     string err = "Non-cons provided to fn/mac";
     throw err;
@@ -120,28 +120,33 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
     if (arg_list.empty()) {
       scope->map[rest] = new hydra_nil;
     } else {
-      hydra_cons *rlist = new hydra_cons;
-      hydra_cons *root = rlist;
-      rlist->car = arg_list.front();
-      arg_list.pop_front();
-      while (!arg_list.empty()) {
-        rlist->cdr = new hydra_cons;
-        rlist = static_cast<hydra_cons *>(rlist->cdr);
-        rlist->car = arg_list.front();
-        arg_list.pop_front();
-      }
-      rlist->cdr = new hydra_nil;
-      scope->map[rest] = root;
+      // we use a recursive lambda to construct the rlist
+      function<hydra_object*()> gen_rest = [&](void) {
+        if (arg_list.empty()) {
+          return (hydra_object*) new hydra_nil;
+        } else {
+          hydra_object *car = arg_list.front();
+          arg_list.pop_front();
+          hydra_object *cdr = gen_rest();
+          return (hydra_object*) new hydra_cons(car, cdr);
+        }
+      };
+      scope->map[rest] = gen_rest();
     }
   }
   if (self) {
     scope->map[self] = this;
   }
+  hydra_object* out;
   if (is_fn) {
-    return expr->eval(r, *scope);
+    out = expr->eval(r, *scope);
   } else {
-    return expr->eval(r, *scope)->eval(r, s);
+    out = expr->eval(r, *scope)->eval(r, s);
   }
+  hydra_object::roots.insert(out);
+  hydra_object::collect_garbage(r);
+  hydra_object::roots.erase(out);
+  return out;
 }
 
 list<hydra_object *> hydra_oper::get_arg_list(hydra_object *arg_list,

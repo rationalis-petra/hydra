@@ -23,5 +23,13 @@ struct op_elt : hydra_oper {
   op_elt();
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
+struct op_lock : hydra_oper {
+  op_lock();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+struct op_unlock : hydra_oper {
+  op_unlock();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
 
 #endif // __HYDRA_DATA_HPP

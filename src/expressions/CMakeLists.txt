@@ -6,5 +6,6 @@ add_library(expressions OBJECT
                         symbol.cpp
                         values.cpp
                         module.cpp
-                        foreign.cpp)
+                        foreign.cpp
+                        lexical_scope.cpp)
 

@@ -133,8 +133,15 @@ std::string lang = R"(
                     (simple-map func (cdr args)))))))
     (simple-map func (apply zip arg-vec))))
 
-(export (current-module) '++)
-(defn ++ (x) (+ x 1))
+;; the '!' is return, so !+ pre-increment, +! is post-increment
+(export (current-module) '!+)
+(defmac !+ (x)
+  (let ((ret (symbol "ret")))
+    (list 'let (list (list ret x))
+          (list 'set x (list '+ x 1))
+          ret)))
+(export (current-module) '+!)
+(defmac +! (x) (list 'set x (list '+ x '1)))
 
 ;; import
 (defn use-module (module1 module2)

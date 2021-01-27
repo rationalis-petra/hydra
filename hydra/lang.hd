@@ -128,8 +128,15 @@
                     (simple-map func (cdr args)))))))
     (simple-map func (apply zip arg-vec))))
 
-(export (current-module) '++)
-(defn ++ (x) (+ x 1))
+;; the '!' is return, so !+ pre-increment, +! is post-increment
+(export (current-module) !+)
+(defmac !+ (x)
+  (let ((ret (symbol "ret")))
+    (list 'let (list (list ret x))
+          (list 'set (list 'quote x) (list '+ x 1))
+          ret)))
+(export (current-module) +!)
+(defmac +! (x) (list 'set (list 'quote x) (list '+ x '1)))
 
 ;; import
 (defn use-module (module1 module2)
@@ -157,5 +164,5 @@
 (use-module &:user &:hydra:core)
 (use-module &:user &:hydra:io)
 (use-module &:user &:hydra:foreign)
-;;(use-module &:user &:hydra:concurrent)
+;; (use-module &:user &:hydra:concurrent)
 (in-module &:user)

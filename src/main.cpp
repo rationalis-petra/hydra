@@ -16,6 +16,9 @@ extern string lang;
 hydra_module* language_module;
 
 int main(int argc, char **argv) {
+  runtime r;
+  hydra_object::r = &r;
+
   language_module = new hydra_module("hydra");
   pair<string, hydra_module*> inbuilts[] = {
       // other modules
@@ -59,6 +62,8 @@ int main(int argc, char **argv) {
       make_pair("quote", new op_quote),
       make_pair("progn", new op_progn),
       make_pair("quit", new op_quit),
+      make_pair("lock", new op_lock),
+      make_pair("unlock", new op_unlock),
 
       make_pair("module", new op_make_module),
       make_pair("symbol", new op_make_symbol),
@@ -83,7 +88,6 @@ int main(int argc, char **argv) {
       make_pair("open-file", new op_open_file),
       make_pair("close-file", new op_close)};
 
-  runtime r;
   r.root = new hydra_module("");
   hydra_symbol* sym = r.root->intern("hydra");
   sym->value = language_module;
@@ -159,13 +163,16 @@ int main(int argc, char **argv) {
     }
   }
 
-  while (!(in == "(quit)")) {
+  while (true) {
     try {
       cout << r.active_module->name << "> ";
       lexical_scope s;
       ast = read(stm, r);
+      hydra_object::roots.insert(ast);
       out = ast->eval(r, s);
       cout << "* " << out << endl;
+      hydra_object::roots.erase(ast);
+      hydra_object::collect_garbage(r);
     } catch (string e) {
       cout << e << endl;
     } catch (const char *err) {
@@ -173,7 +180,6 @@ int main(int argc, char **argv) {
     }
 
     getline(cin, in);
-    hydra_object::collect_garbage(r);
   }
   return 0;
 }

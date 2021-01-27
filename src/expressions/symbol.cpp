@@ -1,6 +1,7 @@
 #include "expressions.hpp"
 
 using std::string;
+#include <types.hpp>
 
 string hydra_symbol::to_string() const {
   if (name == "") {
@@ -15,6 +16,7 @@ string hydra_symbol::to_string() const {
 hydra_symbol::hydra_symbol(string _name) {
   name = _name;
   value = nullptr;
+  mut = true;
 }
 
 hydra_object* hydra_symbol::eval(runtime& r, lexical_scope& s) {

@@ -41,13 +41,14 @@ hydra_object *op_while::call(hydra_object *alist, runtime &r,
   hydra_object *condition = arg_list.front();
   arg_list.pop_front();
   // is nil?
+  hydra_object* out = new hydra_nil;
   while (!condition->eval(r, s)->null()) {
     for (hydra_object *o : arg_list) {
-      o->eval(r, s);
+      out = o->eval(r, s);
     }
   }
   // otherwise
-  return new hydra_nil;
+  return out;
 }
 op_set::op_set() { is_fn = true; }
 hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
@@ -61,9 +62,12 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
     // if there is a lexical scope with the value
     if (s.map.find(symbol) != s.map.end()) {
       s.map[symbol] = value;
+    } else if (symbol->mut) {
+      symbol->value = value;
+    } else {
+    string err = "Error: cannot set immutable symbol";
+    throw err;
     }
-
-    symbol->value = value;
     return value;
   } else {
     string err = "Error: provided non-symbol as first argument of set";

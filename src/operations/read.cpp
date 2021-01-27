@@ -80,10 +80,8 @@ hydra_object *to_cons(list<hydra_object *> list) {
   if (list.empty()) {
     return new hydra_nil();
   } else {
-    hydra_cons *cns = new hydra_cons();
-    cns->car = list.front();
-    list.pop_front();
-    cns->cdr = to_cons(list);
+    hydra_cons *cns =
+      new hydra_cons(list.front(), (list.pop_front(), to_cons(list)));
     return cns;
   }
 }
@@ -111,7 +109,6 @@ hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
       break;
     }
   }
-
   throw "( with no matching )!";
 }
 
@@ -188,13 +185,9 @@ hydra_object *read(hydra_object *raw, runtime &r) {
   is->stream->read(&c, 1);
   while (!is->stream->eof()) {
 
-    if (r.readtable.find(c) != r.readtable.end()){
-      hydra_cons* cns = new hydra_cons;
-      cns->car = new hydra_char(c);
-      cns->cdr = new hydra_nil;
-      hydra_cons* cns2 = new hydra_cons;
-      cns2->car = is;
-      cns2->cdr = cns;
+    if (r.readtable.find(c) != r.readtable.end()) {
+      hydra_cons *cns = new hydra_cons(new hydra_char(c), new hydra_nil);
+      hydra_cons *cns2 = new hydra_cons(is, cns);
 
       // generate a blank 'dummy' scope
       lexical_scope s;
@@ -239,7 +232,8 @@ hydra_object *op_read::call(hydra_object *alist, runtime &r, lexical_scope &s) {
     string err = "Incorrect number of arguments provided to read";
     throw err;
   }
-  return read(arg_list.front(), r);
+  hydra_object* obj = read(arg_list.front(), r);
+  return obj;
 }
 
 op_set_mac_char::op_set_mac_char() { is_fn = true; }

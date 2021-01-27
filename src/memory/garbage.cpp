@@ -29,25 +29,45 @@ void mark_obj(hydra_object* obj) {
 }
 
 void mark(runtime& r) {
+  // mark all objects accessible from the root and active module
   mark_obj(r.root);
+  mark_obj(r.active_module);
+
+  // also, mark everything accessible via a lexical context
+  for (lexical_scope* s : hydra_object::context_list) {
+    for (auto o : s->map) {
+      mark_obj(o.first);
+      mark_obj(o.second);
+    }
+  }
+  for (hydra_object* o : hydra_object::roots) {
+    mark_obj(o);
+  }
 }
 
-void sweep() {
+unsigned long sweep() {
   list<hydra_object*> new_list;
+  unsigned long num = 0;
+  unsigned long deleted = 0;
   for (hydra_object* obj: hydra_object::node_list) {
     if (!obj->marked) {
+      deleted ++;
       delete obj;
     }
     else {
+      num++;
       obj->marked = false;
       new_list.push_front(obj);
     }
   }
   hydra_object::node_list = new_list;
+  return num;
 }
 
 void hydra_object::collect_garbage(runtime& r) {
-  mark(r);
-  sweep();
+  if ((counter - last) > 10000) {
+    mark(r);
+    last = sweep();
+  }
 }
 

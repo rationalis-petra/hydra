@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include <set>
 
 struct runtime;
 struct lexical_scope;
@@ -21,7 +22,20 @@ struct hydra_object {
 
   // mark & sweep garbage collection
   bool marked;
+  static runtime *r;
+  // how many objects exist?
+  static unsigned long counter;
+  // number of objects after most recent collection
+  static unsigned long last;
+  // The list of all hydra objects
   static std::list<hydra_object*> node_list; 
+  // The list of root hydra objects - these are objects
+  // which should not be deleted for reasons 'outside'
+  static std::set<hydra_object*> roots; 
+
+  // the list of all lexical contexts
+  static std::list<lexical_scope*> context_list; 
+  // self-explanatory
   static void collect_garbage(runtime& r);
 };
 

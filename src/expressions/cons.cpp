@@ -5,10 +5,7 @@
 
 using namespace std;
 
-hydra_cons::hydra_cons() {}
-hydra_cons::hydra_cons(hydra_object* car, hydra_object* cdr) {
-  this->car = car;
-  this->cdr = cdr;
+hydra_cons::hydra_cons(hydra_object* _car, hydra_object* _cdr) : car(_car), cdr (_cdr) {
 }
 
 hydra_object *hydra_cons::eval(runtime &r, lexical_scope& s) {

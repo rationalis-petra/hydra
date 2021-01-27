@@ -21,6 +21,8 @@ struct runtime {
 
 struct lexical_scope {
   std::map<hydra_symbol*, hydra_object*> map;
+  lexical_scope();
+  ~lexical_scope();
 };
 
 extern hydra_module* language_module;
