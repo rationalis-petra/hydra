@@ -68,6 +68,10 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
     string err = "Error: cannot set immutable symbol";
     throw err;
     }
+
+    hydra_object::roots.insert(value);
+    hydra_object::collect_garbage(r);
+    hydra_object::roots.erase(value);
     return value;
   } else {
     string err = "Error: provided non-symbol as first argument of set";
@@ -95,7 +99,11 @@ hydra_object *op_eval::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   }
   // eval evaluates in a null lexical scope!
   lexical_scope new_scope;
-  return arg_list.front()->eval(r, new_scope);
+  hydra_object* value = arg_list.front()->eval(r, new_scope);
+  hydra_object::roots.insert(value);
+  hydra_object::collect_garbage(r);
+  hydra_object::roots.erase(value);
+  return value;
 }
 
 op_progn::op_progn() { is_fn = false; }

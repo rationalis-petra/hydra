@@ -20,33 +20,33 @@ hydra_object *op_eq::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   if (hydra_num* num1 = dynamic_cast<hydra_num*>(arg1)) {
     if (hydra_num* num2 = dynamic_cast<hydra_num*>(arg2)) {
       if (num1->value == num2->value)
-        return new hydra_t();
-      return new hydra_nil();
+        return new hydra_t;
+      return new hydra_nil;
     }
-    return new hydra_nil();
+    return new hydra_nil;
   }
   if (hydra_char* char1 = dynamic_cast<hydra_char*>(arg1)) {
     if (hydra_char* char2 = dynamic_cast<hydra_char*>(arg2)) {
       if (char1->value == char2->value)
-        return new hydra_t();
-      return new hydra_nil();
+        return new hydra_t;
+      return new hydra_nil;
     }
-    return new hydra_nil();
+    return new hydra_nil;
   }
   if (hydra_symbol* sym1 = dynamic_cast<hydra_symbol*>(arg1)) {
     if (hydra_symbol* sym2 = dynamic_cast<hydra_symbol*>(arg2)) {
       if (sym1 == sym2)
-        return new hydra_t();
-      return new hydra_nil();
+        return new hydra_t;
+      return new hydra_nil;
     }
     return new hydra_nil();
   }
   if (dynamic_cast<hydra_nil*>(arg1)) {
     if (dynamic_cast<hydra_nil*>(arg2))
-      return new hydra_t();
-    return new hydra_nil();
+      return new hydra_t;
+    return new hydra_nil;
   }
-  return new hydra_nil();
+  return new hydra_nil;
 }
 
 op_or::op_or() { is_fn = false; }

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "expressions.hpp"
 
 // the garbage collector for the language
@@ -7,6 +8,7 @@ using std::list;
 void mark_obj(hydra_object* obj) {
   if (!obj->marked) {
     obj->marked = true;
+
     if (hydra_cons *cns = dynamic_cast<hydra_cons *>(obj)) {
       mark_obj(cns->car);
       mark_obj(cns->cdr);
@@ -48,10 +50,8 @@ void mark(runtime& r) {
 unsigned long sweep() {
   list<hydra_object*> new_list;
   unsigned long num = 0;
-  unsigned long deleted = 0;
-  for (hydra_object* obj: hydra_object::node_list) {
+  for (hydra_object* obj : hydra_object::node_list) {
     if (!obj->marked) {
-      deleted ++;
       delete obj;
     }
     else {
