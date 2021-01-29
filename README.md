@@ -72,6 +72,7 @@ Then, depending on your os:
 cmake .. -G "Visual Studio 16"
 cmake --build . --config Release
 ```
+Note: if you want to use g++ on windows, use `conan install .. --settings compiler="gcc"`, and `cmake .. -G "MinGw Makefiles"`
 ```sh
 (linux, osx)
 $ cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
