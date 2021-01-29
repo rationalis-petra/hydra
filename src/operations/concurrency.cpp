@@ -8,11 +8,10 @@ using std::list;
 using std::string;
 using std::thread;
 
-void opcall(hydra_oper* o, hydra_object* args, runtime& r) {
-  o->call(args, r);
+op_thread::op_thread() {
+  is_fn = true;
+  docstring = new hydra_string("Creates a new thread and starts the provided function within that thread");
 }
-
-op_thread::op_thread() { is_fn = true; }
 hydra_object *op_thread::call(hydra_object *alist, runtime &r) {
   list<hydra_object *> arg_list = get_arg_list(alist, r);
 

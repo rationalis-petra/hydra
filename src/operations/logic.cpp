@@ -7,7 +7,10 @@ using std::list;
 using std::string;
 
 
-op_eq::op_eq() { is_fn = true; }
+op_eq::op_eq() {
+  is_fn = true;
+  docstring = new hydra_string("Returns t if two values are equal, and nil otherwise");
+}
 hydra_object *op_eq::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {

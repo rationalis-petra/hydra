@@ -2,19 +2,24 @@
 
 // copied straight from lang.hd
 std::string lang = R"(
-(core:in-module core)
+(&:hydra:core:in-module &:hydra:core)
 
+"The comment character has not been defined yet"
+"Hence, I use strings as makeshift comments!"
+"We start by defining extremely useful functions: and macros"
 
+"The list function"
 (export (current-module) (quote list))
 (set (quote list) (fn (:rest args) args))
 
-
+"The def function: like setq in common lisp"
 (export (current-module) (quote def))
 (set (quote def) (mac (symbol value)
   (list (quote set) 
         (list (quote quote) symbol)
          value)))
 
+"The defn, i.e. define-function"
 (export (current-module) (quote defn))
 (def defn (mac (name arg-list :rest body)
   (list (quote def) name
@@ -23,6 +28,7 @@ std::string lang = R"(
         (cons (quote :self) (cons name arg-list))
          body)))))
 
+"The defmac, i.e. define macro"
 (export (current-module) (quote defmac))
 (def defmac (mac (name arg-list :rest body)
   (list (quote def) name
@@ -31,15 +37,34 @@ std::string lang = R"(
         (cons (quote :self) (cons name arg-list))
          body)))))
 
+"The comment character macro - we may have comments at last!"
+(defn comment-reader (stream char)
+  (if (= char #newline)
+      (read stream)
+      (comment-reader stream (next stream))))
+
+(set-macro-character #; comment-reader)
+
+;; READER MACROS
+;; Now that we have a base of functions/macros, we can
+;; define some useful reader macros :)
+;; the first reader macro (above) is comment character!
+
+;; quote macro: 'hello -> (quote hello)
 (defn single-quote-reader (stream char) (list (quote quote) (read stream)))
 (set-macro-character #' single-quote-reader)
 
-(defn comment-character (stream char)
-  (if (= char #newline)
-      (read stream)
-      (comment-character stream (next stream))))
+;; bang macro: !L(1 2 3) -> (list 1 2 3)
+;;             !A(1 2 3) -> (array 1 2 3)
+(defn bang-reader (stream char)
+  (if (= (next stream) #L)
+      (cons 'list (read stream)) 
+  (if (= (next stream) #A)
+      (cons 'array (read stream))
+      (read stream))))
+      
 
-(set-macro-character #; comment-character)
+(set-macro-character #! bang-reader)
 
 
 ;;; DATA MANIPULATION
@@ -140,8 +165,8 @@ std::string lang = R"(
 (defn apply (fnc values)
   (let ((quotify (fn (lst :self quotify)
           (when lst 
-            (cons (list 'quote (car lst))
-                  (quotify (cdr lst)))))))
+            (cons !L('quote (car lst))
+                    (quotify (cdr lst)))))))
   (eval (cons fnc (quotify values)))))
 (export (current-module) 'apply)
 
@@ -155,16 +180,6 @@ std::string lang = R"(
                     (simple-map func (cdr args)))))))
     (simple-map func (apply zip arg-vec))))
 
-
-;;; ARITHMETIC
-(export (current-module) '!+)
-(defmac !+ (x)
-  (let ((ret (symbol "ret")))
-    (list 'let (list (list ret x))
-          (list 'set x (list '+ x 1))
-          ret)))
-(export (current-module) '+!)
-(defmac +! (x) (list 'set x (list '+ x '1)))
 
 ;;; MODULES
 (export (current-module) 'use-module)
@@ -191,10 +206,11 @@ std::string lang = R"(
    (close-file fstream)
    (in-module module)))
 
-(in-module &:hydra:core)
+(&:hydra:core:in-module &:hydra:core)
 (def &:user (module "user"))
 (use-module &:user &:hydra:core)
 (use-module &:user &:hydra:io)
+(use-module &:user &:hydra:dev)
 (use-module &:user &:hydra:foreign)
 ;;(use-module &:user &:hydra:concurrent)
 (in-module &:user)

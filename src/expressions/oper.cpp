@@ -74,7 +74,14 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime& r, lexical_scop
       }
     }
     hydra_object *expr_body = cns->cdr;
-    hydra_object* cdr = expr_body;
+    hydra_object *cdr = expr_body;
+
+    if (hydra_cons *docons = (dynamic_cast<hydra_cons *>(expr_body))) {
+      if (hydra_string *dostring = dynamic_cast<hydra_string*>(docons->car)) {
+        docstring = dostring;
+      }
+    }
+
     hydra_symbol *progn = hydra_cast<hydra_symbol>(
         hydra_cast<hydra_module>(
             hydra_cast<hydra_symbol>(language_module->get("core"))->value)

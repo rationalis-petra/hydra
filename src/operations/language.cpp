@@ -106,7 +106,11 @@ hydra_object *op_eval::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   return value;
 }
 
-op_progn::op_progn() { is_fn = false; }
+op_progn::op_progn() {
+  is_fn = false;
+  docstring = new hydra_string("Evaluates its arguments in sequential order, returning the value\n"
+                               "of the last one");
+}
 hydra_object *op_progn::call(hydra_object *alist, runtime &r,
                              lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
@@ -119,18 +123,27 @@ hydra_object *op_progn::call(hydra_object *alist, runtime &r,
   return out;
 }
 
-op_fn::op_fn() { is_fn = false; }
+op_fn::op_fn() {
+  is_fn = false;
+  docstring = new hydra_string("Generates a new function object");
+}
 hydra_object *op_fn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   return new user_oper(alist, true, r, s);
 }
 
-op_mac::op_mac() { is_fn = false; }
+op_mac::op_mac() {
+  is_fn = false;
+  docstring = new hydra_string("Generates a new macro object");
+}
 hydra_object *op_mac::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   return new user_oper(alist, false, r, s);
 }
 
-op_quit::op_quit() { is_fn = false; }
-hydra_object *op_quit::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+op_exit::op_exit() {
+  is_fn = false;
+  docstring = new hydra_string("Exits the current running application");
+}
+hydra_object *op_exit::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   exit(0);
 }
 

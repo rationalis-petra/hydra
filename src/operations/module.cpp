@@ -6,7 +6,10 @@
 using std::list;
 using std::string;
 
-op_make_symbol::op_make_symbol() { is_fn = true; }
+op_make_symbol::op_make_symbol() {
+  is_fn = true;
+  docstring = new hydra_string("Generates a new, unique symbol whose name is the provided string");
+}
 hydra_object *op_make_symbol::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -17,7 +20,10 @@ hydra_object *op_make_symbol::call(hydra_object *alist, runtime &r, lexical_scop
   return new hydra_symbol(name);
 }
 
-op_make_module::op_make_module() { is_fn = true; }
+op_make_module::op_make_module() {
+  is_fn = true;
+  docstring = new hydra_string("Generates a new module whose name is the provided string");
+}
 hydra_object *op_make_module::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() > 1) {
@@ -31,7 +37,10 @@ hydra_object *op_make_module::call(hydra_object* alist, runtime& r, lexical_scop
   return new hydra_module(name);
 }
 
-op_in_module::op_in_module() { is_fn = true; }
+op_in_module::op_in_module() {
+  is_fn = true;
+  docstring = new hydra_string("Sets the current (active) module to the provided argument");
+}
 hydra_object *op_in_module::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -43,7 +52,12 @@ hydra_object *op_in_module::call(hydra_object* alist, runtime& r, lexical_scope 
   return new hydra_t;
 }
 
-op_intern::op_intern() { is_fn = true; }
+op_intern::op_intern() {
+  is_fn = true;
+  docstring = new hydra_string("Take a module and a string; if a symbol with that name exists\n"
+                               "then return it, otherwise place a new symbol in the current\n"
+                               "package with that name and return it");
+}
 hydra_object *op_intern::call(hydra_object* alist, runtime &r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
@@ -56,7 +70,12 @@ hydra_object *op_intern::call(hydra_object* alist, runtime &r, lexical_scope &s)
   return mod->intern(str->value);
 }
 
-op_insert::op_insert() { is_fn = true; }
+op_insert::op_insert() {
+  is_fn = true;
+  docstring = new hydra_string("Takes a module and a symbol; insert the symbol into the module,\n"
+                               "or return an error if a symbol with that name already exists in\n"
+                               "current module");
+}
 hydra_object *op_insert::call(hydra_object* alist, runtime &r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
@@ -74,7 +93,11 @@ hydra_object *op_insert::call(hydra_object* alist, runtime &r, lexical_scope &s)
   return sym;
 }
 
-op_get::op_get() { is_fn = true; }
+op_get::op_get() {
+  is_fn = true;
+  docstring = new hydra_string("Takes a module and a string; if a symbol with the name exists in"
+                               "the module, return it. Otherwise, return nil");
+}
 hydra_object *op_get::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
@@ -87,7 +110,10 @@ hydra_object *op_get::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   return mod->get(str->value);
 }
 
-op_get_module::op_get_module() { is_fn = true; }
+op_get_module::op_get_module() {
+  is_fn = true;
+  docstring = new hydra_string("Returns the current (active) module");
+}
 hydra_object *op_get_module::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 0) {
@@ -98,7 +124,10 @@ hydra_object *op_get_module::call(hydra_object* alist, runtime& r, lexical_scope
 }
 
 
-op_get_symbols::op_get_symbols() { is_fn = true; }
+op_get_symbols::op_get_symbols() {
+  is_fn = true;
+  docstring = new hydra_string("Returns a list of symbols which are exported by a module");
+}
 hydra_object *op_get_symbols::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -114,7 +143,10 @@ hydra_object *op_get_symbols::call(hydra_object* alist, runtime& r, lexical_scop
   return out;
 }
 
-op_remove::op_remove() { is_fn = true; }
+op_remove::op_remove() {
+  is_fn = true;
+  docstring = new hydra_string("Removes a symbol from a module, returns the module");
+}
 hydra_object *op_remove::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {

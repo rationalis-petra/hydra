@@ -2,15 +2,17 @@
 #include <string>
 
 #include "expressions.hpp"
-#include "operations.hpp"
+#include "operations/types.hpp"
 #include "types.hpp"
 
 using std::list;
 using std::string;
 
-struct op_typep : hydra_oper() {};
-
-op_typep::op_typep() { eval_args = true; }
+op_typep::op_typep() {
+  is_fn = true;
+  docstring = new hydra_string("Returns t if the first argument is the type defined by the\n"
+                               "second, otherwise returns nil");
+}
 hydra_object *op_typep::call(hydra_object *alist, runtime &r,
                              lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);

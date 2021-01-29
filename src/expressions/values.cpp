@@ -12,6 +12,11 @@ string hydra_t::to_string() const {
   return "t";
 }
 
+hydra_string::hydra_string() {}
+hydra_string::hydra_string(string str) {
+  value = str;
+}
+
 string hydra_string::to_string() const {
   return '"' + value + '"';
 }

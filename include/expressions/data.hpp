@@ -61,6 +61,9 @@ struct hydra_array : public hydra_object {
 
 
 struct hydra_string : public hydra_object {
+  hydra_string();
+  hydra_string(std::string str);
+
   std::string to_string() const;
   std::string value;  
 };

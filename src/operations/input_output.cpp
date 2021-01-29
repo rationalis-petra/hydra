@@ -13,7 +13,11 @@ using std::istream;
 using std::cout;
 using std::endl;
 
-op_print::op_print() { is_fn = true; }
+op_print::op_print() {
+  is_fn = true;
+  docstring = new hydra_string("Prints a string representation of the provided argument to\n"
+                               "the standard output stream");
+}
 hydra_object *op_print::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -23,7 +27,11 @@ hydra_object *op_print::call(hydra_object *alist, runtime &r, lexical_scope &s) 
   return arg_list.front();
 }
 
-op_open_file::op_open_file() { is_fn = true; }
+op_open_file::op_open_file() {
+  is_fn = true;
+  docstring = new hydra_string("Takes a string (path), and returns an input stream located\n"
+                               "by the path");
+}
 hydra_object *op_open_file::call(hydra_object *alist, runtime &r, lexical_scope& s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -41,7 +49,11 @@ hydra_object *op_open_file::call(hydra_object *alist, runtime &r, lexical_scope&
   }
 }
 
-op_next::op_next() { is_fn = true; }
+op_next::op_next() {
+  is_fn = true;
+  docstring = new hydra_string("Takes an input stream, advances it one character\n"
+                               "and returns the character at the 'current' position");
+}
 hydra_object *op_next::call(hydra_object* alist, runtime& r, lexical_scope& s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -58,7 +70,11 @@ hydra_object *op_next::call(hydra_object* alist, runtime& r, lexical_scope& s) {
   }
 }
 
-op_peek::op_peek() { is_fn = true; }
+op_peek::op_peek() {
+  is_fn = true;
+  docstring = new hydra_string("Takes an input stream, and peeks at the next character\n"
+                               "but does not advance the input stream");
+}
 hydra_object *op_peek::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -75,7 +91,11 @@ hydra_object *op_peek::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   }
 }
 
-op_endp::op_endp() { is_fn = true; }
+op_endp::op_endp() {
+  is_fn = true;
+  docstring = new hydra_string("Returns t if a given input stream has reached the\n"
+                               "end of the file, and nil otherwise");
+}
 hydra_object *op_endp::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -96,7 +116,10 @@ hydra_object *op_endp::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   }
 }
 
-op_close::op_close() { is_fn = true; }
+op_close::op_close() {
+  is_fn = true;
+  docstring = new hydra_string("Takes an input stream representing a file, and closes it");
+}
 hydra_object *op_close::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {

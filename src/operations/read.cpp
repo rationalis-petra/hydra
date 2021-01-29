@@ -225,7 +225,11 @@ hydra_object *read(hydra_object *raw, runtime &r) {
   return new hydra_nil;
 }
 
-op_read::op_read() { is_fn = true; }
+op_read::op_read() {
+  is_fn = true;
+  docstring = new hydra_string("Takes a string or input stream, and returns a hydra expression.\n"
+                               "Programmable via set-macro-character");
+}
 hydra_object *op_read::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -236,7 +240,11 @@ hydra_object *op_read::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   return obj;
 }
 
-op_set_mac_char::op_set_mac_char() { is_fn = true; }
+op_set_mac_char::op_set_mac_char() {
+  is_fn = true;
+  docstring = new hydra_string("Updates the readtable entry for the character (first argument)\n"
+                               "to point to the provided function (second argumetn)");
+}
 hydra_object* op_set_mac_char::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {

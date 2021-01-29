@@ -20,14 +20,20 @@ int main(int argc, char **argv) {
   hydra_object::r = &r;
 
   language_module = new hydra_module("hydra");
-  pair<string, hydra_module*> inbuilts[] = {
+  vector<pair<string, hydra_module*>> inbuilts = {
       // other modules
       make_pair("core", new hydra_module("core")),
       make_pair("io", new hydra_module("io")),
       make_pair("foreign", new hydra_module("foreign")),
-      make_pair("concurrent", new hydra_module("concurrent"))};
+      make_pair("concurrent", new hydra_module("concurrent")),
+      make_pair("dev", new hydra_module("dev"))
+  };
 
-  pair<string, hydra_object*> core[] = {
+  vector<pair<string, hydra_object*>> dev = {
+      make_pair("doc", new op_describe)
+  };
+
+  vector<pair<string, hydra_object*>> core = {
       // arithmetic
       make_pair("+", new op_plus),
       make_pair("-", new op_minus),
@@ -61,7 +67,7 @@ int main(int argc, char **argv) {
       make_pair("set", new op_set),
       make_pair("quote", new op_quote),
       make_pair("progn", new op_progn),
-      make_pair("quit", new op_quit),
+      make_pair("exit", new op_exit),
       make_pair("lock", new op_lock),
       make_pair("unlock", new op_unlock),
 
@@ -78,13 +84,13 @@ int main(int argc, char **argv) {
 
       make_pair("typep", new op_typep)};
 
-  pair<string, hydra_object*> foreign[] = {
+  vector<pair<string, hydra_object*>> foreign = {
       // ffi
       make_pair("load-c-library", new op_foreign_lib),
       make_pair("get-c-symbol", new op_foreign_sym),
       make_pair("internalize", new op_internalize)};
 
-  pair<string, hydra_object*> io[] = {
+  vector<pair<string, hydra_object*>> io = {
       // io
       make_pair("print", new op_print),
       make_pair("open-file", new op_open_file),
@@ -98,39 +104,26 @@ int main(int argc, char **argv) {
   sym->value = new hydra_module("keyword");
   // arithmetic
 
+
   hydra_module *mod = language_module;
   for (auto p : inbuilts) {
     hydra_symbol* sym = mod->intern(p.first);
     sym->value = p.second;
   }
 
-  mod = hydra_cast<hydra_module>(
-      hydra_cast<hydra_symbol>(language_module->get("core"))->value);
-  for (auto p : core) {
-    hydra_symbol *sym = mod->intern(p.first);
-    mod->exported_symbols[p.first] = sym;
-    sym->value = p.second;
+  vector<pair<string, vector<pair<string, hydra_object *>>>> moddefs = {
+      make_pair("core", core), make_pair("io", io),
+      make_pair("foreign", foreign), make_pair("dev", dev)};
+
+  for (auto m : moddefs) {
+    mod = hydra_cast<hydra_module>(
+        hydra_cast<hydra_symbol>(language_module->get(m.first))->value);
+    for (auto p : m.second) {
+      hydra_symbol *sym = mod->intern(p.first);
+      mod->exported_symbols[p.first] = sym;
+      sym->value = p.second;
+    }
   }
-  mod = hydra_cast<hydra_module>(
-      hydra_cast<hydra_symbol>(language_module->get("io"))->value);
-  for (auto p : io) {
-    hydra_symbol *sym = mod->intern(p.first);
-    mod->exported_symbols[p.first] = sym;
-    sym->value = p.second;
-  }
-  mod = hydra_cast<hydra_module>(
-      hydra_cast<hydra_symbol>(language_module->get("foreign"))->value);
-  for (auto p : foreign) {
-    hydra_symbol *sym = mod->intern(p.first);
-    mod->exported_symbols[p.first] = sym;
-    sym->value = p.second;
-  }
-  // mod =
-  // hydra_cast<hydra_module>(hydra_cast<hydra_symbol>(language_module->get("concurrent"))->value);
-  // for (auto p : concurrent) {
-  //   hydra_symbol *sym = mod->intern(p.first);
-  //   sym->value = p.second;
-  // }
 
   hydra_istream *stm = new hydra_istream();
   stm->stream = &cin;

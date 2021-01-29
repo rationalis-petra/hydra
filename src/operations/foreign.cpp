@@ -10,8 +10,14 @@ using std::list;
 using std::string;
 using std::to_string;
 
-op_foreign_lib::op_foreign_lib() { is_fn = true; }
-hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r, lexical_scope &s) {
+op_foreign_lib::op_foreign_lib() {
+  is_fn = true;
+  docstring = new hydra_string("takes a string and tries to open the "
+                               "corresponding\n shared object (.so) or"
+                               "dynamic link library (.dll) file");
+}
+hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r,
+                                   lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(body, r, s);
   if (arg_list.size() != 1) {
     string err =
@@ -37,7 +43,12 @@ hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r, lexical_scope
   }
 }
 
-op_foreign_sym::op_foreign_sym() { is_fn = true; }
+op_foreign_sym::op_foreign_sym() {
+  is_fn = true;
+  docstring = new hydra_string("Takes a string and a foreign library, and"
+                               "will find the\n foreign symbol whose name"
+                               "matches this string in the library");
+}
 hydra_object *op_foreign_sym::call(hydra_object *body, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(body, r, s);
   if (arg_list.size() != 2) {
@@ -65,7 +76,12 @@ hydra_object *op_foreign_sym::call(hydra_object *body, runtime &r, lexical_scope
   }
 }
 // define-foreign-function
-op_internalize::op_internalize() { is_fn = true; }
+op_internalize::op_internalize() {
+  is_fn = true;
+  docstring = new hydra_string("Takes a foreign symbol and a type declaration"
+                               "and returns a hydra\n value that can be used"
+                               "to access the symbol");
+}
 hydra_object *op_internalize::call(hydra_object *body, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(body, r, s);
   if (arg_list.size() != 2) {
@@ -175,7 +191,10 @@ hydra_object *op_internalize::call(hydra_object *body, runtime &r, lexical_scope
 
 
 
-hydra_foreign_oper::hydra_foreign_oper() { is_fn = true; }
+hydra_foreign_oper::hydra_foreign_oper() {
+  is_fn = true;
+  docstring = new hydra_string;
+}
 hydra_object *hydra_foreign_oper::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != arg_types.size()) {

@@ -11,5 +11,6 @@
 #include "operations/foreign.hpp"
 #include "operations/modules.hpp"
 #include "operations/types.hpp"
+#include "operations/dev.hpp"
 
 #endif // __EXPRESSIONS_HPP

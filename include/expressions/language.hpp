@@ -9,6 +9,7 @@ struct hydra_oper : public hydra_object {
   bool is_fn;
 
   virtual hydra_object* call(hydra_object* arg_list, runtime& r, lexical_scope& s) = 0; 
+  hydra_object* docstring;
 
 protected:
   std::list<hydra_object*> get_arg_list(hydra_object* arg_list, runtime& r, lexical_scope& s);
@@ -25,6 +26,7 @@ struct user_oper : public hydra_oper {
 
   std::list<hydra_symbol*> arg_names;
   hydra_object* expr;
+
   // captured scope for closures
   lexical_scope* scope;
   user_oper(hydra_object* op_def, bool eval_args, runtime& r, lexical_scope &s);

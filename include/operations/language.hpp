@@ -67,8 +67,8 @@ struct op_set_mac_char : hydra_oper {
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
 };
 
-struct op_quit : hydra_oper {
-  op_quit();
+struct op_exit : hydra_oper {
+  op_exit();
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
 };
 
