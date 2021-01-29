@@ -1,2 +1,2 @@
 
-add_library(types OBJECT types.cpp)
+add_library(types OBJECT integer.cpp make_type.cpp)

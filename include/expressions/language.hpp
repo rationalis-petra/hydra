@@ -57,3 +57,4 @@ struct hydra_symbol : public hydra_object {
   std::string to_string() const;
   hydra_object* eval(runtime& r, lexical_scope& s);
 };
+

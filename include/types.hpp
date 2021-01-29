@@ -8,30 +8,21 @@
 enum foreign_type { Int32, Pointer, String, Void };
 
 
-struct hydra_type {
-  enum {
-    // simple
-    type_int,
-    type_char,
-    type_symbol,
-    type_t,
-    type_null,
-    type_cons,
-    // composite data structures
-    type_array,
-    type_list,
-    type_fn,
-    type_mac,
-    // foreign stuff
-    type_fsym,
-    type_flib
-  } tag;
-  // for composite types (symbols, lists, ...)
-  std::list<hydra_type> type_params;
+struct hydra_type : public hydra_object {
+public:
+  virtual hydra_object* check_type(hydra_object* obj) = 0;
 };
 
-bool typep(hydra_type t, hydra_object* o);
-void fn_typecheck(hydra_type t, hydra_object* o);
+hydra_type* type_from_rep(hydra_object* type);
+
+struct type_integer : public hydra_type {
+  std::string to_string() const;
+  hydra_object* check_type(hydra_object* obj);
+  int max;
+  int min;
+};
+
+//void fn_typecheck(hydra_type t, hydra_object* o);
 
 template <typename T> T *hydra_cast(hydra_object *inp) {
   T *obj = dynamic_cast<T *>(inp);

@@ -74,7 +74,9 @@ int main(int argc, char **argv) {
       make_pair("insert", new op_insert),
       make_pair("intern", new op_intern),
       make_pair("get", new op_get),
-      make_pair("remove", new op_remove)};
+      make_pair("remove", new op_remove),
+
+      make_pair("typep", new op_typep)};
 
   pair<string, hydra_object*> foreign[] = {
       // ffi
