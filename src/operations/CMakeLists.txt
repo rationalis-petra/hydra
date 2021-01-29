@@ -6,5 +6,6 @@ add_library(operations OBJECT arithmetic.cpp
                        module.cpp
                        logic.cpp
                        read.cpp
-                       foreign.cpp)
+                       foreign.cpp
+                       types.cpp)
                        

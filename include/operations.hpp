@@ -10,5 +10,6 @@
 #include "operations/io.hpp"
 #include "operations/foreign.hpp"
 #include "operations/modules.hpp"
+#include "operations/types.hpp"
 
 #endif // __EXPRESSIONS_HPP
