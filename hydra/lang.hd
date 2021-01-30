@@ -202,6 +202,12 @@
    (close-file fstream)
    (in-module module)))
 
+(export (current-module) 'println)
+(defn println (val)
+  (print val)
+  (print newline)
+  val)
+
 (in-module &:hydra:core)
 (def &:user (module "user"))
 (use-module &:user &:hydra:core)

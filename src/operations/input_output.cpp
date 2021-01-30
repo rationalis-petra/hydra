@@ -23,7 +23,12 @@ hydra_object *op_print::call(hydra_object *alist, runtime &r, lexical_scope &s) 
   if (arg_list.size() != 1) {
     throw "Invalid number of arguments to print: print takes 1 argument";
   }
-  cout << arg_list.front()->to_string() << endl;
+  if (hydra_string* str = dynamic_cast<hydra_string*>(arg_list.front())) {
+    cout << str->value;
+  }
+  else {
+    cout << arg_list.front()->to_string();
+  }
   return arg_list.front();
 }
 

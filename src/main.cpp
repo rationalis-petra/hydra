@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
 
   hydra_istream *stm = new hydra_istream();
   stm->stream = &cin;
-  sym = r.active_module->intern("+cin+");
+  sym = hydra_cast<hydra_module>(language_module->intern("io")->value)->intern("+cin+");
   sym->value = stm;
 
   string in = lang;

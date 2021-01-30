@@ -47,7 +47,7 @@ std::string lang = R"(
 
 ;; READER MACROS
 ;; Now that we have a base of functions/macros, we can
-;; define some useful reader macros :)
+;; define some useful reader macros 
 ;; the first reader macro (above) is comment character!
 
 ;; quote macro: 'hello -> (quote hello)
@@ -76,21 +76,33 @@ std::string lang = R"(
 
 (export (current-module) 'zip)
 (defn zip (:rest lists) 
- (let ((zip-head
-          (fn (lst :self zip-head)
+ (let ((zip-head (lst)
              (when (and lst (car lst))
                (cons (car (car lst))
-                     (zip-head (cdr lst))))))
-       (zip-tail
-          (fn (lst :self zip-tail)
+                     (zip-head (cdr lst)))))
+       (zip-tail (lst)
              (when (and lst (car lst))
                (cons (cdr (car lst))
-                     (zip-tail (cdr lst)))))))
+                     (zip-tail (cdr lst))))))
    (let ((head (zip-head lists))
          (tail (zip-tail lists)))
      (when (and lists (apply and lists))
        (cons head (apply zip tail))))))
 
+(export (current-module) 'reverse)
+(defn reverse (lst :optional acc)
+  (if lst
+      (reverse (cdr lst)
+               (cons (car lst) acc))
+       acc))
+
+(export (current-module) 'concat)
+(defn concat (:rest lists)
+  (when lists
+    (if (car lists)
+        (cons (car (car lists))
+              (apply concat (cons (cdr (car lists)) (cdr lists))))
+         (apply concat (cdr lists)))))
 
 
 ;;; LOGIC
@@ -106,6 +118,10 @@ std::string lang = R"(
 (export (current-module) '<=)
 (defn <= (l r)
   (>= r l))
+
+(export (current-module) '/=)
+(defn /= (l r)
+  (not (= l r)))
   
 ;; control flow
 (export (current-module) 'when)
@@ -151,7 +167,12 @@ std::string lang = R"(
           ((= (len (car binding)) 2)
             (cons (car (cdr (car binding))) (get-vals (cdr binding))))
           ((>= (len (car binding)) 3)
-            (cons (list 'fn (car (cdr (car binding))) (car (cdr (cdr (car binding)))))
+            (cons (list
+                    'fn 
+                    ;; argument list
+                    (concat !L(:self (car (car binding)))
+                            (car (cdr (car binding))))
+                    (car (cdr (cdr (car binding))))) ;; the body
                   (get-vals (cdr binding))))))
      arg-list)))
 
@@ -162,22 +183,21 @@ std::string lang = R"(
      sym))
 
 ;;; FUNCTIONALS
+(export (current-module) 'apply)
 (defn apply (fnc values)
   (let ((quotify (fn (lst :self quotify)
           (when lst 
             (cons !L('quote (car lst))
                     (quotify (cdr lst)))))))
   (eval (cons fnc (quotify values)))))
-(export (current-module) 'apply)
 
 
 (export (current-module) 'map)
 (defn map (func :rest arg-vec)
-  (let ((simple-map 
-          (fn (func args :self simple-map)
-            (when args 
-              (cons (apply func (car args))
-                    (simple-map func (cdr args)))))))
+  (let ((simple-map (func args :self simple-map)
+          (when args 
+            (cons (apply func (car args))
+                  (simple-map func (cdr args))))))
     (simple-map func (apply zip arg-vec))))
 
 
@@ -190,12 +210,13 @@ std::string lang = R"(
         (dolist (cdr syms))))
    (get-symbols module2)))
 
-(defn use-module-tree (module1 module2)
-  (let ((get-subtree () ))))
+;; (defn use-module-tree (module1 module2)
+;;   (let ((get-subtree () ))))
 
 (use-module &:hydra:io (current-module))
 (in-module &:hydra:io)
 
+(export (current-module) '+cin+)
 (export (current-module) 'load)
 
 (defn load (filename)
@@ -206,6 +227,12 @@ std::string lang = R"(
    (close-file fstream)
    (in-module module)))
 
+(export (current-module) 'println)
+(defn println (val)
+  (print val)
+  (print #newline)
+  val)
+
 (&:hydra:core:in-module &:hydra:core)
 (def &:user (module "user"))
 (use-module &:user &:hydra:core)
@@ -214,4 +241,5 @@ std::string lang = R"(
 (use-module &:user &:hydra:foreign)
 ;;(use-module &:user &:hydra:concurrent)
 (in-module &:user)
+
 )";
