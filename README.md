@@ -6,7 +6,7 @@ A [wiki](https://github.com/rationalis-petra/hydra/wiki) is available, but every
 If you are looking at the source-code, the [readme-source](README_SOURCE.md) should help, being as there are relatively few comments.
 
 ## Syntax
-Hydra is composed of S-expressions, e.g.
+Hydra syntax is extremely simple - the general form of a program is =(operation-to-perform value-1 value-2 ...)=. For example, and if statement:
 ```
 (if (>= 1 3)
     "One is bigger"
@@ -88,3 +88,5 @@ cmake .. -DUseConan=OFF -G "<replace-this-with-your-target>"
 cmake --build .
 ```
 
+## Startup
+Once you've built the program, you can execute it as you would any other binary. This will start a repl - to stop the program, type =(exit)= at any time.
