@@ -12,8 +12,8 @@ string type_symbol::to_string() const {
 
 hydra_object *type_symbol::check_type(hydra_object* obj) {
   if (dynamic_cast<hydra_symbol*>(obj)) {
-    return new hydra_t;
+    return hydra_t::get();
   } else {
-    return new hydra_nil;
+    return hydra_nil::get();
   }
 }

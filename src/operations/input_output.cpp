@@ -111,9 +111,9 @@ hydra_object *op_endp::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   if (hydra_istream* stream = dynamic_cast<hydra_istream*>(arg_list.front())) {
     istream* file = static_cast<istream*>(stream->stream);
     if (file->eof()) {
-      return new hydra_t();
+      return hydra_t::get();
     } else {
-      return new hydra_nil;
+      return hydra_nil::get();
     }
   } else {
     string err = "Non-istream argument provided to end";
@@ -135,7 +135,7 @@ hydra_object *op_close::call(hydra_object* alist, runtime& r, lexical_scope &s) 
   if (hydra_istream* stream = dynamic_cast<hydra_istream*>(arg_list.front())) {
     ifstream* file = static_cast<ifstream*>(stream->stream);
     file->close();
-    return new hydra_nil;
+    return hydra_nil::get();
   } else {
     string err = "Non-istream argument provided to peek";
     throw err;

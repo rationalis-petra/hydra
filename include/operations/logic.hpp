@@ -1,5 +1,5 @@
-#ifndef __HYDRA_LOGIC_HPP
-#define __HYDRA_LOGIC_HPP
+#ifndef __HYDRA_OPERATIONS_LOGIC_HPP
+#define __HYDRA_OPERATIONS_LOGIC_HPP
 
 #include "expressions.hpp"
 

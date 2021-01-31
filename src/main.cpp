@@ -82,7 +82,8 @@ int main(int argc, char **argv) {
       make_pair("get", new op_get),
       make_pair("remove", new op_remove),
 
-      make_pair("typep", new op_typep)};
+      make_pair("typep", new op_typep),
+      make_pair("type", new op_type)};
 
   vector<pair<string, hydra_object*>> foreign = {
       // ffi
@@ -132,7 +133,6 @@ int main(int argc, char **argv) {
 
   string in = lang;
   hydra_istream *prog = new hydra_istream();
-  // prog->stream = new stringstream(lang);
   prog->stream = new stringstream(lang);
   hydra_object *ast;
   hydra_object *out;
@@ -175,6 +175,12 @@ int main(int argc, char **argv) {
     }
 
     getline(cin, in);
+  }
+
+  cout << hydra_object::node_list.size() << endl;
+  for (hydra_object* obj : hydra_object::node_list) {
+    cout << obj << endl;
+    delete obj;
   }
   return 0;
 }

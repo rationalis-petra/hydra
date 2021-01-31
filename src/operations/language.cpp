@@ -41,7 +41,7 @@ hydra_object *op_while::call(hydra_object *alist, runtime &r,
   hydra_object *condition = arg_list.front();
   arg_list.pop_front();
   // is nil?
-  hydra_object* out = new hydra_nil;
+  hydra_object* out = hydra_nil::get();
   while (!condition->eval(r, s)->null()) {
     for (hydra_object *o : arg_list) {
       out = o->eval(r, s);
@@ -119,7 +119,7 @@ hydra_object *op_progn::call(hydra_object *alist, runtime &r,
     out = arg->eval(r, s);
   }
   if (!out)
-    out = new hydra_nil();
+    out = hydra_nil::get();
   return out;
 }
 
@@ -128,7 +128,7 @@ op_fn::op_fn() {
   docstring = new hydra_string("Generates a new function object");
 }
 hydra_object *op_fn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  return new user_oper(alist, true, r, s);
+  return (hydra_object*) new user_oper(alist, true, r, s);
 }
 
 op_mac::op_mac() {
@@ -136,14 +136,18 @@ op_mac::op_mac() {
   docstring = new hydra_string("Generates a new macro object");
 }
 hydra_object *op_mac::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  return new user_oper(alist, false, r, s);
+  return (hydra_object*) new user_oper(alist, false, r, s);
 }
 
 op_exit::op_exit() {
   is_fn = false;
   docstring = new hydra_string("Exits the current running application");
 }
+
 hydra_object *op_exit::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  for (hydra_object* obj : hydra_object::node_list) {
+    delete obj;
+  }
   exit(0);
 }
 

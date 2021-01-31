@@ -23,40 +23,40 @@ hydra_object *op_eq::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   if (hydra_num* num1 = dynamic_cast<hydra_num*>(arg1)) {
     if (hydra_num* num2 = dynamic_cast<hydra_num*>(arg2)) {
       if (num1->value == num2->value)
-        return new hydra_t;
-      return new hydra_nil;
+        return hydra_t::get();
+      return hydra_nil::get();
     }
-    return new hydra_nil;
+    return hydra_nil::get();
   }
   if (hydra_char* char1 = dynamic_cast<hydra_char*>(arg1)) {
     if (hydra_char* char2 = dynamic_cast<hydra_char*>(arg2)) {
       if (char1->value == char2->value)
-        return new hydra_t;
-      return new hydra_nil;
+        return hydra_t::get();
+      return hydra_nil::get();
     }
-    return new hydra_nil;
+    return hydra_nil::get();
   }
   if (hydra_symbol* sym1 = dynamic_cast<hydra_symbol*>(arg1)) {
     if (hydra_symbol* sym2 = dynamic_cast<hydra_symbol*>(arg2)) {
       if (sym1 == sym2)
-        return new hydra_t;
-      return new hydra_nil;
+        return hydra_t::get();
+      return hydra_nil::get();
     }
-    return new hydra_nil();
+    return hydra_nil::get();
   }
   if (hydra_string* str1 = dynamic_cast<hydra_string*>(arg1)) {
     if (hydra_string* str2 = dynamic_cast<hydra_string*>(arg2)) {
       if (str1->value == str2->value) 
-        return new hydra_t;
-      return new hydra_nil;
+        return hydra_t::get();
+      return hydra_nil::get();
     }
   }
   if (dynamic_cast<hydra_nil*>(arg1)) {
     if (dynamic_cast<hydra_nil*>(arg2))
-      return new hydra_t;
-    return new hydra_nil;
+      return hydra_t::get();
+    return hydra_nil::get();
   }
-  return new hydra_nil;
+  return hydra_nil::get();
 }
 
 op_or::op_or() { is_fn = false; }
@@ -72,7 +72,7 @@ hydra_object *op_or::call(hydra_object* alist, runtime& r, lexical_scope &s) {
     if (!cond->null())
       return cond;
   }
-  return new hydra_nil;
+  return hydra_nil::get();
 }
 
 op_and::op_and() { is_fn = false; }
@@ -87,14 +87,14 @@ hydra_object *op_and::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   for (hydra_object* arg : arg_list) {
     hydra_object* cond = arg->eval(r, s);
     if (cond->null()) {
-      return new hydra_nil();
+      return hydra_nil::get();
     }
     else {
       out = cond;
     }
   }
   if (!out)
-    out = new hydra_nil();
+    out = hydra_nil::get();
   return out;
 }
 
@@ -106,8 +106,8 @@ hydra_object *op_not::call(hydra_object* alist, runtime& r, lexical_scope &s) {
     throw err;
   }
   if (arg_list.front()->null()) {
-    return new hydra_t();
+    return hydra_t::get();
   } else {
-    return new hydra_nil();
+    return hydra_nil::get();
   }
 }

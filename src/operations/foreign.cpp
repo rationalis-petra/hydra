@@ -37,7 +37,7 @@ hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r,
   lt_dlhandle lib = lt_dlopen(str->value.c_str());
 
   if (lib == NULL) {
-    return new hydra_nil;
+    return hydra_nil::get();
   } else {
     return new hydra_foreign_lib(lib);
   }
@@ -70,7 +70,7 @@ hydra_object *op_foreign_sym::call(hydra_object *body, runtime &r, lexical_scope
 
   void *addr = lt_dlsym(lib->lib, str->value.c_str());
   if (addr == nullptr) {
-    return new hydra_nil;
+    return hydra_nil::get();
   } else {
     return new hydra_foreign_sym(addr);
   }
@@ -185,7 +185,7 @@ hydra_object *op_internalize::call(hydra_object *body, runtime &r, lexical_scope
                    arg_types) == FFI_OK) {
     return op;
   } else {
-    return new hydra_nil;
+    return hydra_nil::get();
   }
 }
 
@@ -256,7 +256,7 @@ hydra_object *hydra_foreign_oper::call(hydra_object *alist, runtime &r, lexical_
   ffi_call(&fn_def, fn_address, &result, arg_values);
   switch (return_type) {
   case Void:
-    return new hydra_nil;
+    return hydra_nil::get();
     break;
   case Int32:
     return new hydra_num((int) result);

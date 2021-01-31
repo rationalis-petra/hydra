@@ -68,6 +68,7 @@ unsigned long sweep() {
 void hydra_object::collect_garbage(runtime& r) {
   if ((counter - last) > 10000) {
     mark(r);
+    counter = node_list.size();
     last = sweep();
   }
 }

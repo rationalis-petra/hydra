@@ -4,14 +4,10 @@
 #include <list>
 
 #include "expressions/object.hpp"
+#include "types/type.hpp"
+#include "types/fn.hpp"
 
 enum foreign_type { Int32, Pointer, String, Void };
-
-
-struct hydra_type : public hydra_object {
-public:
-  virtual hydra_object* check_type(hydra_object* obj) = 0;
-};
 
 hydra_type* type_from_rep(hydra_object* type);
 
@@ -44,6 +40,7 @@ struct type_module : public hydra_type {
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
 };
+
 
 //void fn_typecheck(hydra_type t, hydra_object* o);
 

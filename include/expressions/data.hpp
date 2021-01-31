@@ -7,11 +7,19 @@
 
 struct hydra_t : public hydra_object {
   std::string to_string() const;  
+  static hydra_t* get();
+private:
+  static hydra_t* singleton;
+  hydra_t();
 };
 
 struct hydra_nil : public hydra_object {
   std::string to_string() const;
+  static hydra_nil* get();
   bool null() const;
+private:
+  static hydra_nil* singleton;
+  hydra_nil();
 };
 
 struct hydra_cons : public hydra_object {

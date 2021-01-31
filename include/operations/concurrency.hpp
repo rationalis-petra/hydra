@@ -1,5 +1,5 @@
-#ifndef __HYDRA_OP_CONCURRENCY_HPP
-#define __HYDRA_OP_CONCURRENCY_HPP
+#ifndef __HYDRA_OPERATIONS_CONCURRENCY_HPP
+#define __HYDRA_OPERATIONS_CONCURRENCY_HPP
 
 #include "expressions.hpp"
 

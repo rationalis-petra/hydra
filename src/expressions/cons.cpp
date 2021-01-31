@@ -1,17 +1,19 @@
 #include <string>
 #include <typeinfo>
+#include <iostream>
 
 #include "expressions.hpp"
 
 using namespace std;
 
-hydra_cons::hydra_cons(hydra_object* _car, hydra_object* _cdr) : car(_car), cdr (_cdr) {
+hydra_cons::hydra_cons(hydra_object *_car, hydra_object *_cdr)
+    : car(_car), cdr(_cdr) {
 }
 
-hydra_object *hydra_cons::eval(runtime &r, lexical_scope& s) {
+hydra_object *hydra_cons::eval(runtime &r, lexical_scope &s) {
   hydra_object *oper = car->eval(r, s);
   hydra_oper *op;
-  if ((op = dynamic_cast<hydra_oper*>(oper))) {
+  if ((op = dynamic_cast<hydra_oper *>(oper))) {
     return op->call(cdr, r, s);
   } else {
     string excp = "Attempted to call " + oper->to_string() +

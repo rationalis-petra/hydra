@@ -1,6 +1,7 @@
 #include <istream>
 #include <sstream>
 #include <string>
+#include <iostream>
 
 #include "expressions.hpp"
 #include "operations.hpp"
@@ -15,9 +16,9 @@ hydra_object *read(hydra_object *raw, runtime &r);
 hydra_object *to_value(string token, runtime & r) {
   // boolean literals
   if (token == "nil")
-    return new hydra_nil();
+    return hydra_nil::get();
   if (token == "t")
-    return new hydra_t;
+    return hydra_t::get();
 
   // character literal
   if (token[0] == '#') {
@@ -78,10 +79,13 @@ hydra_object *to_value(string token, runtime & r) {
 
 hydra_object *to_cons(list<hydra_object *> list) {
   if (list.empty()) {
-    return new hydra_nil();
+    return hydra_nil::get();
   } else {
     hydra_cons *cns =
       new hydra_cons(list.front(), (list.pop_front(), to_cons(list)));
+    if (hydra_object::node_list.front() != cns) {
+      std::cout << "toconsleak" << std::endl;
+    }
     return cns;
   }
 }
@@ -186,7 +190,7 @@ hydra_object *read(hydra_object *raw, runtime &r) {
   while (!is->stream->eof()) {
 
     if (r.readtable.find(c) != r.readtable.end()) {
-      hydra_cons *cns = new hydra_cons(new hydra_char(c), new hydra_nil);
+      hydra_cons *cns = new hydra_cons(new hydra_char(c), hydra_nil::get());
       hydra_cons *cns2 = new hydra_cons(is, cns);
 
       // generate a blank 'dummy' scope
@@ -222,7 +226,7 @@ hydra_object *read(hydra_object *raw, runtime &r) {
   }
 
   // todo: more advanced read options!
-  return new hydra_nil;
+  return hydra_nil::get();
 }
 
 op_read::op_read() {

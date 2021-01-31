@@ -49,7 +49,7 @@ hydra_object *op_in_module::call(hydra_object* alist, runtime& r, lexical_scope 
   }
   hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
   r.active_module = mod;
-  return new hydra_t;
+  return hydra_t::get();
 }
 
 op_intern::op_intern() {
@@ -135,7 +135,7 @@ hydra_object *op_get_symbols::call(hydra_object* alist, runtime& r, lexical_scop
     throw err;
   }
   hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
-  hydra_object* out = new hydra_nil;
+  hydra_object* out = hydra_nil::get();
   for (auto sym : mod->exported_symbols) {
     hydra_cons* cns = new hydra_cons(sym.second, out);
     out = cns;

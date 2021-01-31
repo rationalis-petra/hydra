@@ -59,7 +59,7 @@ hydra_symbol *hydra_module::intern(list<string> path) {
 hydra_object *hydra_module::get(string str) {
   map<string, hydra_symbol*>::iterator loc = symbols.find(str);
   if (loc == symbols.end()) {
-    return new hydra_nil;
+    return hydra_nil::get();
   } else {
     return loc->second;
   }
@@ -68,7 +68,7 @@ hydra_object *hydra_module::get(string str) {
 hydra_object *hydra_module::get(list<string> path) {
   map<string, hydra_symbol*>::iterator loc = symbols.find(path.front());
   if (loc == symbols.end()) {
-    return new hydra_nil;
+    return hydra_nil::get();
   } else {
     path.pop_front();
     if (path.empty()) {

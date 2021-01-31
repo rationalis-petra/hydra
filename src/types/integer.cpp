@@ -11,8 +11,8 @@ string type_integer::to_string() const {
 
 hydra_object *type_integer::check_type(hydra_object* obj) {
   if (dynamic_cast<hydra_num*>(obj)) {
-    return new hydra_t;
+    return hydra_t::get();
   } else {
-    return new hydra_nil;
+    return hydra_nil::get();
   }
 }

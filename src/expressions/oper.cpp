@@ -11,7 +11,6 @@ using std::map;
 using std::string;
 using std::function;
 
-
 list<hydra_object *> make_list(hydra_object *obj) {
   list<hydra_object *> lst;
   while (!obj->null()) {
@@ -141,7 +140,7 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
   }
   for (hydra_symbol *s : optionals) {
     if (arg_list.empty()) {
-      scope->map[s] = new hydra_nil;
+      scope->map[s] = hydra_nil::get();
     } else {
       scope->map[s] = arg_list.front();
       arg_list.pop_front();
@@ -150,7 +149,7 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
 
   // set all keys to nil
   for (auto s : keys) {
-    scope->map[s.second] = new hydra_nil;
+    scope->map[s.second] = hydra_nil::get();
   }
 
   int keycounter = keys.size();
@@ -176,17 +175,17 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
     // generate a list containing the rest of the arg_list
     // if list is empty, use nil!
     if (arg_list.empty()) {
-      scope->map[rest] = new hydra_nil;
+      scope->map[rest] = hydra_nil::get();
     } else {
       // we use a recursive lambda to construct the rlist
       function<hydra_object *()> gen_rest = [&](void) {
         if (arg_list.empty()) {
-          return (hydra_object *)new hydra_nil;
+          return (hydra_object *)hydra_nil::get();
         } else {
           hydra_object *car = arg_list.front();
           arg_list.pop_front();
           hydra_object *cdr = gen_rest();
-          return (hydra_object *)new hydra_cons(car, cdr);
+          return (hydra_object *) new hydra_cons(car, cdr);
         }
       };
       scope->map[rest] = gen_rest();
@@ -205,6 +204,10 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
   hydra_object::collect_garbage(r);
   hydra_object::roots.erase(out);
   return out;
+}
+
+user_oper::~user_oper() {
+  delete scope;
 }
 
 list<hydra_object *> hydra_oper::get_arg_list(hydra_object *arg_list,

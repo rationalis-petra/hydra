@@ -1,5 +1,5 @@
-#ifndef __HYDRA_ARITHMETIC_HPP
-#define __HYDRA_ARITHMETIC_HPP
+#ifndef __HYDRA_OPERATIONS_ARITHMETIC_HPP
+#define __HYDRA_OPERATIONS_ARITHMETIC_HPP
 
 #include "expressions.hpp"
 

@@ -121,9 +121,9 @@ hydra_object *op_gr::call(hydra_object *alist, runtime &r, lexical_scope &s) {
     int arg2 = a2->value;
 
     if (arg1 >= arg2) {
-      return new hydra_t();
+      return hydra_t::get();
     } else {
-      return new hydra_nil();
+      return hydra_nil::get();
     }
   } else {
     string err = "Non-numbers provided to >=";

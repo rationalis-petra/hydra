@@ -19,6 +19,7 @@ protected:
 };
 
 struct user_oper : public hydra_oper {
+  ~user_oper();
   std::string to_string() const;
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
 

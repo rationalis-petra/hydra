@@ -1,5 +1,5 @@
-#ifndef __HYDRA_FFI_HPP
-#define __HYDRA_FFI_HPP
+#ifndef __HYDRA_OPERATIONS_FFI_HPP
+#define __HYDRA_OPERATIONS_FFI_HPP
 
 #include "ffi.h"
 

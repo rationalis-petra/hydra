@@ -11,8 +11,8 @@ string type_cons::to_string() const {
 
 hydra_object *type_cons::check_type(hydra_object* obj) {
   if ((dynamic_cast<hydra_cons*>(obj)) == nullptr) {
-    return new hydra_nil;
+    return hydra_nil::get();
   } else {
-    return new hydra_t;
+    return hydra_t::get();
   }
 }
