@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
       // streams
       make_pair("peek", new op_peek),
       make_pair("next", new op_next),
-      make_pair("endp", new op_endp),
+      make_pair("end?", new op_endp),
       make_pair("eval", new op_eval),
       make_pair("read", new op_read),
       make_pair("set-macro-character", new op_set_mac_char),
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
       make_pair("get", new op_get),
       make_pair("remove", new op_remove),
 
-      make_pair("typep", new op_typep),
+      make_pair("is-type?", new op_typep),
       make_pair("type", new op_type)};
 
   vector<pair<string, hydra_object*>> foreign = {

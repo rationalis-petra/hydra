@@ -16,7 +16,7 @@ string hydra_module::to_string() const {
   if (name == "") {
     return "<anonymous module>";
   } else {
-    return "<module: " + name + ">";
+    return "[@m " + name + "]";
   }
 }
 

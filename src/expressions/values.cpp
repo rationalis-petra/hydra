@@ -31,14 +31,14 @@ string hydra_string::to_string() const {
 }
 
 string hydra_array::to_string() const {
-  string out = "#A(";
+  string out = "[@v";
 
   for (unsigned i = 0; i < array.size() ; i++) {
     out += array[i]->to_string();
     if (i != array.size() - 1)
       out += " ";
   }
-  out += ")";
+  out += "]";
   return out;
 }
 

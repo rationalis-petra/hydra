@@ -14,14 +14,23 @@ std::string lang = R"(
 
 "The def function: like setq in common lisp"
 (export (current-module) (quote def))
+"
 (set (quote def) (mac (symbol value)
   (list (quote set) 
         (list (quote quote) symbol)
          value)))
+"
+
+(set (quote def) 
+  (mac (symbol val :rest body)
+    [list (quote set) [list (quote quote) symbol]
+          (if body
+              [cons (quote fn) [cons val body]]
+              val)]))
 
 "The defn, i.e. define-function"
 (export (current-module) (quote defn))
-(def defn (mac (name arg-list :rest body)
+(set (quote defn) (mac (name arg-list :rest body)
   (list (quote def) name
     (cons (quote fn)
       (cons
@@ -54,17 +63,18 @@ std::string lang = R"(
 (defn single-quote-reader (stream char) (list (quote quote) (read stream)))
 (set-macro-character #' single-quote-reader)
 
-;; bang macro: !L(1 2 3) -> (list 1 2 3)
-;;             !A(1 2 3) -> (array 1 2 3)
-(defn bang-reader (stream char)
-  (if (= (next stream) #L)
-      (cons 'list (read stream)) 
-  (if (= (next stream) #A)
-      (cons 'array (read stream))
-      (read stream))))
-      
 
-(set-macro-character #! bang-reader)
+;; COMPACT CONSTRUCTORS
+(export (current-module) '@v)
+(def @v array)
+(export (current-module) '@l)
+(def @l list)
+(export (current-module) '@m)
+(def @m module)
+(export (current-module) '@s)
+(def @s symbol)
+(export (current-module) '@c)
+(def @c cons)
 
 
 ;;; DATA MANIPULATION
@@ -119,8 +129,8 @@ std::string lang = R"(
 (defn <= (l r)
   (>= r l))
 
-(export (current-module) '/=)
-(defn /= (l r)
+(export (current-module) '!=)
+(defn != (l r)
   (not (= l r)))
   
 ;; control flow
@@ -170,7 +180,7 @@ std::string lang = R"(
             (cons (list
                     'fn 
                     ;; argument list
-                    (concat !L(:self (car (car binding)))
+                    (concat [@l :self (car (car binding))]
                             (car (cdr (car binding))))
                     (car (cdr (cdr (car binding))))) ;; the body
                   (get-vals (cdr binding))))))
@@ -187,8 +197,8 @@ std::string lang = R"(
 (defn apply (fnc values)
   (let ((quotify (fn (lst :self quotify)
           (when lst 
-            (cons !L('quote (car lst))
-                    (quotify (cdr lst)))))))
+            (cons [@l 'quote (car lst)]
+                      (quotify (cdr lst)))))))
   (eval (cons fnc (quotify values)))))
 
 

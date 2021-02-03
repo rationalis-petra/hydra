@@ -102,6 +102,7 @@ hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
     case '\t':
       is->stream->read(&c, 1);
       break;
+    case ']':
     case ')': {
       is->stream->read(&c, 1);
       return to_cons(list);
@@ -113,8 +114,10 @@ hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
       break;
     }
   }
-  throw "( with no matching )!";
+  throw "( or [with no matching ) or ]!";
 }
+
+
 
 hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
   string token = string("");
@@ -126,6 +129,8 @@ hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
     case '\t':
     case '(':
     case ')':
+    case '[':
+    case ']':
       return to_value(token, r);
       break;
       // escape character!
@@ -204,12 +209,14 @@ hydra_object *read(hydra_object *raw, runtime &r) {
     case ' ':
       break;
 
+    case '[':
     case '(':
       return mac_lparen(is, c, r);
       break;
 
+    case ']':
     case ')': {
-      string err = "error: ')' with no matching '('!";
+      string err = "error: ') or ]' with no matching '( or ['!";
       throw err;
     }
       break;

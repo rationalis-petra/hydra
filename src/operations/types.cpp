@@ -17,7 +17,7 @@ hydra_object *op_typep::call(hydra_object *alist, runtime &r,
                              lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
-    string err = "typep expects exactly 2 arguments";
+    string err = "type? expects exactly 2 arguments";
     throw err;
   }
   hydra_object *obj = arg_list.front();
