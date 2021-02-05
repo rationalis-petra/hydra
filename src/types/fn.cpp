@@ -6,7 +6,8 @@
 using std::string;
 
 std::string type_fn::to_string() const {
-  return string("{type (") + ") -> " + return_type->to_string() + "}";
+  //return string("{type (") + ") -> " + return_type->to_string() + "}";
+  return string("function: X -> Y");
 }
 
 hydra_object *type_fn::check_type(hydra_object *obj) {
@@ -16,6 +17,9 @@ hydra_object *type_fn::check_type(hydra_object *obj) {
   return hydra_nil::get();
 }
 
+hydra_object *type_fn::check_args(hydra_object* alist, runtime &r, lexical_scope &s) {
+  return hydra_t::get();
+}
 
   // hydra_type* return_type;
   // std::list<hydra_type*> arg_list;

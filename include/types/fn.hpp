@@ -12,6 +12,7 @@
 struct type_fn : public hydra_type {
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
+  hydra_object* check_args(hydra_object* obj, runtime& r, lexical_scope& s);
 
   hydra_type* return_type;
   std::list<hydra_type*> arg_list;

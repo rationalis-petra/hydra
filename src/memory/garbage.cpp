@@ -16,8 +16,11 @@ void mark_obj(hydra_object* obj) {
       for (hydra_object* obj : arr->array) {
         mark_obj(obj);
       }
-    } else if (user_oper *op = dynamic_cast<user_oper*>(obj)) {
-      mark_obj(op->expr);
+    } else if (hydra_oper *op = dynamic_cast<hydra_oper*>(obj)) {
+      mark_obj(op->type);
+      if (user_oper *uop = dynamic_cast<user_oper *>(obj)) {
+        mark_obj(uop->expr);
+      }
       mark_obj(op->docstring);
     } else if (hydra_symbol *sym = dynamic_cast<hydra_symbol*>(obj)) {
       if (sym->value) {

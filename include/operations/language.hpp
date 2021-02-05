@@ -16,10 +16,11 @@ struct op_set : hydra_oper {
   op_set();
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
 };
-// struct op_def : hydra_oper {
-//   op_def();
-//   hydra_object *call(hydra_object *arg_list, runtime &r);
-// };
+
+struct op_addfn : hydra_oper {
+  op_addfn();
+  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
+};
 struct op_fn : hydra_oper {
   op_fn();
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);

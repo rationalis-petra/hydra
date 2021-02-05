@@ -23,7 +23,7 @@ hydra_object *hydra_cons::eval(runtime &r, lexical_scope &s) {
 }
 
 string hydra_cons::to_string() const {
-  string out = "[@l";
+  string out = "[@l ";
   const hydra_object *elt = this;
   while (!elt->null()) {
     if (const hydra_cons *obj = dynamic_cast<const hydra_cons *>(elt)) {

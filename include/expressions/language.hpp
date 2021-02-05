@@ -5,9 +5,13 @@
 #include "object.hpp"
 
 struct hydra_symbol;
+struct type_fn;
 struct hydra_oper : public hydra_object {
+  hydra_oper();
   std::string to_string() const;
   bool is_fn;
+
+  type_fn* type;
 
   virtual hydra_object *call(hydra_object *arg_list, runtime &r,
                              lexical_scope &s) = 0;
@@ -34,6 +38,14 @@ struct user_oper : public hydra_oper {
   // captured scope for closures
   lexical_scope *scope;
   user_oper(hydra_object *op_def, bool eval_args, runtime &r, lexical_scope &s);
+};
+
+struct combined_fn : public hydra_oper {
+  void add (hydra_oper* op);
+  std::string to_string() const;
+  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
+
+  std::list<hydra_oper*> functions;
 };
 
 // modules are like packages or namepsaces in other languages

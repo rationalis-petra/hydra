@@ -4,26 +4,29 @@
 #include "operations.hpp"
 #include "types.hpp"
 
+using std::string;
+
 hydra_type* type_from_rep(hydra_object* type) {
   if (hydra_symbol *sym = dynamic_cast<hydra_symbol *>(type)) {
-    if (sym->name == "integer") {
+    if (sym->name == "Integer") {
       return new type_integer;
     }
-    if (sym->name == "symbol") {
+    if (sym->name == "Symbol") {
       return new type_symbol;
     }
-    if (sym->name == "list") {
+    if (sym->name == "List") {
       return new type_list;
     }
-    if (sym->name == "cons") {
+    if (sym->name == "Cons") {
       return new type_cons;
     }
-    if (sym->name == "string") {
+    if (sym->name == "String") {
       return new type_string;
     }
-    if (sym->name == "module") {
+    if (sym->name == "Module") {
       return new type_module;
     }
   }
-  return new type_integer();
+  string err = "bad thing to be a type specifier: " + type->to_string();
+  throw err;
 }

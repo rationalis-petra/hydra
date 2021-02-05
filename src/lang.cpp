@@ -75,14 +75,24 @@ std::string lang = R"(
 (def @s symbol)
 (export (current-module) '@c)
 (def @c cons)
+(export (current-module) '@t)
+(def @t type)
 
 
 ;;; DATA MANIPULATION
 
-(export (current-module) (quote len))
-(set (quote len) 
-  (fn (list :self len)
-    (if list (+ 1 (len (cdr list))) 0)))
+(export (current-module) 'caar)
+(def caar (x) (car (car x)))
+
+(export (current-module) 'cadr)
+(def cadr (x) (car (cdr x)))
+
+(export (current-module) 'cdar)
+(def cdar (x) (cdr (car x)))
+
+(export (current-module) 'len)
+(def len (list :self len)
+    (if list (+ 1 (len (cdr list))) 0))
 
 (export (current-module) 'zip)
 (defn zip (:rest lists) 
@@ -158,6 +168,19 @@ std::string lang = R"(
              (rec-cond (cdr body)))))
    body))
   
+
+;;; ARITHMETIC
+(export (current-module) 'even?)
+(def even? (x)
+  (= x (* 2 (/ x 2))))
+
+(export (current-module) 'rem)
+(def rem (val quot)
+  (- val (* quot (/ val quot))))
+
+(export (current-module) 'div)
+(def div (val quot)
+  ((/ val quot)))
 
 ;;; LANGUAGE
 (export (current-module) 'let)

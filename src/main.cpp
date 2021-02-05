@@ -67,6 +67,7 @@ int main(int argc, char **argv) {
       make_pair("set", new op_set),
       make_pair("quote", new op_quote),
       make_pair("progn", new op_progn),
+      make_pair("add-fn", new op_addfn),
       make_pair("exit", new op_exit),
       make_pair("lock", new op_lock),
       make_pair("unlock", new op_unlock),
@@ -82,7 +83,7 @@ int main(int argc, char **argv) {
       make_pair("get", new op_get),
       make_pair("remove", new op_remove),
 
-      make_pair("is-type?", new op_typep),
+      make_pair("type?", new op_typep),
       make_pair("type", new op_type)};
 
   vector<pair<string, hydra_object*>> foreign = {

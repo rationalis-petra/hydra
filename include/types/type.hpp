@@ -11,4 +11,5 @@ public:
   virtual hydra_object* check_type(hydra_object* obj) = 0;
 };
 
+
 #endif

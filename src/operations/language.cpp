@@ -139,6 +139,22 @@ hydra_object *op_mac::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   return (hydra_object*) new user_oper(alist, false, r, s);
 }
 
+op_addfn::op_addfn() {
+  is_fn = false;
+  docstring = new hydra_string("Combines functions into an effective function");
+}
+hydra_object *op_addfn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  combined_fn* f = new combined_fn;
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+
+  for (hydra_object* o : arg_list) {
+    hydra_oper* op = hydra_cast<hydra_oper>(o);
+    f->add(op);
+  }
+
+  return f;
+}
+
 op_exit::op_exit() {
   is_fn = false;
   docstring = new hydra_string("Exits the current running application");

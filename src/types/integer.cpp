@@ -6,7 +6,7 @@
 using std::string;
 
 string type_integer::to_string() const {
-  return "{type integer}";
+  return "{type Integer}";
 }
 
 hydra_object *type_integer::check_type(hydra_object* obj) {

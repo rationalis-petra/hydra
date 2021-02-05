@@ -19,9 +19,15 @@ hydra_object* op_describe::call(hydra_object* alist, runtime &r, lexical_scope& 
     throw err;
   }
   if (hydra_oper* op = dynamic_cast<hydra_oper*>(arg_list.front())) {
-    return op->docstring;
-  }
-  else {
+    string str = "Function:\n" + op->docstring->to_string() +
+                 "\nLambda-List: " +
+      "\nType: " + type->to_string();
+    if (user_oper* uop = dynamic_cast<user_oper*>(op)) {
+      //str += "\n Expression:\n";
+      //str += "(fn " + uop->expr->to_string() + ")";
+    }
+    return new hydra_string(str);
+  } else {
     return new hydra_string("some value...");
   }
 }

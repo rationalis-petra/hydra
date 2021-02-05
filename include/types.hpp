@@ -11,6 +11,11 @@ enum foreign_type { Int32, Pointer, String, Void };
 
 hydra_type* type_from_rep(hydra_object* type);
 
+struct type_nil : public hydra_type {
+  std::string to_string() const;
+  virtual hydra_object* check_type(hydra_object* obj);
+};
+
 struct type_integer : public hydra_type {
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);

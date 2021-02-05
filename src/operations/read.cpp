@@ -118,6 +118,35 @@ hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
 }
 
 
+hydra_object *mac_curl(hydra_istream *is, char c, runtime &r) {
+  // continue to add tokens to list until we hit a ')'
+  list<hydra_object *> list;
+  list.push_front(hydra_cast<hydra_module>(hydra_cast<hydra_module>(r.root->intern("hydra")->value)
+                                           ->intern("core")->value)
+                  ->intern("type"));
+
+  while (!is->stream->eof()) {
+    c = is->stream->peek();
+    switch (c) {
+    case ' ':
+    case '\n':
+    case '\t': 
+      is->stream->read(&c, 1);
+      break;
+    case '}': {
+      is->stream->read(&c, 1);
+      return to_cons(list);
+      break;
+    }
+      break;
+    default:
+      list.push_back(read(is, r));
+      break;
+    }
+  }
+  throw "{ with no matching }!";
+}
+
 
 hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
   string token = string("");
@@ -127,6 +156,8 @@ hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
     case ' ':
     case '\n':
     case '\t':
+    case '{':
+    case '}':
     case '(':
     case ')':
     case '[':
@@ -207,6 +238,10 @@ hydra_object *read(hydra_object *raw, runtime &r) {
     case '\t':
     case '\n':
     case ' ':
+      break;
+
+    case '{':
+      return mac_curl(is, c, r);
       break;
 
     case '[':

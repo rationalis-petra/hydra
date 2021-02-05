@@ -11,6 +11,11 @@ using std::map;
 using std::string;
 using std::function;
 
+hydra_oper::hydra_oper() {
+  type = new type_fn;
+  type->return_type = new type_nil;
+}
+
 list<hydra_object *> make_list(hydra_object *obj) {
   list<hydra_object *> lst;
   while (!obj->null()) {
@@ -34,18 +39,26 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
   if (hydra_cons *cns = dynamic_cast<hydra_cons *>(op_def)) {
     hydra_object *name_list = cns->car;
 
-    // TODO: actually test for keyword!!!
     list<hydra_object *> lst = make_list(name_list);
     bool optional = false;
     bool key = false;
 
     for (auto it = lst.begin(); it != lst.end(); it++) {
-      hydra_symbol *name = hydra_cast<hydra_symbol>(*it);
+      hydra_symbol* name;
+      hydra_type* t_type;
+      if (hydra_cons* symdef = dynamic_cast<hydra_cons*>(*it)) {
+        name = hydra_cast<hydra_symbol>(symdef->car);
+        t_type = type_from_rep(hydra_cast<hydra_cons>(symdef->cdr)->car);
+      } else {
+        name = hydra_cast<hydra_symbol>(*it);
+        t_type = new type_nil;
+      }
       // :self keyword
       if (name == hydra_cast<hydra_module>(r.root->intern("keyword")->value)
                       ->get("self")) {
         if (++it != lst.end()) {
           self = hydra_cast<hydra_symbol>(*it);
+          type->return_type = t_type;
         } else {
           string err = "No self argument name!";
           throw err;
@@ -90,9 +103,13 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
                   ->intern(name->name);
           keys[keyword] = name;
           keyword->value = keyword;
+          type->keyword_list.push_back(t_type);
+          type->keyword_names.push_back(name);
         } else if (optional) {
           optionals.push_back(name);
+          type->optional_list.push_back(t_type);
         } else {
+          type->arg_list.push_back(t_type);
           arg_names.push_back(name);
         }
       }
@@ -210,6 +227,27 @@ user_oper::~user_oper() {
   delete scope;
 }
 
+void combined_fn::add(hydra_oper* fn) {
+  if (combined_fn *f = dynamic_cast<combined_fn*>(fn)) {
+    for (hydra_oper* o : f->functions) {
+      add(o);
+    }
+  } else {
+    functions.push_front(fn);
+  }
+}
+
+hydra_object* combined_fn::call(hydra_object* alist, runtime &r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+  for (hydra_oper* fn : functions) {
+    if (!fn->type->check_args(alist, r, s)->null()) {
+      return fn->call(alist, r, s);
+    }
+  }
+  string err = "No matching function in combined function";
+  throw err;
+}
+
 list<hydra_object *> hydra_oper::get_arg_list(hydra_object *arg_list,
                                               runtime &r, lexical_scope &s) {
   list<hydra_object *> out_list;
@@ -226,6 +264,9 @@ list<hydra_object *> hydra_oper::get_arg_list(hydra_object *arg_list,
   return out_list;
 }
 
-string user_oper::to_string() const { return "user-defined operation"; }
+string combined_fn::to_string() const { return "<combined function>"; }
 
-string hydra_oper::to_string() const { return "inbuilt operation"; }
+string user_oper::to_string() const { return "<user-defined operation>"; }
+
+string hydra_oper::to_string() const { return "<inbuilt operation>"; }
+

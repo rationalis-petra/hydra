@@ -6,7 +6,7 @@
 using std::string;
 
 string type_cons::to_string() const {
-  return "{type cons}";
+  return "{type Cons}";
 }
 
 hydra_object *type_cons::check_type(hydra_object* obj) {
