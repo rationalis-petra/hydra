@@ -6,6 +6,7 @@
 
 struct hydra_symbol;
 struct type_fn;
+struct hydra_string;
 struct hydra_oper : public hydra_object {
   hydra_oper();
   std::string to_string() const;
@@ -15,7 +16,7 @@ struct hydra_oper : public hydra_object {
 
   virtual hydra_object *call(hydra_object *arg_list, runtime &r,
                              lexical_scope &s) = 0;
-  hydra_object *docstring;
+  hydra_string *docstring;
 
 protected:
   std::list<hydra_object *> get_arg_list(hydra_object *arg_list, runtime &r,

@@ -26,6 +26,12 @@ hydra_type* type_from_rep(hydra_object* type) {
     if (sym->name == "Module") {
       return new type_module;
     }
+    if (sym->name == "Char") {
+      return new type_char;
+    }
+    if (sym->name == "Stream") {
+      return new type_stream;
+    }
   }
   string err = "bad thing to be a type specifier: " + type->to_string();
   throw err;

@@ -14,18 +14,16 @@ std::string lang = R"(
 
 "The def function: like setq in common lisp"
 (export (current-module) (quote def))
-"
-(set (quote def) (mac (symbol value)
-  (list (quote set) 
-        (list (quote quote) symbol)
-         value)))
-"
 
 (set (quote def) 
   (mac (symbol val :rest body)
     [list (quote set) [list (quote quote) symbol]
           (if body
-              [cons (quote fn) [cons val body]]
+              (if (and (defined? symbol) (type? (eval symbol) Fn))
+                  [list (quote add-fn) 
+                        symbol
+                        [cons (quote fn) [cons val body]]]
+                  [cons (quote fn) [cons val body]])
               val)]))
 
 "The defn, i.e. define-function"
@@ -47,7 +45,7 @@ std::string lang = R"(
          body)))))
 
 "The comment character macro - we may have comments at last!"
-(defn comment-reader (stream char)
+(def comment-reader (stream char)
   (if (= char #newline)
       (read stream)
       (comment-reader stream (next stream))))
@@ -60,7 +58,7 @@ std::string lang = R"(
 ;; the first reader macro (above) is comment character!
 
 ;; quote macro: 'hello -> (quote hello)
-(defn single-quote-reader (stream char) (list (quote quote) (read stream)))
+(def single-quote-reader (stream char) (list (quote quote) (read stream)))
 (set-macro-character #' single-quote-reader)
 
 
@@ -95,7 +93,7 @@ std::string lang = R"(
     (if list (+ 1 (len (cdr list))) 0))
 
 (export (current-module) 'zip)
-(defn zip (:rest lists) 
+(def zip (:rest lists) 
  (let ((zip-head (lst)
              (when (and lst (car lst))
                (cons (car (car lst))
@@ -110,14 +108,14 @@ std::string lang = R"(
        (cons head (apply zip tail))))))
 
 (export (current-module) 'reverse)
-(defn reverse ({lst List} :optional acc)
+(def reverse ({lst List} :optional acc)
   (if lst
       (reverse (cdr lst)
                (cons (car lst) acc))
        acc))
 
 (export (current-module) 'concat)
-(defn concat (:rest lists)
+(def concat (:rest lists)
   (when lists
     (if (car lists)
         (cons (car (car lists))
@@ -210,14 +208,14 @@ std::string lang = R"(
      arg-list)))
 
 (export (current-module) 'ref)
-(defn ref (value)
+(def ref (value)
   (let ((sym (symbol "")))
     (set sym value)
      sym))
 
 ;;; FUNCTIONALS
 (export (current-module) 'apply)
-(defn apply (fnc values)
+(def apply (fnc values)
   (let ((quotify (fn (lst :self quotify)
           (when lst 
             (cons [@l 'quote (car lst)]
@@ -226,7 +224,7 @@ std::string lang = R"(
 
 
 (export (current-module) 'map)
-(defn map (func :rest arg-vec)
+(def map (func :rest arg-vec)
   (let ((simple-map (func args :self simple-map)
           (when args 
             (cons (apply func (car args))
@@ -236,7 +234,7 @@ std::string lang = R"(
 
 ;;; MODULES
 (export (current-module) 'use-module)
-(defn use-module (module1 module2)
+(def use-module (module1 module2)
   ((fn (syms :self dolist)
       (when syms
         (insert module1 (car syms))
@@ -252,7 +250,7 @@ std::string lang = R"(
 (export (current-module) '+cin+)
 (export (current-module) 'load)
 
-(defn load (filename)
+(def load (filename)
   (let ((fstream (open-file filename))
         (module (current-module)))
    (while (not (endp fstream))
@@ -261,7 +259,7 @@ std::string lang = R"(
    (in-module module)))
 
 (export (current-module) 'println)
-(defn println (val)
+(def println (val)
   (print val)
   (print #newline)
   val)

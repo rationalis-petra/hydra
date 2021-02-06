@@ -33,6 +33,10 @@ struct op_progn : hydra_oper {
   op_progn();
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
 };
+struct op_defined : hydra_oper {
+  op_defined();
+  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
+};
 
 
 struct op_quote : hydra_oper {

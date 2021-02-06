@@ -14,8 +14,6 @@ using std::function;
 
 hydra_oper::hydra_oper() {
   type = new type_fn;
-  type->return_type = new type_nil;
-  type->rest_type = nullptr;
 }
 
 list<hydra_object *> make_list(hydra_object *obj) {
@@ -239,18 +237,17 @@ void combined_fn::add(hydra_oper* fn) {
     for (hydra_oper* o : f->functions) {
       add(o);
     }
-  } else {
+  } else if (fn->is_fn) {
     functions.push_front(fn);
+  } else {
+    string err = "Attempted to add macro to add-fn!";
+    throw err;
   }
 }
 
 hydra_object* combined_fn::call(hydra_object* alist, runtime &r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
 
-  if (type->check_args(arg_list)->null()) {
-    string err = "Type error calling function";
-    throw err;
-  }
   for (hydra_oper* fn : functions) {
     if (!fn->type->check_args(arg_list)->null()) {
       return fn->call(alist, r, s);

@@ -20,7 +20,7 @@ hydra_object* op_describe::call(hydra_object* alist, runtime &r, lexical_scope& 
     throw err;
   }
   if (hydra_oper* op = dynamic_cast<hydra_oper*>(arg_list.front())) {
-    string str = "Function:\n" + op->docstring->to_string() +
+    string str = "Function:\n" + op->docstring->value +
                  "\nLambda-List: " +
       "\nType: " + op->type->to_string();
     if (user_oper* uop = dynamic_cast<user_oper*>(op)) {

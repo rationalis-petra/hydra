@@ -93,6 +93,21 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   }
 }
 
+op_defined::op_defined() {
+  is_fn = true;
+  docstring = new hydra_string("Returns t if symbol contains a value, and nil otherwise");
+  type->arg_list.push_back(new type_symbol);
+};
+hydra_object* op_defined::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+  hydra_symbol* sym = hydra_cast<hydra_symbol>(arg_list.front());
+  if (sym->value) {
+    return hydra_t::get();
+  } else {
+    return hydra_nil::get();
+  }
+}
+
 op_quote::op_quote() {
   is_fn = false;
   docstring = new hydra_string("Prevents evaluation of the argument it is provided");
@@ -101,14 +116,14 @@ op_quote::op_quote() {
 hydra_object *op_quote::call(hydra_object *alist, runtime &r,
                              lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
-  if (arg_list.size() != 1) {
-    string err = "invalid number of arguments to quote";
-    throw err;
-  }
   return arg_list.front();
 }
 
-op_eval::op_eval() { is_fn = true; }
+op_eval::op_eval() {
+  is_fn = true;
+  docstring = new hydra_string("Evaluates it's argument as if it was a hydra program");
+  type->arg_list.push_front(new type_nil);
+}
 hydra_object *op_eval::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -169,6 +184,7 @@ op_addfn::op_addfn() {
 }
 hydra_object *op_addfn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   combined_fn* f = new combined_fn;
+  f->type->rest_type = new type_nil;
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
 
   for (hydra_object* o : arg_list) {
@@ -176,7 +192,7 @@ hydra_object *op_addfn::call(hydra_object *alist, runtime &r, lexical_scope &s) 
     f->add(op);
   }
 
-  return f;
+  return (hydra_object*) f;
 }
 
 op_exit::op_exit() {

@@ -43,6 +43,8 @@ int main(int argc, char **argv) {
       make_pair("Symbol", new type_symbol),
       make_pair("List", new type_list),
       make_pair("Fn", new type_fn),
+      make_pair("Stream", new type_stream),
+      make_pair("Char", new type_char),
 
       // arithmetic
       make_pair("+", new op_plus),
@@ -69,18 +71,23 @@ int main(int argc, char **argv) {
       make_pair("or", new op_or),
       make_pair("and", new op_and),
       make_pair("not", new op_not),
-      // language
+
+      // symbols
+
+      make_pair("defined?", new op_defined),
+      make_pair("set", new op_set),
+      make_pair("lock", new op_lock),
+      make_pair("unlock", new op_unlock),
+
+      // language/control-flow
       make_pair("if", new op_if),
       make_pair("while", new op_while),
       make_pair("fn", new op_fn),
       make_pair("mac", new op_mac),
-      make_pair("set", new op_set),
       make_pair("quote", new op_quote),
       make_pair("progn", new op_progn),
       make_pair("add-fn", new op_addfn),
       make_pair("exit", new op_exit),
-      make_pair("lock", new op_lock),
-      make_pair("unlock", new op_unlock),
 
       make_pair("module", new op_make_module),
       make_pair("symbol", new op_make_symbol),

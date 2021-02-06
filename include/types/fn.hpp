@@ -10,6 +10,7 @@
 #include "types/type.hpp"
 
 struct type_fn : public hydra_type {
+  type_fn();
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
   hydra_object* check_args(std::list<hydra_object*> alist);

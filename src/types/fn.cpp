@@ -7,6 +7,11 @@
 using std::string;
 using std::list;
 
+type_fn::type_fn() {
+  rest_type = nullptr;
+  return_type = new type_nil;
+}
+
 std::string type_fn::to_string() const {
   //return string("{type (") + ") -> " + return_type->to_string() + "}";
   string str = "fn (";

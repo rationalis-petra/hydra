@@ -46,6 +46,15 @@ struct type_module : public hydra_type {
   hydra_object* check_type(hydra_object* obj);
 };
 
+struct type_char : public hydra_type {
+  std::string to_string() const;
+  hydra_object* check_type(hydra_object* obj);
+};
+
+struct type_stream : public hydra_type {
+  std::string to_string() const;
+  hydra_object* check_type(hydra_object* obj);
+};
 
 //void fn_typecheck(hydra_type t, hydra_object* o);
 
