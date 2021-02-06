@@ -1,4 +1,5 @@
 #include <functional>
+#include <iostream>
 #include <map>
 #include <string>
 #include <typeinfo>
@@ -14,6 +15,7 @@ using std::function;
 hydra_oper::hydra_oper() {
   type = new type_fn;
   type->return_type = new type_nil;
+  type->rest_type = nullptr;
 }
 
 list<hydra_object *> make_list(hydra_object *obj) {
@@ -27,10 +29,11 @@ list<hydra_object *> make_list(hydra_object *obj) {
 }
 
 user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
-                     lexical_scope &s) {
+                     lexical_scope &s) : hydra_oper() {
   is_fn = _is_fn;
   rest = nullptr;
   self = nullptr;
+  type->rest_type = nullptr;
   docstring = new hydra_string;
   scope = new lexical_scope(s);
 
@@ -58,7 +61,7 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
                       ->get("self")) {
         if (++it != lst.end()) {
           self = hydra_cast<hydra_symbol>(*it);
-          type->return_type = t_type;
+          //type->return_type = t_type;
         } else {
           string err = "No self argument name!";
           throw err;
@@ -71,6 +74,7 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
                    ->get("rest")) {
         if (++it != lst.end()) {
           rest = hydra_cast<hydra_symbol>(*it);
+          type->rest_type = new type_nil;
         } else {
           string err = "No rest argument name provided!";
           throw err;
@@ -105,12 +109,15 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
           keyword->value = keyword;
           type->keyword_list.push_back(t_type);
           type->keyword_names.push_back(name);
+
         } else if (optional) {
           optionals.push_back(name);
           type->optional_list.push_back(t_type);
+
         } else {
           type->arg_list.push_back(t_type);
           arg_names.push_back(name);
+
         }
       }
     }
@@ -239,8 +246,13 @@ void combined_fn::add(hydra_oper* fn) {
 
 hydra_object* combined_fn::call(hydra_object* alist, runtime &r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+
+  if (type->check_args(arg_list)->null()) {
+    string err = "Type error calling function";
+    throw err;
+  }
   for (hydra_oper* fn : functions) {
-    if (!fn->type->check_args(alist, r, s)->null()) {
+    if (!fn->type->check_args(arg_list)->null()) {
       return fn->call(alist, r, s);
     }
   }
@@ -260,6 +272,10 @@ list<hydra_object *> hydra_oper::get_arg_list(hydra_object *arg_list,
       out_list.push_back(arg);
     }
     arg_list = list_elt->cdr;
+  }
+  if (type->check_args(out_list)->null()) {
+    string err = "type check failed!";
+    throw err;
   }
   return out_list;
 }

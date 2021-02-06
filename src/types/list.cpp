@@ -7,7 +7,7 @@
 using std::string;
 
 string type_list::to_string() const {
-  return "{type List}";
+  return "List";
 }
 
 hydra_object *type_list::check_type(hydra_object* obj) {

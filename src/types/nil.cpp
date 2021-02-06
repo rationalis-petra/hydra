@@ -6,7 +6,7 @@
 using std::string;
 
 string type_nil::to_string() const {
-  return "{type Nil}";
+  return "Nil";
 }
 
 hydra_object *type_nil::check_type(hydra_object* obj) {

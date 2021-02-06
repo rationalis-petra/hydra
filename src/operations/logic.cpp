@@ -10,6 +10,8 @@ using std::string;
 op_eq::op_eq() {
   is_fn = true;
   docstring = new hydra_string("Returns t if two values are equal, and nil otherwise");
+  type->arg_list.push_front(new type_nil);
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_eq::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
@@ -59,7 +61,10 @@ hydra_object *op_eq::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   return hydra_nil::get();
 }
 
-op_or::op_or() { is_fn = false; }
+op_or::op_or() {
+  is_fn = false;
+  type->rest_type = new type_nil;
+  }
 hydra_object *op_or::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
@@ -75,7 +80,10 @@ hydra_object *op_or::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   return hydra_nil::get();
 }
 
-op_and::op_and() { is_fn = false; }
+op_and::op_and() {
+  is_fn = false;
+  type->rest_type = new type_nil;
+}
 hydra_object *op_and::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
@@ -98,7 +106,10 @@ hydra_object *op_and::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   return out;
 }
 
-op_not::op_not() { is_fn = true; }
+op_not::op_not() {
+  is_fn = true;
+  type->arg_list.push_front(new type_nil);
+}
 hydra_object *op_not::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {

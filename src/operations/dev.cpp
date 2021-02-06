@@ -9,6 +9,7 @@ using std::string;
 op_describe::op_describe() {
   is_fn = true;
   docstring = new hydra_string("Describes the provided argument");
+  type->arg_list.push_front(new type_nil);
 };
 
 
@@ -21,7 +22,7 @@ hydra_object* op_describe::call(hydra_object* alist, runtime &r, lexical_scope& 
   if (hydra_oper* op = dynamic_cast<hydra_oper*>(arg_list.front())) {
     string str = "Function:\n" + op->docstring->to_string() +
                  "\nLambda-List: " +
-      "\nType: " + type->to_string();
+      "\nType: " + op->type->to_string();
     if (user_oper* uop = dynamic_cast<user_oper*>(op)) {
       //str += "\n Expression:\n";
       //str += "(fn " + uop->expr->to_string() + ")";

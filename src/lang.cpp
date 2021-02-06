@@ -91,7 +91,7 @@ std::string lang = R"(
 (def cdar (x) (cdr (car x)))
 
 (export (current-module) 'len)
-(def len (list :self len)
+(def len ({list List} :self len)
     (if list (+ 1 (len (cdr list))) 0))
 
 (export (current-module) 'zip)
@@ -110,7 +110,7 @@ std::string lang = R"(
        (cons head (apply zip tail))))))
 
 (export (current-module) 'reverse)
-(defn reverse (lst :optional acc)
+(defn reverse ({lst List} :optional acc)
   (if lst
       (reverse (cdr lst)
                (cons (car lst) acc))
@@ -128,19 +128,19 @@ std::string lang = R"(
 ;;; LOGIC
 (export (current-module) '>)
 (export (current-module) '>=)
-(defn >= (l r)
+(def >= ({l Integer} {r Integer})
   (or (> l r) (= l r)))
 
 (export (current-module) '<)
-(defn < (l r)
+(def < ({l Integer} {r Integer})
   (> r l))
 
 (export (current-module) '<=)
-(defn <= (l r)
+(def <= ({l Integer} {r Integer})
   (>= r l))
 
 (export (current-module) '!=)
-(defn != (l r)
+(def != ({l Integer} {r Integer})
   (not (= l r)))
   
 ;; control flow

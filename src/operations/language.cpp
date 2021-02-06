@@ -7,7 +7,12 @@
 using std::list;
 using std::string;
 
-op_if::op_if() { is_fn = false; }
+op_if::op_if() {
+  is_fn = false;
+  type->arg_list.push_front(new type_nil);
+  type->arg_list.push_front(new type_nil);
+  type->arg_list.push_front(new type_nil);
+}
 hydra_object *op_if::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   // aseert that list length is 3
@@ -27,7 +32,9 @@ hydra_object *op_if::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   return arg_list.front()->eval(r, s);
 }
 
-op_while::op_while() { is_fn = false; }
+op_while::op_while() { is_fn = false;
+  type->rest_type = new type_nil;
+  }
 hydra_object *op_while::call(hydra_object *alist, runtime &r,
                              lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
@@ -50,7 +57,14 @@ hydra_object *op_while::call(hydra_object *alist, runtime &r,
   // otherwise
   return out;
 }
-op_set::op_set() { is_fn = true; }
+op_set::op_set() {
+  is_fn = true;
+
+  docstring = new hydra_string("Sets the value symbol (first argument) to the second argument");
+
+  type->arg_list.push_front(new type_nil);
+  type->arg_list.push_front(new type_symbol);
+}
 hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
@@ -79,7 +93,11 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   }
 }
 
-op_quote::op_quote() { is_fn = false; }
+op_quote::op_quote() {
+  is_fn = false;
+  docstring = new hydra_string("Prevents evaluation of the argument it is provided");
+  type->arg_list.push_front(new type_nil);
+}
 hydra_object *op_quote::call(hydra_object *alist, runtime &r,
                              lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
@@ -110,6 +128,7 @@ op_progn::op_progn() {
   is_fn = false;
   docstring = new hydra_string("Evaluates its arguments in sequential order, returning the value\n"
                                "of the last one");
+  type->rest_type = new type_nil;
 }
 hydra_object *op_progn::call(hydra_object *alist, runtime &r,
                              lexical_scope &s) {
@@ -126,6 +145,8 @@ hydra_object *op_progn::call(hydra_object *alist, runtime &r,
 op_fn::op_fn() {
   is_fn = false;
   docstring = new hydra_string("Generates a new function object");
+  type->arg_list.push_front(new type_cons);
+  type->rest_type = new type_nil;
 }
 hydra_object *op_fn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   return (hydra_object*) new user_oper(alist, true, r, s);
@@ -134,14 +155,17 @@ hydra_object *op_fn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
 op_mac::op_mac() {
   is_fn = false;
   docstring = new hydra_string("Generates a new macro object");
+  type->arg_list.push_front(new type_cons);
+  type->rest_type = new type_nil;
 }
 hydra_object *op_mac::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   return (hydra_object*) new user_oper(alist, false, r, s);
 }
 
 op_addfn::op_addfn() {
-  is_fn = false;
+  is_fn = true;
   docstring = new hydra_string("Combines functions into an effective function");
+  type->rest_type = new type_nil;
 }
 hydra_object *op_addfn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   combined_fn* f = new combined_fn;

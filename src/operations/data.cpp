@@ -11,6 +11,8 @@ op_cons::op_cons() {
   docstring = new hydra_string("Creates a new cons cell and places the first "
                                "argument in the car,\n the second in the cdr."
                                "Will fail if the second is not cons or nil");
+  type->arg_list.push_back(new type_nil);
+  type->arg_list.push_back(new type_list);
 }
 hydra_object *op_cons::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
@@ -35,6 +37,7 @@ op_cdr::op_cdr() {
   is_fn = true;
   docstring =
       new hydra_string("Takes a cons cell as input, and returns the cdr");
+  type->arg_list.push_front(new type_cons);
 }
 hydra_object *op_cdr::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
@@ -55,6 +58,7 @@ op_car::op_car() {
   is_fn = true;
   docstring =
       new hydra_string("Takes a cons cell as input, and returns the car");
+  type->arg_list.push_front(new type_cons);
 }
 hydra_object *op_car::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);

@@ -12,6 +12,8 @@ op_typep::op_typep() {
   is_fn = true;
   docstring = new hydra_string("Returns t if the first argument is the type defined by the\n"
                                "second, otherwise returns nil");
+  type->arg_list.push_front(new type_nil);
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_typep::call(hydra_object *alist, runtime &r,
                              lexical_scope &s) {
@@ -33,6 +35,7 @@ hydra_object *op_typep::call(hydra_object *alist, runtime &r,
 op_type::op_type() {
   is_fn = true;
   docstring = new hydra_string("Generates a type from the provided symbol argument");
+  type->arg_list.push_front(new type_symbol);
 }
 hydra_object *op_type::call(hydra_object *alist, runtime &r,
                             lexical_scope &s) {

@@ -7,7 +7,7 @@
 using std::string;
 
 string type_module::to_string() const {
-  return "{type module}";
+  return "module";
 }
 
 hydra_object *type_module::check_type(hydra_object* obj) {

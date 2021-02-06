@@ -7,7 +7,7 @@
 using std::string;
 
 string type_string::to_string() const {
-  return "{type String}";
+  return "String";
 }
 
 hydra_object *type_string::check_type(hydra_object* obj) {

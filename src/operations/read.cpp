@@ -102,6 +102,7 @@ hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
     case '\t':
       is->stream->read(&c, 1);
       break;
+    case '}':
     case ']':
     case ')': {
       is->stream->read(&c, 1);
@@ -118,34 +119,6 @@ hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
 }
 
 
-hydra_object *mac_curl(hydra_istream *is, char c, runtime &r) {
-  // continue to add tokens to list until we hit a ')'
-  list<hydra_object *> list;
-  list.push_front(hydra_cast<hydra_module>(hydra_cast<hydra_module>(r.root->intern("hydra")->value)
-                                           ->intern("core")->value)
-                  ->intern("type"));
-
-  while (!is->stream->eof()) {
-    c = is->stream->peek();
-    switch (c) {
-    case ' ':
-    case '\n':
-    case '\t': 
-      is->stream->read(&c, 1);
-      break;
-    case '}': {
-      is->stream->read(&c, 1);
-      return to_cons(list);
-      break;
-    }
-      break;
-    default:
-      list.push_back(read(is, r));
-      break;
-    }
-  }
-  throw "{ with no matching }!";
-}
 
 
 hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
@@ -241,14 +214,12 @@ hydra_object *read(hydra_object *raw, runtime &r) {
       break;
 
     case '{':
-      return mac_curl(is, c, r);
-      break;
-
     case '[':
     case '(':
       return mac_lparen(is, c, r);
       break;
 
+    case '}':
     case ']':
     case ')': {
       string err = "error: ') or ]' with no matching '( or ['!";
@@ -275,6 +246,7 @@ op_read::op_read() {
   is_fn = true;
   docstring = new hydra_string("Takes a string or input stream, and returns a hydra expression.\n"
                                "Programmable via set-macro-character");
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_read::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
@@ -290,6 +262,8 @@ op_set_mac_char::op_set_mac_char() {
   is_fn = true;
   docstring = new hydra_string("Updates the readtable entry for the character (first argument)\n"
                                "to point to the provided function (second argumetn)");
+  type->arg_list.push_front(new type_fn);
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object* op_set_mac_char::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);

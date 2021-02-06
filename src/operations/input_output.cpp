@@ -17,6 +17,7 @@ op_print::op_print() {
   is_fn = true;
   docstring = new hydra_string("Prints a string representation of the provided argument to\n"
                                "the standard output stream");
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_print::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
@@ -36,6 +37,7 @@ op_open_file::op_open_file() {
   is_fn = true;
   docstring = new hydra_string("Takes a string (path), and returns an input stream located\n"
                                "by the path");
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_open_file::call(hydra_object *alist, runtime &r, lexical_scope& s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
@@ -58,6 +60,7 @@ op_next::op_next() {
   is_fn = true;
   docstring = new hydra_string("Takes an input stream, advances it one character\n"
                                "and returns the character at the 'current' position");
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_next::call(hydra_object* alist, runtime& r, lexical_scope& s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
@@ -79,6 +82,7 @@ op_peek::op_peek() {
   is_fn = true;
   docstring = new hydra_string("Takes an input stream, and peeks at the next character\n"
                                "but does not advance the input stream");
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_peek::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
@@ -100,6 +104,7 @@ op_endp::op_endp() {
   is_fn = true;
   docstring = new hydra_string("Returns t if a given input stream has reached the\n"
                                "end of the file, and nil otherwise");
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_endp::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
@@ -124,6 +129,7 @@ hydra_object *op_endp::call(hydra_object* alist, runtime& r, lexical_scope &s) {
 op_close::op_close() {
   is_fn = true;
   docstring = new hydra_string("Takes an input stream representing a file, and closes it");
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_close::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);

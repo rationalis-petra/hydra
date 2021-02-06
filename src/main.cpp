@@ -16,6 +16,7 @@ extern string lang;
 hydra_module* language_module;
 
 int main(int argc, char **argv) {
+
   runtime r;
   hydra_object::r = &r;
 
@@ -34,6 +35,15 @@ int main(int argc, char **argv) {
   };
 
   vector<pair<string, hydra_object*>> core = {
+      // types
+      make_pair("Integer", new type_integer),
+      make_pair("String", new type_string),
+      make_pair("Module", new type_module),
+      make_pair("Nil", new type_nil),
+      make_pair("Symbol", new type_symbol),
+      make_pair("List", new type_list),
+      make_pair("Fn", new type_fn),
+
       // arithmetic
       make_pair("+", new op_plus),
       make_pair("-", new op_minus),

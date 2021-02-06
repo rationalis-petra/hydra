@@ -30,6 +30,14 @@ void mark_obj(hydra_object* obj) {
       for (auto valpair : mod->symbols) {
         mark_obj(valpair.second);
       }
+    } else if (type_fn* fn = dynamic_cast<type_fn*>(obj)) {
+      for (auto type : fn->arg_list) {
+        mark_obj(type);
+      }
+      mark_obj(fn->return_type);
+      if (fn->rest_type) {
+        mark_obj(fn->rest_type);
+      }
     }
   }
 }
