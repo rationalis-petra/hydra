@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
       hydra_object::roots.insert(ast);
       out = ast->eval(r, s);
       cout << "* " << out << endl;
-      hydra_object::roots.erase(ast);
+      hydra_object::roots.remove(ast);
       hydra_object::collect_garbage(r);
     } catch (string e) {
       cout << e << endl;

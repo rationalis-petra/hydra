@@ -6,6 +6,14 @@ using std::string;
 using std::map;
 using std::list;
 
+void hydra_module::mark_node() {
+  if (marked) return;
+  marked = true;
+  for (auto pair : symbols) {
+    pair.second->mark_node();
+  }
+}
+
 hydra_module::hydra_module() {}
 
 hydra_module::hydra_module(string _name) {

@@ -7,10 +7,9 @@ using std::list;
 
 list<hydra_object*> hydra_object::node_list;
 list<lexical_scope*> hydra_object::context_list;
-std::set<hydra_object*> hydra_object::roots; 
+hydra_roots hydra_object::roots; 
 
 unsigned long hydra_object::counter = 0;
-unsigned long hydra_object::last = 0;
 runtime *hydra_object::r;
 
 hydra_object::hydra_object() {
@@ -22,9 +21,7 @@ hydra_object::hydra_object() {
   // check for the number of 
 }
 
-hydra_object::~hydra_object() {
-  counter--;
-}
+hydra_object::~hydra_object() {}
 
 bool hydra_object::null() const {
   return false;

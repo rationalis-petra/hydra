@@ -6,6 +6,10 @@
 
 using std::string;
 
+void type_symbol::mark_node() {
+  marked = true;
+}
+
 string type_symbol::to_string() const {
   return "Symbol";
 }

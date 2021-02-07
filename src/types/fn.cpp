@@ -7,6 +7,26 @@
 using std::string;
 using std::list;
 
+void type_fn::mark_node() {
+  if (marked) return;
+  marked = true;
+  for (hydra_type* t : arg_list) {
+    t->mark_node();
+  }
+  for (hydra_type* t : optional_list) {
+    t->mark_node();
+  }
+  for (hydra_type* t : keyword_list) {
+    t->mark_node();
+  }
+  for (hydra_symbol* t : keyword_names) {
+    t->mark_node();
+  }
+  if (rest_type) {
+    rest_type->mark_node();
+  }
+}
+
 type_fn::type_fn() {
   rest_type = nullptr;
   return_type = new type_nil;

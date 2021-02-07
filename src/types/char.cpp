@@ -5,6 +5,10 @@
 
 using std::string;
 
+void type_char::mark_node() {
+  marked = true;
+}
+
 string type_char::to_string() const {
   return "Char";
 }

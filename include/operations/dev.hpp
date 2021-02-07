@@ -8,4 +8,9 @@ struct op_describe : hydra_oper {
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 
+struct op_trace : hydra_oper {
+  op_trace();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+
 #endif // __HYDRA_DATA_HPP

@@ -1,7 +1,16 @@
 #include "expressions.hpp"
+#include <iostream>
 
 using std::string;
 #include <types.hpp>
+
+void hydra_symbol::mark_node() {
+  if (marked) return;
+  marked = true;
+  if (value) {
+    value->mark_node();
+  }
+}
 
 string hydra_symbol::to_string() const {
   if (name == "") {
@@ -21,6 +30,7 @@ hydra_symbol::hydra_symbol(string _name) {
 
 hydra_object* hydra_symbol::eval(runtime& r, lexical_scope& s) {
   // fist, check the lexical scope
+
   auto loc = s.map.find(this);
   if (loc != s.map.end()) {
     return loc->second; 

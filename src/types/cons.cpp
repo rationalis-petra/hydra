@@ -5,6 +5,10 @@
 
 using std::string;
 
+void type_cons::mark_node() {
+  marked = true;
+}
+
 string type_cons::to_string() const {
   return "Cons";
 }

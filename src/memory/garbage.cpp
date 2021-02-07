@@ -5,82 +5,48 @@
 
 using std::list;
 
-void mark_obj(hydra_object* obj) {
-  if (!obj->marked) {
-    obj->marked = true;
-
-    if (hydra_cons *cns = dynamic_cast<hydra_cons *>(obj)) {
-      mark_obj(cns->car);
-      mark_obj(cns->cdr);
-    } else if (hydra_array *arr = dynamic_cast<hydra_array*>(obj)) {
-      for (hydra_object* obj : arr->array) {
-        mark_obj(obj);
-      }
-    } else if (hydra_oper *op = dynamic_cast<hydra_oper*>(obj)) {
-      mark_obj(op->type);
-      if (user_oper *uop = dynamic_cast<user_oper *>(obj)) {
-        mark_obj(uop->expr);
-      }
-      mark_obj(op->docstring);
-    } else if (hydra_symbol *sym = dynamic_cast<hydra_symbol*>(obj)) {
-      if (sym->value) {
-        mark_obj(sym->value);
-      }
-    } else if (hydra_module *mod = dynamic_cast<hydra_module*>(obj)) {
-      for (auto valpair : mod->symbols) {
-        mark_obj(valpair.second);
-      }
-    } else if (type_fn* fn = dynamic_cast<type_fn*>(obj)) {
-      for (auto type : fn->arg_list) {
-        mark_obj(type);
-      }
-      mark_obj(fn->return_type);
-      if (fn->rest_type) {
-        mark_obj(fn->rest_type);
-      }
-    }
-  }
-}
+using std::list;
 
 void mark(runtime& r) {
   // mark all objects accessible from the root and active module
-  mark_obj(r.root);
-  mark_obj(r.active_module);
+  r.root->mark_node();
+  r.active_module->mark_node();
 
   // also, mark everything accessible via a lexical context
   for (lexical_scope* s : hydra_object::context_list) {
     for (auto o : s->map) {
-      mark_obj(o.first);
-      mark_obj(o.second);
+      o.first->mark_node();
+      o.second->mark_node();
     }
   }
-  for (hydra_object* o : hydra_object::roots) {
-    mark_obj(o);
+  for (auto o : hydra_object::roots.data) {
+    o.first->mark_node();
   }
+
+  hydra_t::get()->mark_node();
+  hydra_nil::get()->mark_node();
 }
 
-unsigned long sweep() {
+void sweep() {
   list<hydra_object*> new_list;
-  unsigned long num = 0;
   for (hydra_object* obj : hydra_object::node_list) {
     if (!obj->marked) {
       delete obj;
     }
     else {
-      num++;
       obj->marked = false;
       new_list.push_front(obj);
     }
   }
   hydra_object::node_list = new_list;
-  return num;
 }
 
 void hydra_object::collect_garbage(runtime& r) {
-  if ((counter - last) > 10000) {
+  if (counter > 10000) {
+    counter = 0;
+
     mark(r);
-    counter = node_list.size();
-    last = sweep();
+    sweep();
   }
 }
 

@@ -10,6 +10,8 @@
 #include "types/type.hpp"
 
 struct type_fn : public hydra_type {
+  virtual void mark_node();
+
   type_fn();
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);

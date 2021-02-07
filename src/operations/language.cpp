@@ -85,7 +85,7 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
 
     hydra_object::roots.insert(value);
     hydra_object::collect_garbage(r);
-    hydra_object::roots.erase(value);
+    hydra_object::roots.remove(value);
     return value;
   } else {
     string err = "Error: provided non-symbol as first argument of set";
@@ -135,7 +135,7 @@ hydra_object *op_eval::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   hydra_object* value = arg_list.front()->eval(r, new_scope);
   hydra_object::roots.insert(value);
   hydra_object::collect_garbage(r);
-  hydra_object::roots.erase(value);
+  hydra_object::roots.remove(value);
   return value;
 }
 
@@ -206,18 +206,3 @@ hydra_object *op_exit::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   }
   exit(0);
 }
-
-// hydra_object* macroexpand(hydra_object* args) {
-// if (hydra_cons* cns = dynamic_cast<hydra_cons*>(args)) {
-//   if () {
-//   } else if {
-//   }
-// } else {
-//   return args;
-// }
-//}
-
-// op_macroexpand::op_macroexpand() { is_macro = false; }
-// hydra_object *op_macroexpand::call(hydra_object* alist, runtime& r) {
-//   macroexpand(alist);
-// }

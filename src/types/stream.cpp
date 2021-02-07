@@ -6,6 +6,10 @@
 
 using std::string;
 
+void type_stream::mark_node() {
+  marked = true;
+}
+
 string type_stream::to_string() const {
   return "Stream";
 }

@@ -4,9 +4,18 @@
 #include <string>
 #include <list>
 #include <set>
+#include <map>
 
 struct runtime;
 struct lexical_scope;
+struct hydra_object;
+
+struct hydra_roots {
+public:
+  void remove(hydra_object* obj);
+  void insert(hydra_object* obj);
+  std::map<hydra_object*, unsigned long> data;
+};
 
 struct hydra_object {
   //std::string docstring;
@@ -21,7 +30,10 @@ struct hydra_object {
   bool mut;
 
   // mark & sweep garbage collection
+  // local variables/functions
   bool marked;
+  virtual void mark_node() = 0;
+
   static runtime *r;
   // how many objects exist?
   static unsigned long counter;
@@ -31,7 +43,7 @@ struct hydra_object {
   static std::list<hydra_object*> node_list; 
   // The list of root hydra objects - these are objects
   // which should not be deleted for reasons 'outside'
-  static std::set<hydra_object*> roots; 
+  static hydra_roots roots; 
 
   // the list of all lexical contexts
   static std::list<lexical_scope*> context_list; 

@@ -6,6 +6,10 @@
 
 using std::string;
 
+void type_list::mark_node() {
+  marked = true;
+}
+
 string type_list::to_string() const {
   return "List";
 }

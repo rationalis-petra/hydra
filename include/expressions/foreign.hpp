@@ -11,6 +11,8 @@
 #include "types.hpp"
 
 struct hydra_foreign_lib : public hydra_object {
+  virtual void mark_node();
+
   hydra_foreign_lib(lt_dlhandle lib);
   std::string to_string() const;
 
@@ -18,6 +20,8 @@ struct hydra_foreign_lib : public hydra_object {
 };
 
 struct hydra_foreign_sym : public hydra_object {
+  virtual void mark_node();
+
   hydra_foreign_sym(void *addr);
   std::string to_string() const;
 
@@ -25,6 +29,7 @@ struct hydra_foreign_sym : public hydra_object {
 };
 
 struct hydra_foreign_oper : public hydra_oper {
+
   hydra_object* call(hydra_object* args, runtime& r, lexical_scope &s);
   hydra_foreign_oper();
 

@@ -10,11 +10,13 @@ std::string lang = R"(
 
 "The list function"
 (export (current-module) (quote list))
-(set (quote list) (fn (:rest args) args))
+(set (quote list) 
+  (fn (:rest args)
+   "Makes a list from its' args" 
+    args))
 
 "The def function: like setq in common lisp"
 (export (current-module) (quote def))
-
 (set (quote def) 
   (mac (symbol val :rest body)
     [list (quote set) [list (quote quote) symbol]
@@ -95,10 +97,12 @@ std::string lang = R"(
 (export (current-module) 'zip)
 (def zip (:rest lists) 
  (let ((zip-head (lst)
+       "Retrieves the car of all elements in a list of lists"
              (when (and lst (car lst))
                (cons (car (car lst))
                      (zip-head (cdr lst)))))
        (zip-tail (lst)
+       "Retrieves the cdr of all elements in a list of lists"
              (when (and lst (car lst))
                (cons (cdr (car lst))
                      (zip-tail (cdr lst))))))
@@ -139,6 +143,7 @@ std::string lang = R"(
 
 (export (current-module) '!=)
 (def != ({l Integer} {r Integer})
+  "Returns true iff two arguments are not equal"
   (not (= l r)))
   
 ;; control flow
@@ -161,7 +166,7 @@ std::string lang = R"(
   ((fn (body :self rec-cond)
     (when body
        (list 'if 
-             (car (car body))
+             (caar body)
              (cons 'progn (cdr (car body)))
              (rec-cond (cdr body)))))
    body))
@@ -198,12 +203,11 @@ std::string lang = R"(
           ((= (len (car binding)) 2)
             (cons (car (cdr (car binding))) (get-vals (cdr binding))))
           ((>= (len (car binding)) 3)
-            (cons (list
-                    'fn 
+            (cons (cons 'fn 
                     ;; argument list
-                    (concat [@l :self (car (car binding))]
-                            (car (cdr (car binding))))
-                    (car (cdr (cdr (car binding))))) ;; the body
+                    (cons (concat [@l :self (car (car binding))]
+                                  (car (cdr (car binding))))
+                          (cdr (cdr (car binding))))) ;; the body
                   (get-vals (cdr binding))))))
      arg-list)))
 
@@ -216,7 +220,9 @@ std::string lang = R"(
 ;;; FUNCTIONALS
 (export (current-module) 'apply)
 (def apply (fnc values)
+  "Will call the function FNC with arg-list VALUES"
   (let ((quotify (fn (lst :self quotify)
+        "Will quote all elements in a list"
           (when lst 
             (cons [@l 'quote (car lst)]
                       (quotify (cdr lst)))))))
@@ -225,7 +231,10 @@ std::string lang = R"(
 
 (export (current-module) 'map)
 (def map (func :rest arg-vec)
+  "Will produce a list, where the nth element of the list is the result of calling
+FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
   (let ((simple-map (func args :self simple-map)
+         "Tail-recursive internal implementation"
           (when args 
             (cons (apply func (car args))
                   (simple-map func (cdr args))))))
@@ -235,6 +244,7 @@ std::string lang = R"(
 ;;; MODULES
 (export (current-module) 'use-module)
 (def use-module (module1 module2)
+  "Places all symbols exported by MODULE2 in MODULE1"
   ((fn (syms :self dolist)
       (when syms
         (insert module1 (car syms))

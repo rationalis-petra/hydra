@@ -7,7 +7,11 @@
 using std::string;
 
 string type_module::to_string() const {
-  return "module";
+  return "Module";
+}
+
+void type_module::mark_node() {
+  marked = true;
 }
 
 hydra_object *type_module::check_type(hydra_object* obj) {

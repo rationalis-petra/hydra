@@ -6,6 +6,10 @@
 
 using std::string;
 
+void type_string::mark_node() {
+  marked = true;
+}
+
 string type_string::to_string() const {
   return "String";
 }

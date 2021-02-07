@@ -5,6 +5,10 @@
 
 using std::string;
 
+void type_nil::mark_node() {
+  marked = true;
+}
+
 string type_nil::to_string() const {
   return "Nil";
 }

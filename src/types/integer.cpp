@@ -5,6 +5,10 @@
 
 using std::string;
 
+void type_integer::mark_node() {
+  marked = true;
+}
+
 string type_integer::to_string() const {
   return "Integer";
 }
