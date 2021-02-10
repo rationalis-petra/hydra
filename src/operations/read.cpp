@@ -81,12 +81,9 @@ hydra_object *to_cons(list<hydra_object *> list) {
   if (list.empty()) {
     return hydra_nil::get();
   } else {
-    hydra_cons *cns =
-      new hydra_cons(list.front(), (list.pop_front(), to_cons(list)));
-    if (hydra_object::node_list.front() != cns) {
-      std::cout << "toconsleak" << std::endl;
-    }
-    return cns;
+    hydra_object* car = list.front();
+    list.pop_front();
+    return new hydra_cons(car, to_cons(list));
   }
 }
 
