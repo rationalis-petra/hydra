@@ -145,6 +145,11 @@ std::string lang = R"(
               (apply concat (cons (cdr (car lists)) (cdr lists))))
          (apply concat (cdr lists)))))
 
+(defimpl elt ({lst List} {idx Integer})
+  (if (= 0 idx) 
+      (car lst)
+      (elt (cdr lst) (- idx 1))))
+
 
 ;;; LOGIC
 (export (current-module) '>)
