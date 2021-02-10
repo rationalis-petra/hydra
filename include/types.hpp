@@ -14,8 +14,7 @@ hydra_type* type_from_rep(hydra_object* type);
 struct type_nil : public hydra_type {
   virtual void mark_node();
   std::string to_string() const;
-  virtual hydra_object* check_type(hydra_object* obj);
-};
+  virtual hydra_object* check_type(hydra_object* obj);};
 
 struct type_integer : public hydra_type {
   virtual void mark_node();
@@ -36,6 +35,12 @@ struct type_symbol : public hydra_type {
 };
 
 struct type_cons : public hydra_type {
+  virtual void mark_node();
+  std::string to_string() const;
+  hydra_object* check_type(hydra_object* obj);
+};
+
+struct type_array : public hydra_type {
   virtual void mark_node();
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
@@ -65,6 +70,11 @@ struct type_stream : public hydra_type {
   hydra_object* check_type(hydra_object* obj);
 };
 
+struct type_type : public hydra_type {
+  virtual void mark_node();
+  std::string to_string() const;
+  hydra_object* check_type(hydra_object* obj);
+};
 //void fn_typecheck(hydra_type t, hydra_object* o);
 
 template <typename T> T *hydra_cast(hydra_object *inp) {

@@ -84,7 +84,7 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
       hydra_type* t_type;
       if (hydra_cons* symdef = dynamic_cast<hydra_cons*>(*it)) {
         name = hydra_cast<hydra_symbol>(symdef->car);
-        t_type = type_from_rep(hydra_cast<hydra_cons>(symdef->cdr)->car);
+        t_type = hydra_cast<hydra_type>(hydra_cast<hydra_cons>(symdef->cdr)->car->eval(r, s));
       } else {
         name = hydra_cast<hydra_symbol>(*it);
         t_type = new type_nil;
@@ -106,8 +106,14 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
                hydra_cast<hydra_module>(r.root->intern("keyword")->value)
                    ->get("rest")) {
         if (++it != lst.end()) {
-          rest = hydra_cast<hydra_symbol>(*it);
-          type->rest_type = new type_nil;
+          if (hydra_cons* cns = dynamic_cast<hydra_cons*>(*it)) {
+            rest = hydra_cast<hydra_symbol>(cns->car);
+            type->rest_type = hydra_cast<hydra_type>(hydra_cast<hydra_cons>(cns->cdr)->car->eval(r, s));
+          }
+          else {
+            rest = hydra_cast<hydra_symbol>(*it);
+            type->rest_type = new type_nil;
+          }
         } else {
           string err = "No rest argument name provided!";
           throw err;

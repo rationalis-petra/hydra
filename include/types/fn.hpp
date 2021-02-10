@@ -25,4 +25,18 @@ struct type_fn : public hydra_type {
   std::list<hydra_type*> keyword_list;
 };
 
+struct type_gen_fn : public hydra_type {
+  virtual void mark_node();
+
+  type_gen_fn();
+  std::string to_string() const;
+  hydra_object* check_type(hydra_object* obj);
+
+  hydra_type* return_type;
+  hydra_type* rest_type;
+  std::list<hydra_type*> arg_list;
+  std::list<hydra_type*> optional_list;
+  std::list<hydra_symbol*> keyword_names;
+  std::list<hydra_type*> keyword_list;
+};
 #endif

@@ -23,6 +23,20 @@ struct op_elt : hydra_oper {
   op_elt();
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
+struct op_str_elt : hydra_oper {
+  op_str_elt();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+
+struct op_vec_cat : hydra_oper {
+  op_vec_cat();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+struct op_str_cat : hydra_oper {
+  op_str_cat();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+
 struct op_lock : hydra_oper {
   op_lock();
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);

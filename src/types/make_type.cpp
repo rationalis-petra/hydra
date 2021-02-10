@@ -31,7 +31,13 @@ hydra_type* type_from_rep(hydra_object* type) {
     }
     if (sym->name == "Stream") {
       return new type_stream;
-    }
+    } 
+    if (sym->name == "Type") {
+      return new type_type;
+    } 
+    if (sym->name == "Fn") {
+      return new type_fn;
+    } 
   }
   string err = "bad thing to be a type specifier: " + type->to_string();
   throw err;

@@ -14,106 +14,20 @@ using namespace std;
 extern string lang;
 
 hydra_module* language_module;
+vector<pair<string, hydra_object*>> inbuilts;
+vector<pair<string, hydra_object*>> dev;
+vector<pair<string, hydra_object*>> core;
+vector<pair<string, hydra_object*>> foreign;
+vector<pair<string, hydra_object*>> io;
+
+void make_modules();
 
 int main(int argc, char **argv) {
+  make_modules();
 
   runtime r;
   hydra_object::r = &r;
 
-  language_module = new hydra_module("hydra");
-  vector<pair<string, hydra_module*>> inbuilts = {
-      // other modules
-      make_pair("core", new hydra_module("core")),
-      make_pair("io", new hydra_module("io")),
-      make_pair("foreign", new hydra_module("foreign")),
-      make_pair("concurrent", new hydra_module("concurrent")),
-      make_pair("dev", new hydra_module("dev"))
-  };
-
-  vector<pair<string, hydra_object*>> dev = {
-      make_pair("doc", new op_describe)
-  };
-
-  vector<pair<string, hydra_object*>> core = {
-      // types
-      make_pair("Integer", new type_integer),
-      make_pair("String", new type_string),
-      make_pair("Module", new type_module),
-      make_pair("Nil", new type_nil),
-      make_pair("Symbol", new type_symbol),
-      make_pair("List", new type_list),
-      make_pair("Fn", new type_fn),
-      make_pair("Stream", new type_stream),
-      make_pair("Char", new type_char),
-
-      // arithmetic
-      make_pair("+", new op_plus),
-      make_pair("-", new op_minus),
-      make_pair("*", new op_multiply),
-      make_pair("/", new op_divide),
-      make_pair(">", new op_gr),
-      // data
-      make_pair("array", new op_arr),
-      make_pair("cons", new op_cons),
-      make_pair("car", new op_car),
-      make_pair("cdr", new op_cdr),
-      make_pair("elt", new op_elt),
-
-      // streams
-      make_pair("peek", new op_peek),
-      make_pair("next", new op_next),
-      make_pair("end?", new op_endp),
-      make_pair("eval", new op_eval),
-      make_pair("read", new op_read),
-      make_pair("set-macro-character", new op_set_mac_char),
-      // logic
-      make_pair("=", new op_eq),
-      make_pair("or", new op_or),
-      make_pair("and", new op_and),
-      make_pair("not", new op_not),
-
-      // symbols
-
-      make_pair("defined?", new op_defined),
-      make_pair("set", new op_set),
-      make_pair("lock", new op_lock),
-      make_pair("unlock", new op_unlock),
-
-      // language/control-flow
-      make_pair("if", new op_if),
-      make_pair("while", new op_while),
-      make_pair("fn", new op_fn),
-      make_pair("mac", new op_mac),
-      make_pair("quote", new op_quote),
-      make_pair("progn", new op_progn),
-      make_pair("add-fn", new op_addfn),
-      make_pair("exit", new op_exit),
-
-      make_pair("module", new op_make_module),
-      make_pair("symbol", new op_make_symbol),
-      make_pair("in-module", new op_in_module),
-      make_pair("current-module", new op_get_module),
-      make_pair("get-symbols", new op_get_symbols),
-      make_pair("export", new op_export),
-      make_pair("insert", new op_insert),
-      make_pair("intern", new op_intern),
-      make_pair("get", new op_get),
-      make_pair("remove", new op_remove),
-
-      make_pair("type?", new op_typep),
-      make_pair("type", new op_type)};
-
-  vector<pair<string, hydra_object*>> foreign = {
-      // ffi
-      make_pair("load-c-library", new op_foreign_lib),
-      make_pair("get-c-symbol", new op_foreign_sym),
-      make_pair("internalize", new op_internalize)};
-
-  vector<pair<string, hydra_object*>> io = {
-      // io
-      make_pair("print", new op_print),
-      make_pair("open-file", new op_open_file),
-      make_pair("close-file", new op_close)};
 
   r.root = new hydra_module("");
   hydra_symbol* sym = r.root->intern("hydra");
@@ -201,4 +115,118 @@ int main(int argc, char **argv) {
     delete obj;
   }
   return 0;
+}
+
+void make_modules() {
+  language_module = new hydra_module("hydra");
+  inbuilts = {
+      // other modules
+      make_pair("core", new hydra_module("core")),
+      make_pair("io", new hydra_module("io")),
+      make_pair("foreign", new hydra_module("foreign")),
+      make_pair("concurrent", new hydra_module("concurrent")),
+      make_pair("dev", new hydra_module("dev"))
+  };
+
+  dev = {
+      make_pair("doc", new op_describe)
+  };
+
+  combined_fn* gn_elt = new combined_fn;
+  gn_elt->is_fn = true;
+  gn_elt->type->rest_type = new type_nil;
+  gn_elt->add(new op_elt);
+  gn_elt->add(new op_str_elt);
+
+  combined_fn* gn_concat = new combined_fn;
+  gn_concat->is_fn = true;
+  gn_concat->type->rest_type = new type_nil;
+  gn_concat->add(new op_str_cat);
+  gn_concat->add(new op_vec_cat);
+
+  core = {
+
+      // arithmetic
+      make_pair("+", new op_plus),
+      make_pair("-", new op_minus),
+      make_pair("*", new op_multiply),
+      make_pair("/", new op_divide),
+      make_pair(">", new op_gr),
+      // data
+      make_pair("vector", new op_arr),
+      make_pair("cons", new op_cons),
+      make_pair("car", new op_car),
+      make_pair("cdr", new op_cdr),
+      make_pair("elt", gn_elt),
+      make_pair("concat", gn_concat),
+
+      // streams
+      make_pair("peek", new op_peek),
+      make_pair("next", new op_next),
+      make_pair("end?", new op_endp),
+      make_pair("eval", new op_eval),
+      make_pair("read", new op_read),
+      make_pair("set-macro-character", new op_set_mac_char),
+      // logic
+      make_pair("=", new op_eq),
+      make_pair("or", new op_or),
+      make_pair("and", new op_and),
+      make_pair("not", new op_not),
+
+      // symbols
+
+      make_pair("defined?", new op_defined),
+      make_pair("set", new op_set),
+      make_pair("lock", new op_lock),
+      make_pair("unlock", new op_unlock),
+
+      // language/control-flow
+      make_pair("if", new op_if),
+      make_pair("while", new op_while),
+      make_pair("fn", new op_fn),
+      make_pair("gen", new op_gen),
+      make_pair("mac", new op_mac),
+      make_pair("quote", new op_quote),
+      make_pair("progn", new op_progn),
+      make_pair("add-fn", new op_addfn),
+      make_pair("exit", new op_exit),
+
+      make_pair("module", new op_make_module),
+      make_pair("symbol", new op_make_symbol),
+      make_pair("in-module", new op_in_module),
+      make_pair("current-module", new op_get_module),
+      make_pair("get-symbols", new op_get_symbols),
+      make_pair("export", new op_export),
+      make_pair("insert", new op_insert),
+      make_pair("intern", new op_intern),
+      make_pair("get", new op_get),
+      make_pair("remove", new op_remove),
+
+      // types
+      make_pair("Integer", new type_integer),
+      make_pair("Vector", new type_array),
+      make_pair("Type", new type_type),
+      make_pair("String", new type_string),
+      make_pair("Module", new type_module),
+      make_pair("Nil", new type_nil),
+      make_pair("Symbol", new type_symbol),
+      make_pair("List", new type_list),
+      make_pair("Stream", new type_stream),
+      make_pair("Character", new type_char),
+      make_pair("Fn", new type_fn),
+      make_pair("Gen", new type_gen_fn),
+      make_pair("type?", new op_typep)};
+      //make_pair("type", new op_type)};
+
+  foreign = {
+      // ffi
+      make_pair("load-c-library", new op_foreign_lib),
+      make_pair("get-c-symbol", new op_foreign_sym),
+      make_pair("internalize", new op_internalize)};
+
+   io = {
+      // io
+      make_pair("print", new op_print),
+      make_pair("open-file", new op_open_file),
+      make_pair("close-file", new op_close)};
 }

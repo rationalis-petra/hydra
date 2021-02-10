@@ -157,10 +157,28 @@ hydra_object *op_progn::call(hydra_object *alist, runtime &r,
   return out;
 }
 
+op_gen::op_gen() {
+  docstring = new hydra_string("Generates a new generic function object");
+  type->arg_list.push_front(new type_list);
+  type->rest_type = new type_nil;
+}
+hydra_object *op_gen::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+  combined_fn* out = new combined_fn;
+  out->type->rest_type = new type_nil;
+  arg_list.pop_front();
+  if (!arg_list.empty()) {
+    if (hydra_string* str = dynamic_cast<hydra_string*>(arg_list.front())) {
+      out->docstring = str;
+    }
+  }
+  return out;
+}
+
 op_fn::op_fn() {
   is_fn = false;
   docstring = new hydra_string("Generates a new function object");
-  type->arg_list.push_front(new type_cons);
+  type->arg_list.push_front(new type_list);
   type->rest_type = new type_nil;
 }
 hydra_object *op_fn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
@@ -180,12 +198,13 @@ hydra_object *op_mac::call(hydra_object *alist, runtime &r, lexical_scope &s) {
 op_addfn::op_addfn() {
   is_fn = true;
   docstring = new hydra_string("Combines functions into an effective function");
+  type->arg_list.push_front(new type_gen_fn);
   type->rest_type = new type_nil;
 }
 hydra_object *op_addfn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  combined_fn* f = new combined_fn;
-  f->type->rest_type = new type_nil;
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+  combined_fn* f = dynamic_cast<combined_fn*>(arg_list.front());
+  arg_list.pop_front();
 
   for (hydra_object* o : arg_list) {
     hydra_oper* op = hydra_cast<hydra_oper>(o);

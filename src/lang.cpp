@@ -21,7 +21,7 @@ std::string lang = R"(
   (mac (symbol val :rest body)
     [list (quote set) [list (quote quote) symbol]
           (if body
-              (if (and (defined? symbol) (type? (eval symbol) Fn))
+              (if (and (defined? symbol) (type? (eval symbol) Gen))
                   [list (quote add-fn) 
                         symbol
                         [cons (quote fn) [cons val body]]]
@@ -36,6 +36,27 @@ std::string lang = R"(
       (cons
         (cons (quote :self) (cons name arg-list))
          body)))))
+
+(export (current-module) (quote defgen))
+(set (quote defgen) (mac (name arg-list :rest body)
+  (list (quote set) (list (quote quote) name)
+    (cons (quote gen)
+      (cons
+        (cons (quote :self) (cons name arg-list))
+         body)))))
+
+(export (current-module) (quote defimpl))
+(set (quote defimpl) (mac (name arg-list :rest body)
+  (list (quote set) (list (quote quote) name)
+    (list (quote add-fn) name
+      (cons (quote fn)
+        (cons
+          (cons (quote :self) (cons name arg-list))
+           body))))))
+
+(export (current-module) (quote defvar))
+(set (quote defvar) (mac (name value)
+  (list (quote set) (list (quote quote) name) value)))
 
 "The defmac, i.e. define macro"
 (export (current-module) (quote defmac))
@@ -66,7 +87,7 @@ std::string lang = R"(
 
 ;; COMPACT CONSTRUCTORS
 (export (current-module) '@v)
-(def @v array)
+(def @v vector)
 (export (current-module) '@l)
 (def @l list)
 (export (current-module) '@m)
@@ -75,8 +96,6 @@ std::string lang = R"(
 (def @s symbol)
 (export (current-module) '@c)
 (def @c cons)
-(export (current-module) '@t)
-(def @t type)
 
 
 ;;; DATA MANIPULATION
@@ -119,7 +138,7 @@ std::string lang = R"(
        acc))
 
 (export (current-module) 'concat)
-(def concat (:rest lists)
+(defimpl concat (:rest {lists List})
   (when lists
     (if (car lists)
         (cons (car (car lists))
@@ -174,15 +193,15 @@ std::string lang = R"(
 
 ;;; ARITHMETIC
 (export (current-module) 'even?)
-(def even? (x)
+(def even? ({x Integer})
   (= x (* 2 (/ x 2))))
 
 (export (current-module) 'rem)
-(def rem (val quot)
+(def rem ({val Integer} {quot Integer})
   (- val (* quot (/ val quot))))
 
 (export (current-module) 'div)
-(def div (val quot)
+(def div ({val Integer} {quot Integer})
   ((/ val quot)))
 
 ;;; LANGUAGE
@@ -219,7 +238,7 @@ std::string lang = R"(
 
 ;;; FUNCTIONALS
 (export (current-module) 'apply)
-(def apply (fnc values)
+(def apply ({fnc Fn} {values List})
   "Will call the function FNC with arg-list VALUES"
   (let ((quotify (fn (lst :self quotify)
         "Will quote all elements in a list"

@@ -21,6 +21,10 @@ struct op_addfn : hydra_oper {
   op_addfn();
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
 };
+struct op_gen : hydra_oper {
+  op_gen();
+  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
+};
 struct op_fn : hydra_oper {
   op_fn();
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);

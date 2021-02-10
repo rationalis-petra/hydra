@@ -30,6 +30,7 @@ void hydra_oper::mark_node() {
 
 list<hydra_object *> hydra_oper::get_arg_list(hydra_object *arg_list,
                                               runtime &r, lexical_scope &s) {
+  hydra_object* original_list = arg_list;
   list<hydra_object *> out_list;
   while (!arg_list->null()) {
     hydra_cons *list_elt = dynamic_cast<hydra_cons *>(arg_list);
@@ -42,7 +43,7 @@ list<hydra_object *> hydra_oper::get_arg_list(hydra_object *arg_list,
     arg_list = list_elt->cdr;
   }
   if (type->check_args(out_list)->null()) {
-    string err = "type check failed!";
+    string err = "type check failed! for arg_list: " + original_list->to_string();
     throw err;
   }
   return out_list;
@@ -51,7 +52,9 @@ list<hydra_object *> hydra_oper::get_arg_list(hydra_object *arg_list,
 
 // COMBINED FUNCTION
 
-string combined_fn::to_string() const { return "<combined function>"; }
+string combined_fn::to_string() const {
+  return "<generic function>";
+}
 
 void combined_fn::mark_node() {
   if (marked) return;
