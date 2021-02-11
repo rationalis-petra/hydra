@@ -5,6 +5,7 @@
 #include "ltdl.h"
 
 #include "operations.hpp"
+#include "types.hpp"
 
 using std::list;
 using std::string;

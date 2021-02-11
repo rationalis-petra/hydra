@@ -8,7 +8,6 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
-
 using namespace std;
 
 extern string lang;
@@ -135,8 +134,16 @@ void make_modules() {
   combined_fn* gn_elt = new combined_fn;
   gn_elt->is_fn = true;
   gn_elt->type->rest_type = new type_nil;
-  gn_elt->add(new op_elt);
+  gn_elt->add(new op_vec_elt);
   gn_elt->add(new op_str_elt);
+
+  
+  combined_fn* gn_len = new combined_fn;
+  gn_len->is_fn = true;
+  gn_len->type->rest_type = new type_nil;
+  gn_len->add(new op_vec_len);
+  //gn_elt->add(new op_str_elt);
+
 
   combined_fn* gn_concat = new combined_fn;
   gn_concat->is_fn = true;
@@ -153,15 +160,17 @@ void make_modules() {
       make_pair("/", new op_divide),
       make_pair(">", new op_gr),
       // data
-      make_pair("vector", new op_arr),
+      make_pair("vector", new op_vec),
       make_pair("cons", new op_cons),
       make_pair("car", new op_car),
       make_pair("cdr", new op_cdr),
       make_pair("elt", gn_elt),
       make_pair("concat", gn_concat),
+      make_pair("len", gn_len),
 
       // streams
       make_pair("peek", new op_peek),
+      make_pair("put", new op_put),
       make_pair("next", new op_next),
       make_pair("end?", new op_endp),
       make_pair("eval", new op_eval),
@@ -204,19 +213,19 @@ void make_modules() {
 
       // types
       make_pair("Integer", new type_integer),
-      make_pair("Vector", new type_array),
+      make_pair("Vector", new type_vector),
       make_pair("Type", new type_type),
       make_pair("String", new type_string),
       make_pair("Module", new type_module),
       make_pair("Nil", new type_nil),
       make_pair("Symbol", new type_symbol),
       make_pair("List", new type_list),
-      make_pair("Stream", new type_stream),
-      make_pair("Character", new type_char),
+      make_pair("IOStream", new type_iostream),
+      make_pair("IStream", new type_istream),
+      make_pair("OStream", new type_ostream),
       make_pair("Fn", new type_fn),
       make_pair("Gen", new type_gen_fn),
       make_pair("type?", new op_typep)};
-      //make_pair("type", new op_type)};
 
   foreign = {
       // ffi

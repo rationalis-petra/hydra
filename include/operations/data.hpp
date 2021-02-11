@@ -15,12 +15,14 @@ struct op_cdr : hydra_oper {
   op_cdr();
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
-struct op_arr : hydra_oper {
-  op_arr();
+struct op_vec : hydra_oper {
+  op_vec();
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
-struct op_elt : hydra_oper {
-  op_elt();
+
+// GET DATA
+struct op_vec_elt : hydra_oper {
+  op_vec_elt();
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 struct op_str_elt : hydra_oper {
@@ -28,6 +30,16 @@ struct op_str_elt : hydra_oper {
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 
+// Length
+
+struct op_vec_len : hydra_oper {
+  op_vec_len();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+
+
+
+// CONCATENATE
 struct op_vec_cat : hydra_oper {
   op_vec_cat();
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);

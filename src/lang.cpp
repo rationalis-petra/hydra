@@ -110,7 +110,7 @@ std::string lang = R"(
 (def cdar (x) (cdr (car x)))
 
 (export (current-module) 'len)
-(def len ({list List} :self len)
+(defimpl len ({list List} :self len)
     (if list (+ 1 (len (cdr list))) 0))
 
 (export (current-module) 'zip)
@@ -254,7 +254,9 @@ std::string lang = R"(
 
 
 (export (current-module) 'map)
-(def map (func :rest arg-vec)
+(defgen map () "Applies function to sequence")
+
+(defimpl map ((func Fn) :rest arg-vec)
   "Will produce a list, where the nth element of the list is the result of calling
 FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
   (let ((simple-map (func args :self simple-map)
@@ -263,7 +265,6 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
             (cons (apply func (car args))
                   (simple-map func (cdr args))))))
     (simple-map func (apply zip arg-vec))))
-
 
 ;;; MODULES
 (export (current-module) 'use-module)

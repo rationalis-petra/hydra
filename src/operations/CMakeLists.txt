@@ -1,12 +1,17 @@
 
-add_library(operations OBJECT arithmetic.cpp
-                       data.cpp
+add_library(operations OBJECT
+                       data/data.cpp
+                       data/string.cpp
+                       data/vector.cpp
+                       arithmetic.cpp
+                       #concurrency.cpp
+                       dev.cpp
+                       foreign.cpp
                        input_output.cpp
                        language.cpp
-                       module.cpp
                        logic.cpp
+                       module.cpp
                        read.cpp
-                       foreign.cpp
-                       dev.cpp
+                       symbol.cpp
                        types.cpp)
                        

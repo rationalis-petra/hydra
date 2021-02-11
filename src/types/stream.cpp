@@ -6,16 +6,54 @@
 
 using std::string;
 
-void type_stream::mark_node() {
+// INPUT-OUTPUT STREAM
+void type_iostream::mark_node() {
   marked = true;
 }
 
-string type_stream::to_string() const {
-  return "Stream";
+string type_iostream::to_string() const {
+  return "IOStream";
 }
 
-hydra_object *type_stream::check_type(hydra_object* obj) {
-  if ((dynamic_cast<hydra_istream*>(obj)) == nullptr) {
+hydra_object *type_iostream::check_type(hydra_object* obj) {
+  if ((dynamic_cast<hydra_iostream*>(obj)) == nullptr) {
+    return hydra_nil::get();
+  } else {
+    return hydra_t::get();
+  }
+}
+
+
+// INPUT STREAM
+void type_istream::mark_node() {
+  marked = true;
+}
+
+string type_istream::to_string() const {
+  return "IStream";
+}
+
+hydra_object *type_istream::check_type(hydra_object* obj) {
+  if ((dynamic_cast<hydra_istream*>(obj)) == nullptr &&
+      (dynamic_cast<hydra_iostream*>(obj)) == nullptr) {
+    return hydra_nil::get();
+  } else {
+    return hydra_t::get();
+  }
+}
+
+// OUTPUT STREAM
+void type_ostream::mark_node() {
+  marked = true;
+}
+
+string type_ostream::to_string() const {
+  return "OStream";
+}
+
+hydra_object *type_ostream::check_type(hydra_object* obj) {
+  if ((dynamic_cast<hydra_ostream*>(obj)) == nullptr &&
+      (dynamic_cast<hydra_iostream*>(obj)) == nullptr) {
     return hydra_nil::get();
   } else {
     return hydra_t::get();

@@ -1,5 +1,5 @@
-#ifndef __HYDRA_FOREIGN_HPP
-#define __HYDRA_FOREIGN_HPP
+#ifndef __HYDRA_EXPRESSIONS_FOREIGN_HPP
+#define __HYDRA_EXPRESSIONS_FOREIGN_HPP
 
 #include <list>
 #include <string>
@@ -7,8 +7,10 @@
 #include "ltdl.h"
 #include "ffi.h"
 
-#include "object.hpp"
 #include "types.hpp"
+#include "object.hpp"
+
+enum foreign_type { Int32, Pointer, String, Void };
 
 struct hydra_foreign_lib : public hydra_object {
   virtual void mark_node();

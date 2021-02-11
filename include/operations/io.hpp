@@ -24,6 +24,11 @@ struct op_peek : hydra_oper {
   op_peek();
   hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
 };
+struct op_put : hydra_oper {
+  op_put();
+  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
+};
+
 struct op_close : hydra_oper {
   op_close();
   hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);

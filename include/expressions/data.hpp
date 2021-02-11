@@ -61,11 +61,19 @@ struct hydra_ostream : public hydra_object {
   virtual void mark_node();
 
   std::string to_string() const;
-  std::ostream stream;
-
+  std::ostream *stream;
+  ~hydra_ostream();
 };
 
-struct hydra_array : public hydra_object {
+struct hydra_iostream : public hydra_object {
+  virtual void mark_node();
+
+  std::string to_string() const;
+  std::iostream *stream;
+  ~hydra_iostream();
+};
+
+struct hydra_vector : public hydra_object {
   virtual void mark_node();
 
   std::string to_string() const;

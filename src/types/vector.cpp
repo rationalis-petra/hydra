@@ -5,16 +5,16 @@
 
 using std::string;
 
-void type_array::mark_node() {
+void type_vector::mark_node() {
   marked = true;
 }
 
-string type_array::to_string() const {
+string type_vector::to_string() const {
   return "Vector";
 }
 
-hydra_object *type_array::check_type(hydra_object* obj) {
-  if ((dynamic_cast<hydra_array*>(obj)) || obj->null()) {
+hydra_object *type_vector::check_type(hydra_object* obj) {
+  if ((dynamic_cast<hydra_vector*>(obj)) || obj->null()) {
     return hydra_t::get();
   } else {
     return hydra_nil::get();

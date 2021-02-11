@@ -6,7 +6,6 @@
 using std::string;
 using std::to_string;
 
-
 /// TRUE
 
 // compound types: string, array
@@ -23,6 +22,7 @@ hydra_t* hydra_t::get() {
   }
   return singleton;
 }
+
 string hydra_t::to_string() const {
   return "t";
 }
@@ -48,14 +48,14 @@ string hydra_string::to_string() const {
 
 /// ARRAY
 
-void hydra_array::mark_node() {
+void hydra_vector::mark_node() {
   marked = true;
   for (hydra_object* o : array) {
     o->mark_node();
   }
 }
-string hydra_array::to_string() const {
-  string out = "[@v";
+string hydra_vector::to_string() const {
+  string out = "[@v ";
 
   for (unsigned i = 0; i < array.size() ; i++) {
     out += array[i]->to_string();
@@ -119,7 +119,7 @@ string hydra_nil::to_string() const {
 }
 
 
-
+/* STREAMS */
 // INPUT STREAM
 void hydra_istream::mark_node() {
   marked = true;
@@ -133,4 +133,32 @@ hydra_istream::~hydra_istream() {
   if (stream != &std::cin) {
     delete stream;
   }
+}
+
+// OUTPUT STREAM
+void hydra_ostream::mark_node() {
+  marked = true;
+}
+
+string hydra_ostream::to_string() const {
+  return "output stream";
+}
+
+hydra_ostream::~hydra_ostream() {
+  if (stream != &std::cout) {
+    delete stream;
+  }
+}
+
+// INPUT-OUTPUT STREAM
+void hydra_iostream::mark_node() {
+  marked = true;
+}
+
+string hydra_iostream::to_string() const {
+  return "input/output stream";
+}
+
+hydra_iostream::~hydra_iostream() {
+  delete stream;
 }

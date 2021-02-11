@@ -1,8 +1,6 @@
 
-add_library(types OBJECT make_type.cpp
-                         cons.cpp
+add_library(types OBJECT cons.cpp
                          integer.cpp
-                         array.cpp
                          list.cpp
                          nil.cpp
                          type.cpp
@@ -12,4 +10,5 @@ add_library(types OBJECT make_type.cpp
                          char.cpp
                          string.cpp
                          symbol.cpp
-                         fn.cpp)
+                         fn.cpp
+                         vector.cpp)

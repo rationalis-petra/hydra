@@ -14,6 +14,7 @@ op_plus::op_plus() {
                                "provided with no arguments, returns 0");
   type->rest_type = new type_integer;
 }
+
 hydra_object *op_plus::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   // we guarantee that this is a cons object
   std::list<hydra_object *> arg_list = get_arg_list(alist, r, s);
@@ -32,6 +33,7 @@ op_minus::op_minus() {
       "Subtract the second and all subsequent arguments from the first");
   type->rest_type = new type_integer;
 }
+
 hydra_object *op_minus::call(hydra_object *alist, runtime &r,
                              lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
