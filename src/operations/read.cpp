@@ -67,9 +67,9 @@ hydra_object *to_value(string token, runtime & r) {
   } else if (path.front() == "") {
     path.pop_front();
     path.push_front("keyword");
-    hydra_symbol* obj = r.root->intern(path);
-    obj->value = obj;
-    return obj;
+    hydra_symbol* sym = r.root->intern(path);
+    sym->value = sym;
+    return sym;
     // keyword
   } else {
     hydra_object *obj = r.active_module->intern(path);
