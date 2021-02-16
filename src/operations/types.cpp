@@ -28,3 +28,18 @@ hydra_object *op_typep::call(hydra_object *alist, runtime &r,
   return type_rep->check_type(obj);
 }
 
+op_type::op_type() {
+  is_fn = true;
+  docstring = new hydra_string("Calls the constructor for a particular type");
+  type->arg_list.push_front(new type_type);
+  type->rest_type = new type_nil;
+}
+
+hydra_object *op_type::call(hydra_object *alist, runtime &r,
+                             lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+  hydra_type *type = dynamic_cast<hydra_type*>(arg_list.front());
+  arg_list.pop_front();
+
+  return type->constructor(arg_list);
+}

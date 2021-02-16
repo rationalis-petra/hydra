@@ -85,20 +85,23 @@ op_next::op_next() {
                                "and returns the character at the 'current' position");
   type->arg_list.push_front(new type_istream);
 }
+
 hydra_object *op_next::call(hydra_object* alist, runtime& r, lexical_scope& s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
-  if (arg_list.size() != 1) {
-    string err = "Invalid number of arguments provided to next"; 
-  }
 
-  if (hydra_istream* stream = dynamic_cast<hydra_istream*>(arg_list.front())) {
-    char ch;
-    stream->stream->read(&ch, 1);
-    return new hydra_char(ch);
+  istream* stream;
+  if (hydra_istream* s = dynamic_cast<hydra_istream*>(arg_list.front())) {
+    stream = s->stream;
+  } else if (hydra_iostream* s = dynamic_cast<hydra_iostream*>(arg_list.front())) {
+    stream = s->stream;
   } else {
-    string err = "Non-istream argument provided to peek";
+    string err = "Non-istream argument provided to next";
     throw err;
   }
+
+  char ch;
+  stream->get(ch);
+  return new hydra_char(ch);
 }
 
 op_peek::op_peek() {
@@ -110,18 +113,19 @@ op_peek::op_peek() {
 
 hydra_object *op_peek::call(hydra_object* alist, runtime& r, lexical_scope &s) {
   list<hydra_object*> arg_list = get_arg_list(alist, r, s);
-  if (arg_list.size() != 1) {
-    string err = "Invalid number of arguments provided to peek"; 
-    throw err;
-  }
-  if (hydra_istream* stream = dynamic_cast<hydra_istream*>(arg_list.front())) {
-    hydra_char* c = new hydra_char;
-    c->value = stream->stream->peek();
-    return c;
+
+  istream* stream;
+  if (hydra_istream* s = dynamic_cast<hydra_istream*>(arg_list.front())) {
+    stream = s->stream;
+  } else if (hydra_iostream* s = dynamic_cast<hydra_iostream*>(arg_list.front())) {
+    stream = s->stream;
   } else {
     string err = "Non-istream argument provided to peek";
     throw err;
   }
+
+  char ch = stream->peek();
+  return new hydra_char(ch);
 }
 
 op_put::op_put() {

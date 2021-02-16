@@ -3,6 +3,7 @@ add_library(operations OBJECT
                        data/data.cpp
                        data/string.cpp
                        data/vector.cpp
+                       data/adt.cpp
                        arithmetic.cpp
                        #concurrency.cpp
                        dev.cpp

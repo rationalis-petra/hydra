@@ -4,88 +4,67 @@
 #include <list>
 
 #include "expressions/object.hpp"
+#include "expressions/operation.hpp"
 
 
 struct hydra_type : public hydra_object {
 public:
   virtual hydra_object* check_type(hydra_object* obj) = 0;
-};
-
-struct type_nil : public hydra_type {
-  virtual void mark_node();
-  std::string to_string() const;
-  virtual hydra_object* check_type(hydra_object* obj);};
-
-struct type_integer : public hydra_type {
-  virtual void mark_node();
-  std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-};
-
-struct type_string : public hydra_type {
-  virtual void mark_node();
-  std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
+  virtual hydra_type* constructor(std::list<hydra_object*> lst) = 0;
 };
 
 struct type_symbol : public hydra_type {
   virtual void mark_node();
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
 };
+
+// TODO: TUPLE, UNION!!!
 
 struct type_cons : public hydra_type {
   virtual void mark_node();
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
+
+  hydra_type* type_car;
+  hydra_type* type_cdr;
 };
 
 struct type_vector : public hydra_type {
   virtual void mark_node();
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
+
+  hydra_type* type_elt;
 };
 
 struct type_list : public hydra_type {
   virtual void mark_node();
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
+
+  hydra_type* elt_type;
 };
 
-struct type_module : public hydra_type {
-  virtual void mark_node();
-  std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-};
+// struct type_or : public hydra_type {
+//   virtual void mark_node();
+//   std::string to_string() const;
+//   hydra_object* check_type(hydra_object* obj);
+//   hydra_type* constructor(std::list<hydra_object*> lst);
 
-struct type_char : public hydra_type {
-  virtual void mark_node();
-  std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-};
+//   std::list<hydra_type*> types;
+// };
 
-struct type_iostream : public hydra_type {
-  virtual void mark_node();
-  std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-};
+// struct type_and : public hydra_type {
+//   virtual void mark_node();
+//   std::string to_string() const;
+//   hydra_object* check_type(hydra_object* obj);
+//   hydra_type* constructor(std::list<hydra_object*> lst);
 
-struct type_istream : public hydra_type {
-  virtual void mark_node();
-  std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-};
-
-struct type_ostream : public hydra_type {
-  virtual void mark_node();
-  std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-};
-
-struct type_type : public hydra_type {
-  virtual void mark_node();
-  std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-};
-
+//   std::list<hydra_type*> types;
+// };
 #endif

@@ -8,4 +8,9 @@ struct op_typep : hydra_oper {
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
 };
 
+struct op_type : hydra_oper {
+  op_type();
+  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
+};
+
 #endif

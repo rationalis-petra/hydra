@@ -183,15 +183,21 @@ hydra_object *mac_string(hydra_istream* is, char c, runtime& r) {
 hydra_object *read(hydra_object *raw, runtime &r) {
   // strings work too!
   hydra_istream *is;
+  hydra_iostream *ios = nullptr;
   if (hydra_string *str = dynamic_cast<hydra_string *>(raw)) {
     is = new hydra_istream();
     is->stream = new stringstream(str->value);
-  } else if (!(is = dynamic_cast<hydra_istream*>(raw))) {
+  } else if (!(is = dynamic_cast<hydra_istream*>(raw)) &&
+             !(ios = dynamic_cast<hydra_iostream*>(raw))) {
     string err = "Non-stream type provided to read!";
     throw err;
   }
   char c;
 
+  if (ios) {
+    is = new hydra_istream;
+    is->stream = ios->stream;
+  }
   is->stream->read(&c, 1);
   while (!is->stream->eof()) {
 

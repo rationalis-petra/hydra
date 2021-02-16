@@ -5,6 +5,7 @@
 #include "types.hpp"
 
 using std::string;
+using std::list;
 
 string type_module::to_string() const {
   return "Module";
@@ -19,5 +20,14 @@ hydra_object *type_module::check_type(hydra_object* obj) {
     return hydra_t::get();
   } else {
     return hydra_nil::get();
+  }
+}
+
+hydra_type *type_module::constructor(list<hydra_object*> lst) {
+  if (lst.size() == 0) {
+    return this;
+  } else {
+    string err = "Cannot provide argument to the Module Type constructor";
+    throw err;
   }
 }

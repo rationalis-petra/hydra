@@ -20,6 +20,17 @@ struct op_vec : hydra_oper {
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 
+
+struct op_union : hydra_oper {
+  op_union();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+
+struct op_tuple : hydra_oper {
+  op_tuple();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+
 // GET DATA
 struct op_vec_elt : hydra_oper {
   op_vec_elt();

@@ -16,6 +16,7 @@ struct type_fn : public hydra_type {
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
   hydra_object* check_args(std::list<hydra_object*> alist);
+  hydra_type* constructor(std::list<hydra_object*> lst);
 
   hydra_type* return_type;
   hydra_type* rest_type;
@@ -31,6 +32,7 @@ struct type_gen_fn : public hydra_type {
   type_gen_fn();
   std::string to_string() const;
   hydra_object* check_type(hydra_object* obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
 
   hydra_type* return_type;
   hydra_type* rest_type;

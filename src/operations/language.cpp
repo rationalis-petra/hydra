@@ -178,7 +178,6 @@ hydra_object *op_gen::call(hydra_object *alist, runtime &r, lexical_scope &s) {
 op_fn::op_fn() {
   is_fn = false;
   docstring = new hydra_string("Generates a new function object");
-  type->arg_list.push_front(new type_list);
   type->rest_type = new type_nil;
 }
 hydra_object *op_fn::call(hydra_object *alist, runtime &r, lexical_scope &s) {

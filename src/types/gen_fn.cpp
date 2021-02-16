@@ -55,3 +55,12 @@ hydra_object *type_gen_fn::check_type(hydra_object *obj) {
   return hydra_nil::get();
 }
 
+
+hydra_type *type_gen_fn::constructor(list<hydra_object*> lst) {
+  if (lst.size() == 0) {
+    return this;
+  } else {
+    string err = "type_gen_fn::constructor not implemented";
+    throw err;
+  }
+}

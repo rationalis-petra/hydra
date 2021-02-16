@@ -48,7 +48,6 @@ struct hydra_num : public hydra_object {
   int value;
 };
 
-
 struct hydra_istream : public hydra_object {
   virtual void mark_node();
 
@@ -98,4 +97,20 @@ struct hydra_char : public hydra_object {
   hydra_char(int c);
   std::string to_string() const;
   int value;
+};
+
+struct hydra_tuple : public hydra_object {
+  virtual void mark_node();
+
+  std::string to_string() const;
+  std::vector<hydra_object*> values;
+};
+
+struct hydra_symbol;
+struct hydra_union : public hydra_object {
+  virtual void mark_node();
+
+  std::string to_string() const;
+  hydra_symbol* tag;
+  hydra_object* value;
 };

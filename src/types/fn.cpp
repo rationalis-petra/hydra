@@ -93,8 +93,10 @@ hydra_object *type_fn::check_args(list<hydra_object*> alist) {
   return hydra_t::get();
 }
 
-  // hydra_type* return_type;
-  // std::list<hydra_type*> arg_list;
-  // std::list<hydra_type*> optional_list;
-  // std::list<hydra_symbol*> keyword_names;
-  // std::list<hydra_type*> keyword_list;
+
+hydra_type *type_fn::constructor(list<hydra_object*> lst) {
+  if (lst.size() == 0) {
+    return this;
+  } else {
+  }
+}

@@ -70,10 +70,33 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
   type->rest_type = nullptr;
   scope = new lexical_scope(s);
 
+  // if we have a symbol, try evaluating it to see if it's a type
+
   // operations have the form:
   // (fn/mac <optional name> <arg_list> rest)
   if (hydra_cons *cns = dynamic_cast<hydra_cons *>(op_def)) {
-    hydra_object *name_list = cns->car;
+
+    hydra_object *name_list;
+
+    if (hydra_symbol *sym = dynamic_cast<hydra_symbol *>(cns->car)) {
+      hydra_object *raw_type = sym->eval(r, s);
+      if (hydra_type* ret_type = dynamic_cast<hydra_type*>(raw_type)) {
+        type->return_type = ret_type;
+      } else {
+        string err = "First argument to fn is neither type nor argument-list";
+        throw err;
+      }
+      if (hydra_cons* cns2 = dynamic_cast<hydra_cons *>(cns->cdr)) {
+        name_list = cns2->car;
+        cns = cns2;
+      } else {
+        string err = "Second argument to typed fn is not an argument-list";
+        throw err;
+      }
+    } else {
+      name_list = cns->car;
+    }
+
 
     list<hydra_object *> lst = make_list(name_list);
     bool optional = false;

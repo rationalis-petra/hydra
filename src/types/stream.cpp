@@ -5,6 +5,7 @@
 #include "types.hpp"
 
 using std::string;
+using std::list;
 
 // INPUT-OUTPUT STREAM
 void type_iostream::mark_node() {
@@ -23,6 +24,14 @@ hydra_object *type_iostream::check_type(hydra_object* obj) {
   }
 }
 
+hydra_type *type_iostream::constructor(list<hydra_object*> lst) {
+  if (lst.size() == 0) {
+    return this;
+  } else {
+    string err = "Cannot provide argument to the IOStream Type constructor";
+    throw err;
+  }
+}
 
 // INPUT STREAM
 void type_istream::mark_node() {
@@ -42,6 +51,15 @@ hydra_object *type_istream::check_type(hydra_object* obj) {
   }
 }
 
+hydra_type *type_istream::constructor(list<hydra_object*> lst) {
+  if (lst.size() == 0) {
+    return this;
+  } else {
+    string err = "Cannot provide argument to the IStream Type constructor";
+    throw err;
+  }
+}
+
 // OUTPUT STREAM
 void type_ostream::mark_node() {
   marked = true;
@@ -57,5 +75,14 @@ hydra_object *type_ostream::check_type(hydra_object* obj) {
     return hydra_nil::get();
   } else {
     return hydra_t::get();
+  }
+}
+
+hydra_type *type_ostream::constructor(list<hydra_object*> lst) {
+  if (lst.size() == 0) {
+    return this;
+  } else {
+    string err = "Cannot provide argument to the OStream Type constructor";
+    throw err;
   }
 }

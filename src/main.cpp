@@ -160,6 +160,8 @@ void make_modules() {
       make_pair("/", new op_divide),
       make_pair(">", new op_gr),
       // data
+      make_pair("tuple", new op_tuple),
+      make_pair("union", new op_union),
       make_pair("vector", new op_vec),
       make_pair("cons", new op_cons),
       make_pair("car", new op_car),
@@ -225,7 +227,8 @@ void make_modules() {
       make_pair("OStream", new type_ostream),
       make_pair("Fn", new type_fn),
       make_pair("Gen", new type_gen_fn),
-      make_pair("type?", new op_typep)};
+      make_pair("type?", new op_typep),
+      make_pair("type", new op_type)};
 
   foreign = {
       // ffi

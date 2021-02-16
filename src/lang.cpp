@@ -30,12 +30,14 @@ std::string lang = R"(
 
 "The defn, i.e. define-function"
 (export (current-module) (quote defn))
-(set (quote defn) (mac (name arg-list :rest body)
-  (list (quote def) name
-    (cons (quote fn)
-      (cons
-        (cons (quote :self) (cons name arg-list))
-         body)))))
+(set (quote defn) (mac (name arg1 :optional arg2 :rest body)
+  (let ((arg-list (if (type? arg1 Symbol) arg2 arg1))
+        (body (if (type? arg1 Symbol) body (cons arg2 body))))
+   (list (quote def) name
+     (cons (quote fn)
+       (cons
+         (cons (quote :self) (cons name arg-list))
+          body))))))
 
 (export (current-module) (quote defgen))
 (set (quote defgen) (mac (name arg-list :rest body)
@@ -96,6 +98,8 @@ std::string lang = R"(
 (def @s symbol)
 (export (current-module) '@c)
 (def @c cons)
+(export (current-module) '@t)
+(def @t type)
 
 
 ;;; DATA MANIPULATION
@@ -286,9 +290,9 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 (export (current-module) 'load)
 
 (def load (filename)
-  (let ((fstream (open-file filename))
+  (let ((fstream (open-file filename :input))
         (module (current-module)))
-   (while (not (endp fstream))
+   (while (not (end? fstream))
      (eval (read fstream)))
    (close-file fstream)
    (in-module module)))

@@ -16,6 +16,7 @@ op_foreign_lib::op_foreign_lib() {
   docstring = new hydra_string("takes a string and tries to open the "
                                "corresponding\n shared object (.so) or"
                                "dynamic link library (.dll) file");
+  type->arg_list.push_back(new type_string);
 }
 hydra_object *op_foreign_lib::call(hydra_object *body, runtime &r,
                                    lexical_scope &s) {
@@ -49,6 +50,8 @@ op_foreign_sym::op_foreign_sym() {
   docstring = new hydra_string("Takes a string and a foreign library, and"
                                "will find the\n foreign symbol whose name"
                                "matches this string in the library");
+  type->arg_list.push_front(new type_string);
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_foreign_sym::call(hydra_object *body, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(body, r, s);
@@ -82,6 +85,8 @@ op_internalize::op_internalize() {
   docstring = new hydra_string("Takes a foreign symbol and a type declaration"
                                "and returns a hydra\n value that can be used"
                                "to access the symbol");
+  type->arg_list.push_front(new type_nil);
+  type->arg_list.push_front(new type_nil);
 }
 hydra_object *op_internalize::call(hydra_object *body, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(body, r, s);

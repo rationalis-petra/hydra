@@ -5,6 +5,7 @@
 
 #include "expressions/object.hpp"
 #include "types/type.hpp"
+#include "types/basic.hpp"
 #include "types/fn.hpp"
 
 

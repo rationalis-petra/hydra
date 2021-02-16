@@ -67,8 +67,42 @@ string hydra_vector::to_string() const {
 }
 
 
+/// TUPLE
 
+void hydra_tuple::mark_node() {
+  marked = true;
+  for (hydra_object* o : values) {
+    o->mark_node();
+  }
+}
+string hydra_tuple::to_string() const {
+  string out = "[@t ";
 
+  for (unsigned i = 0; i < values.size() ; i++) {
+    out += values[i]->to_string();
+    if (i != values.size() - 1)
+      out += " ";
+  }
+  out += "]";
+  return out;
+}
+
+/// UNION
+
+void hydra_union::mark_node() {
+  marked = true;
+  tag->mark_node();
+  value->mark_node();
+}
+
+string hydra_union::to_string() const {
+  string out = "[";
+  out += tag->to_string();
+  out += " ";
+  out += value->to_string();
+  out += "]";
+  return out;
+}
 
 
 //// NUMBER
