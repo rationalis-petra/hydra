@@ -2,6 +2,7 @@
 add_library(types OBJECT cons.cpp
                          integer.cpp
                          list.cpp
+                         tuple.cpp
                          nil.cpp
                          type.cpp
                          gen_fn.cpp

@@ -136,6 +136,7 @@ void make_modules() {
   gn_elt->type->rest_type = new type_nil;
   gn_elt->add(new op_vec_elt);
   gn_elt->add(new op_str_elt);
+  gn_elt->add(new op_tuple_elt);
 
   
   combined_fn* gn_len = new combined_fn;
@@ -214,6 +215,7 @@ void make_modules() {
       make_pair("remove", new op_remove),
 
       // types
+      make_pair("Tuple", new type_tuple),
       make_pair("Integer", new type_integer),
       make_pair("Vector", new type_vector),
       make_pair("Type", new type_type),

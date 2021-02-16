@@ -2,6 +2,8 @@
 #define __HYDRA_TYPE_TYPE_HPP
 
 #include <list>
+#include <vector>
+#include <string>
 
 #include "expressions/object.hpp"
 #include "expressions/operation.hpp"
@@ -48,6 +50,24 @@ struct type_list : public hydra_type {
   hydra_type* constructor(std::list<hydra_object*> lst);
 
   hydra_type* elt_type;
+};
+
+struct type_tuple : public hydra_type {
+  virtual void mark_node();
+  std::string to_string() const;
+  hydra_object* check_type(hydra_object* obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
+
+  std::vector<hydra_type*> types;
+};
+
+struct type_union : public hydra_type {
+  virtual void mark_node();
+  std::string to_string() const;
+  hydra_object* check_type(hydra_object* obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
+
+  std::list<hydra_type*> types;
 };
 
 // struct type_or : public hydra_type {

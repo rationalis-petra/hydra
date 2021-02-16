@@ -98,5 +98,7 @@ hydra_type *type_fn::constructor(list<hydra_object*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {
+    string err = "type_fn::constructor unimplemented";
+    throw err;
   }
 }

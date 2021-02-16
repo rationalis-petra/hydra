@@ -6,31 +6,35 @@
 using std::list;
 using std::string;
 
+hydra_object* make_list(list<hydra_object*> objects) {
+  if (objects.size() == 1) {
+    if (dynamic_cast<hydra_cons*>(objects.front()) || (objects.front() == hydra_nil::get())) {
+      return objects.front();
+    } else {
+      string err = "Last argument to cons must be of type list!!";
+      throw err;
+    }
+  } else {
+    hydra_object* o = objects.front();
+    objects.pop_front();
+    return new hydra_cons(o, make_list(objects));
+  }
+}
+
 op_cons::op_cons() {
   is_fn = true;
   docstring = new hydra_string("Creates a new cons cell and places the first "
                                "argument in the car,\n the second in the cdr."
                                "Will fail if the second is not cons or nil");
   type->arg_list.push_back(new type_nil);
-  type->arg_list.push_back(new type_list);
+  type->arg_list.push_back(new type_nil);
+  type->rest_type = new type_nil;
+  type->return_type = new type_cons;
 }
 hydra_object *op_cons::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
-  if (arg_list.size() != 2) {
-    throw "invalid number of args to cons";
-  }
-  hydra_object *car = arg_list.front();
-  arg_list.pop_front();
-  hydra_object *cdr = arg_list.front();
 
-  if (!(dynamic_cast<hydra_cons *>(cdr) || dynamic_cast<hydra_nil *>(cdr))) {
-    string err =
-        "Non-list provided as second argument to cons: " + cdr->to_string();
-    throw err;
-  }
-
-  hydra_cons *out = new hydra_cons(car, cdr);
-  return out;
+  return make_list(arg_list);
 }
 
 op_cdr::op_cdr() {
