@@ -69,10 +69,11 @@ hydra_object* op_handler_bind::call(hydra_object* alist, runtime &r, lexical_sco
 
 // RESTARTS
 op_add_restart::op_add_restart () {
-  is_fn = true;
+  is_fn = false;
   docstring = new hydra_string("signals an object as an exception");
-  type->arg_list.push_front(new type_symbol);
-  type->arg_list.push_front(new type_fn);
+
+  type->arg_list.push_front(new type_nil);
+  type->arg_list.push_front(new type_nil);
   type->arg_list.push_front(new type_nil);
 }
 
@@ -80,23 +81,30 @@ op_add_restart::op_add_restart () {
 hydra_object* op_add_restart::call(hydra_object* alist, runtime &r, lexical_scope& s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
 
-  hydra_symbol* sym = dynamic_cast<hydra_symbol*> (arg_list.front());
+  hydra_symbol* sym = dynamic_cast<hydra_symbol*> (arg_list.front()->eval(r, s));
   arg_list.pop_front();
-  hydra_oper* op = dynamic_cast<hydra_oper*>(sym);
+  hydra_oper* op = dynamic_cast<hydra_oper*>(arg_list.front()->eval(r, s));
   arg_list.pop_front();
   hydra_restart* res = new hydra_restart(op, sym);
 
   r.restarts.push_front(res);
-  // TODO: find 
+
   try {
-    return arg_list.front()->eval(r, s);
+    hydra_object* ret = arg_list.front()->eval(r, s);
+
+    // NOTE: it seems that the restart wdoesn't get registered until we return??
+    r.restarts.pop_front();
+    return ret;
+
   } catch (hydra_exception* ex) {
     if (ex->type == RESTART_CALL && ex->res == res) {
+      r.restarts.pop_front();
       lexical_scope s = *(ex->s);
       delete ex->s;
       delete ex;
       return res->op->call(ex->args, r, s);
     } else {
+      r.restarts.pop_front();
       throw ex;
     }
   }
@@ -112,7 +120,9 @@ hydra_object* gen_list(std::list<hydra_restart*> lst) {
   if (lst.empty()) {
     return hydra_nil::get();
   } else {
-    return new hydra_cons(lst.front(), (lst.pop_front(), gen_list(lst)));
+    hydra_restart* r = lst.front();
+    lst.pop_front();
+    return new hydra_cons(r, gen_list(lst));
   }
 }
 hydra_object *op_get_restarts::call(hydra_object *alist, runtime &r,

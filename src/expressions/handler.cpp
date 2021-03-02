@@ -31,10 +31,10 @@ hydra_restart::hydra_restart(hydra_oper* o, hydra_symbol *s) : op(o), sym(s) {}
 hydra_object *hydra_restart::call(hydra_object *arg_list, runtime &r,
                                   lexical_scope &s) {
   // invokesn a restart
-  hydra_exception e(RESTART_CALL);
-  e.res = this;
-  e.args = arg_list;
-  e.s = new lexical_scope(s);
+  hydra_exception* e = new hydra_exception(RESTART_CALL);
+  e->res = this;
+  e->args = arg_list;
+  e->s = new lexical_scope(s);
   throw e;
 }
 
