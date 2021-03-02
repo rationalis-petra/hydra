@@ -202,6 +202,7 @@ void make_modules() {
       // CONDiTIONS
       make_pair("signal-condition", new op_signal_condition),
       make_pair("handler-case", new op_handler_catch),
+      make_pair("handler-bind", new op_handler_bind),
       make_pair("with-restart", new op_add_restart),
       make_pair("get-restarts", new op_get_restarts),
 

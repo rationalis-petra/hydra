@@ -7,13 +7,15 @@ bind_handler::bind_handler(std::list<hydra_object *> lst, runtime &run,
 }
 
 hydra_object* bind_handler::handle(hydra_object* condition) {
+
   for (hydra_object *o : handling_code) {
-    hydra_object* fst = dynamic_cast<hydra_cons*>(o)->car;
-    hydra_object* ty = hydra_cast<hydra_cons>(fst)->car;
-    hydra_type *t = dynamic_cast<hydra_type*>(ty);
+    hydra_object *fst = dynamic_cast<hydra_cons *>(o)->car;
+    hydra_object *ty = hydra_cast<hydra_cons>(fst)->car;
+    hydra_type *t = dynamic_cast<hydra_type *>(ty->eval(r, s));
 
     if (!t->check_type(condition)->null()) {
-      return dynamic_cast<hydra_cons*>(o)->cdr->eval(r, s);
+      return dynamic_cast<hydra_cons *>(dynamic_cast<hydra_cons *>(o)->cdr)
+          ->car->eval(r, s);
     }
   }
   // indicate that the handler failed
