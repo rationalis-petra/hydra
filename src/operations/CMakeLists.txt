@@ -5,6 +5,7 @@ add_library(operations OBJECT
                        data/vector.cpp
                        data/adt.cpp
                        arithmetic.cpp
+                       conditions.cpp
                        #concurrency.cpp
                        dev.cpp
                        foreign.cpp

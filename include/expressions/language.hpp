@@ -42,4 +42,12 @@ struct hydra_symbol : public hydra_object {
   hydra_object *eval(runtime &r, lexical_scope &s);
 };
 
+struct hydra_pattern : public hydra_object {
+  virtual void mark_node();
+  std::string to_string() const;
+
+  hydra_object* match(hydra_object* o);
+  hydra_object *eval(runtime &r, lexical_scope &s);
+};
+
 #endif

@@ -159,6 +159,7 @@ hydra_object *op_progn::call(hydra_object *alist, runtime &r,
 
 op_gen::op_gen() {
   docstring = new hydra_string("Generates a new generic function object");
+  is_fn = false;
   type->arg_list.push_front(new type_list);
   type->rest_type = new type_nil;
 }

@@ -3,6 +3,7 @@ add_library(expressions OBJECT
                         object.cpp
                         cons.cpp
                         oper.cpp
+                        handler.cpp
                         user_oper.cpp
                         symbol.cpp
                         values.cpp

@@ -9,6 +9,7 @@
 #include "operations/data.hpp"
 #include "operations/io.hpp"
 #include "operations/foreign.hpp"
+#include "operations/conditions.hpp"
 #include "operations/modules.hpp"
 #include "operations/types.hpp"
 #include "operations/dev.hpp"
