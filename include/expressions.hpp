@@ -32,7 +32,7 @@ struct runtime {
 struct local_runtime {
   runtime& r;
   std::list<condition_handler*> handlers;
-  std::list<hydra_object*> restarts;
+  std::list<hydra_restart*> restarts;
   hydra_module* active_module;
 };
 

@@ -19,8 +19,8 @@ struct op_divide : hydra_oper {
   op_divide();
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope& s);
 };
-struct op_gr : hydra_oper {
-  op_gr();
+struct op_int_gr : hydra_oper {
+  op_int_gr();
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope& s);
 };
 

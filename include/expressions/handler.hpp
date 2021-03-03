@@ -30,6 +30,7 @@ enum exception_type {
 
 struct hydra_restart : public hydra_oper {
   hydra_restart(hydra_oper* o, hydra_symbol* s);
+  void mark_node();
 
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
   hydra_oper* op;

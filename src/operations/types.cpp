@@ -43,3 +43,18 @@ hydra_object *op_type::call(hydra_object *alist, runtime &r,
 
   return type->constructor(arg_list);
 }
+
+op_subtype::op_subtype() {
+  is_fn = true;
+  docstring = new hydra_string("Returns true if the first argument is a subtype of the second");
+  type->arg_list.push_front(new type_type);
+  type->arg_list.push_front(new type_type);
+}
+
+hydra_object *op_subtype::call(hydra_object *alist, runtime &r,
+                             lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+
+  // TODO: implement
+  return hydra_t::get();
+}

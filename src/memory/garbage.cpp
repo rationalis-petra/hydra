@@ -22,6 +22,9 @@ void mark(runtime& r) {
   for (auto o : hydra_object::roots.data) {
     o.first->mark_node();
   }
+  for (auto o : r.restarts) {
+    o->mark_node();
+  }
 
   hydra_t::get()->mark_node();
   hydra_nil::get()->mark_node();

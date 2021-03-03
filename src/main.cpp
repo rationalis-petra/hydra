@@ -19,6 +19,8 @@ vector<pair<string, hydra_object*>> dev;
 vector<pair<string, hydra_object*>> core;
 vector<pair<string, hydra_object*>> foreign;
 vector<pair<string, hydra_object*>> io;
+// net
+// concurrent / parallel
 
 void make_modules();
 
@@ -156,12 +158,20 @@ void make_modules() {
   gn_concat->add(new op_str_cat);
   gn_concat->add(new op_vec_cat);
 
+  combined_fn* gn_gr = new combined_fn;
+  gn_gr->is_fn = true;
+  gn_gr->type->arg_list.push_front(new type_nil);
+  gn_gr->type->arg_list.push_front(new type_nil);
+
+  gn_gr->add(new op_int_gr);
+  gn_gr->add(new op_str_gr);
+
   core = {
 
       // arithmetic
       make_pair("+", new op_plus), make_pair("-", new op_minus),
       make_pair("*", new op_multiply), make_pair("/", new op_divide),
-      make_pair(">", new op_gr),
+      make_pair(">", gn_gr),
       // data
       make_pair("tuple", new op_tuple), make_pair("union", new op_union),
       make_pair("vector", new op_vec), make_pair("cons", new op_cons),

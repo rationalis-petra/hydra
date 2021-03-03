@@ -51,3 +51,22 @@ hydra_object *op_str_cat::call(hydra_object *alist, runtime &r, lexical_scope &s
   }
   return new hydra_string(str);
 }
+
+op_str_gr::op_str_gr() {
+  is_fn = true;
+  docstring = new hydra_string(
+      "Returns true if the first argument is greater than the second");
+  type->arg_list.push_front(new type_string);
+  type->arg_list.push_front(new type_string);
+}
+
+hydra_object *op_str_gr::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+  hydra_string *s1 = dynamic_cast<hydra_string *>(arg_list.front());
+  hydra_string *s2 = dynamic_cast<hydra_string *>(arg_list.back());
+  if (s1->value > s2->value) {
+    return hydra_t::get();
+  } else {
+    return hydra_nil::get(); 
+  }
+}

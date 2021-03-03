@@ -62,9 +62,17 @@ hydra_object* op_handler_bind::call(hydra_object* alist, runtime &r, lexical_sco
   hydra_object *code = arg_list.front();
   arg_list.pop_front();
   r.handlers.push_front(new bind_handler(arg_list, r, s));
-  hydra_object *out = code->eval(r, s);
-  r.handlers.pop_front();
-  return out;
+  try {
+    hydra_object *out = code->eval(r, s);
+    r.handlers.pop_front();
+    return out;
+  } catch (hydra_exception* e) {
+    // if the exception is a restart, then pop
+    if (e->type == RESTART_CALL) {
+      r.handlers.pop_front();
+    }
+    throw e;
+  }
 }
 
 // RESTARTS

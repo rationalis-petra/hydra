@@ -51,6 +51,11 @@ struct op_vec_len : hydra_oper {
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 
+// COMPARISON
+struct op_str_gr : hydra_oper {
+  op_str_gr();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
 
 
 // CONCATENATE

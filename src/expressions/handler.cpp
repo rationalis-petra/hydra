@@ -30,6 +30,12 @@ hydra_object* case_handler::handle(hydra_object* condition) {
 
 hydra_restart::hydra_restart(hydra_oper* o, hydra_symbol *s) : op(o), sym(s) {}
 
+void hydra_restart::mark_node() {
+  marked = true;
+  op->mark_node();
+  sym->mark_node();
+}
+
 hydra_object *hydra_restart::call(hydra_object *arg_list, runtime &r,
                                   lexical_scope &s) {
   // invokesn a restart

@@ -22,9 +22,14 @@ hydra_object *hydra_cons::eval(runtime &r, lexical_scope &s) {
   hydra_object::roots.insert(oper);
   hydra_oper *op;
   if ((op = dynamic_cast<hydra_oper *>(oper))) {
-    hydra_object* out = op->call(cdr, r, s);
-    hydra_object::roots.remove(oper);
-    return out;
+    try {
+      hydra_object *out = op->call(cdr, r, s);
+      hydra_object::roots.remove(oper);
+      return out;
+    } catch (hydra_exception* e) {
+      roots.remove(oper);
+      throw e;
+    }
   } else {
     string excp = "Attempted to call " + oper->to_string() +
                   " which is not an operation!";

@@ -158,19 +158,19 @@ std::string lang = R"(
 ;;; LOGIC
 (export (current-module) '>)
 (export (current-module) '>=)
-(def >= ({l Integer} {r Integer})
+(def >= (l  r)
   (or (> l r) (= l r)))
 
 (export (current-module) '<)
-(def < ({l Integer} {r Integer})
+(def < (l r)
   (> r l))
 
 (export (current-module) '<=)
-(def <= ({l Integer} {r Integer})
+(def <= (l  r)
   (>= r l))
 
 (export (current-module) '!=)
-(def != ({l Integer} {r Integer})
+(def != (l  r)
   "Returns true iff two arguments are not equal"
   (not (= l r)))
   

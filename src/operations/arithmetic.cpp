@@ -93,14 +93,14 @@ hydra_object *op_divide::call(hydra_object *alist, runtime &r,
   return out;
 }
 
-op_gr::op_gr() {
+op_int_gr::op_int_gr() {
   is_fn = true;
   docstring = new hydra_string("Returns t iff the first argument is greater "
                                "than the second, and nil otherwise");
   type->arg_list.push_front(new type_integer);
   type->arg_list.push_front(new type_integer);
 }
-hydra_object *op_gr::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+hydra_object *op_int_gr::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   // we now ASSERT that arg_list is a list of length 2
   // does it contain integers?
