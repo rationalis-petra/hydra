@@ -83,9 +83,9 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
     throw err;
     }
 
-    hydra_object::roots.insert(value);
+    hydra_object::roots.insert(symbol);
     hydra_object::collect_garbage(r);
-    hydra_object::roots.remove(value);
+    hydra_object::roots.remove(symbol);
     return value;
   } else {
     string err = "Error: provided non-symbol as first argument of set";
@@ -93,11 +93,41 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   }
 }
 
+op_unset::op_unset() {
+  is_fn = true;
+
+  docstring = new hydra_string("Removes the value from a symbol");
+
+  type->arg_list.push_front(new type_symbol);
+}
+hydra_object *op_unset::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+
+  hydra_symbol *symbol = dynamic_cast<hydra_symbol *>(arg_list.front());
+
+  // if there is a lexical scope with the value
+  if (s.map.find(symbol) != s.map.end()) {
+    //s.map[symbol] = nullptr;
+    s.map.erase(symbol);
+  } else if (symbol->mut) {
+    symbol->value = nullptr;
+  } else {
+    string err = "Error: cannot set immutable symbol";
+    throw err;
+  }
+
+  hydra_object::roots.insert(symbol);
+  hydra_object::collect_garbage(r);
+  hydra_object::roots.remove(symbol);
+  return symbol;
+}
+
 op_defined::op_defined() {
   is_fn = true;
   docstring = new hydra_string("Returns t if symbol contains a value, and nil otherwise");
   type->arg_list.push_back(new type_symbol);
 };
+
 hydra_object* op_defined::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   hydra_symbol* sym = hydra_cast<hydra_symbol>(arg_list.front());

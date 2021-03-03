@@ -191,6 +191,7 @@ void make_modules() {
       // symbols
 
       make_pair("defined?", new op_defined), make_pair("set", new op_set),
+      make_pair("unset", new op_unset),
       make_pair("lock", new op_lock), make_pair("unlock", new op_unlock),
 
       // language/control-flow

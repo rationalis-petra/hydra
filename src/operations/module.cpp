@@ -92,9 +92,15 @@ hydra_object *op_insert::call(hydra_object* alist, runtime &r, lexical_scope &s)
   hydra_module* mod = hydra_cast<hydra_module>(arg_list.front());
   hydra_symbol* sym = hydra_cast<hydra_symbol>(arg_list.back());
 
-  if (!mod->get(sym->name)->null()) {
-    string err = "Cannot import symbol " + sym->name + " there is already a symbol of that name";
-    throw err;
+  if (hydra_object* obj = mod->get(sym->name)) {
+    if (!obj->null()) {
+      hydra_symbol* sym = dynamic_cast<hydra_symbol*>(obj);
+      if (sym->value) {
+        string err = "Cannot import symbol " + sym->name +
+                     " there is already a symbol of that name";
+        throw err;
+      }
+    }
   }
   mod->symbols[sym->name] = sym;
   return sym;
