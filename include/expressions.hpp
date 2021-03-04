@@ -10,6 +10,7 @@
 
 
 #include "expressions/operation.hpp"
+#include "expressions/oobject.hpp"
 #include "expressions/language.hpp"
 #include "expressions/data.hpp"
 #include "expressions/foreign.hpp"

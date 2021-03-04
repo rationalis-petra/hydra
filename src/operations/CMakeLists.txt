@@ -1,6 +1,7 @@
 
 add_library(operations OBJECT
                        data/data.cpp
+                       data/object.cpp
                        data/string.cpp
                        data/vector.cpp
                        data/adt.cpp

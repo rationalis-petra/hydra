@@ -1,6 +1,7 @@
 [requires]
 libffi/3.3 
 libtool/2.4.6
+boost/1.75.0
 
 [generators]
 cmake

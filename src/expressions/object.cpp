@@ -10,7 +10,7 @@ list<lexical_scope*> hydra_object::context_list;
 hydra_roots hydra_object::roots; 
 
 unsigned long hydra_object::counter = 0;
-runtime *hydra_object::r;
+//runtime *hydra_object::r;
 
 hydra_object::hydra_object() {
   node_list.push_front(this);

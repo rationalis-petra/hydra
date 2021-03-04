@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
   make_modules();
 
   runtime r;
-  hydra_object::r = &r;
+  //hydra_object::r = &r;
 
 
   r.root = new hydra_module("");
@@ -166,6 +166,13 @@ void make_modules() {
   gn_gr->add(new op_int_gr);
   gn_gr->add(new op_str_gr);
 
+  combined_fn* gn_get = new combined_fn;
+  gn_get->is_fn = true;
+  gn_get->type->arg_list.push_front(new type_nil);
+  gn_get->type->arg_list.push_front(new type_nil);
+  gn_get->add(new op_obj_get);
+  gn_get->add(new op_get);
+
   core = {
 
       // arithmetic
@@ -173,11 +180,18 @@ void make_modules() {
       make_pair("*", new op_multiply), make_pair("/", new op_divide),
       make_pair(">", gn_gr),
       // data
-      make_pair("tuple", new op_tuple), make_pair("union", new op_union),
-      make_pair("vector", new op_vec), make_pair("cons", new op_cons),
-      make_pair("car", new op_car), make_pair("cdr", new op_cdr),
-      make_pair("elt", gn_elt), make_pair("concat", gn_concat),
+      make_pair("object", new op_object), 
+      make_pair("tuple", new op_tuple),
+      make_pair("union", new op_union),
+      make_pair("vector", new op_vec),
+      make_pair("cons", new op_cons),
+      make_pair("car", new op_car),
+      make_pair("cdr", new op_cdr),
+      make_pair("elt", gn_elt),
+      make_pair("concat", gn_concat),
       make_pair("len", gn_len),
+
+      make_pair("get", gn_get),
 
       // streams
       make_pair("peek", new op_peek), make_pair("put", new op_put),
@@ -206,8 +220,9 @@ void make_modules() {
       make_pair("in-module", new op_in_module),
       make_pair("current-module", new op_get_module),
       make_pair("get-symbols", new op_get_symbols),
-      make_pair("export", new op_export), make_pair("insert", new op_insert),
-      make_pair("intern", new op_intern), make_pair("get", new op_get),
+      make_pair("export", new op_export),
+      make_pair("insert", new op_insert),
+      make_pair("intern", new op_intern),
       make_pair("remove", new op_remove),
 
       // CONDiTIONS

@@ -1,6 +1,7 @@
 
 add_library(expressions OBJECT
                         object.cpp
+                        oobject.cpp
                         cons.cpp
                         oper.cpp
                         handler.cpp

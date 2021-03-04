@@ -77,4 +77,15 @@ struct op_unlock : hydra_oper {
   hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
 };
 
+// OBJECTS
+struct op_obj_get : hydra_oper {
+  op_obj_get();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+
+struct op_object : hydra_oper {
+  op_object();
+  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
+};
+
 #endif // __HYDRA_DATA_HPP

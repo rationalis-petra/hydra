@@ -34,7 +34,7 @@ struct hydra_object {
   bool marked;
   virtual void mark_node() = 0;
 
-  static runtime *r;
+  //static runtime *r;
   // how many objects exist?
   static unsigned long counter;
   // number of objects after most recent collection
