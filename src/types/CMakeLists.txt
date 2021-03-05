@@ -1,7 +1,9 @@
 
 add_library(types OBJECT cons.cpp
                          integer.cpp
+                         object.cpp
                          list.cpp
+                         derives.cpp
                          tuple.cpp
                          nil.cpp
                          type.cpp

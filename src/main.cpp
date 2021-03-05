@@ -134,7 +134,8 @@ void make_modules() {
   };
 
   dev = {
-      make_pair("doc", new op_describe)
+    make_pair("doc", new op_describe),
+    make_pair("time", new op_time)
   };
 
   combined_fn* gn_elt = new combined_fn;
@@ -192,6 +193,7 @@ void make_modules() {
       make_pair("len", gn_len),
 
       make_pair("get", gn_get),
+      make_pair("derive", new op_derive),
 
       // streams
       make_pair("peek", new op_peek), make_pair("put", new op_put),
@@ -233,17 +235,29 @@ void make_modules() {
       make_pair("get-restarts", new op_get_restarts),
 
       // types
+      make_pair("Derives", new type_derives),
+      make_pair("Object", new type_object),
       make_pair("Tuple", new type_tuple),
       make_pair("Integer", new type_integer),
-      make_pair("Vector", new type_vector), make_pair("Type", new type_type),
+      make_pair("Vector", new type_vector),
+      make_pair("Type", new type_type),
       make_pair("String", new type_string),
-      make_pair("Module", new type_module), make_pair("Nil", new type_nil),
-      make_pair("Symbol", new type_symbol), make_pair("List", new type_list),
+      make_pair("Module", new type_module),
+      make_pair("Nil", new type_nil),
+      make_pair("Symbol", new type_symbol),
+      make_pair("List", new type_list),
       make_pair("IOStream", new type_iostream),
       make_pair("IStream", new type_istream),
-      make_pair("OStream", new type_ostream), make_pair("Fn", new type_fn),
-      make_pair("Gen", new type_gen_fn), make_pair("type?", new op_typep),
-      make_pair("type", new op_type)};
+      make_pair("OStream", new type_ostream),
+      // Mac
+      // Op
+      make_pair("Fn", new type_fn),
+      make_pair("Gen", new type_gen_fn),
+
+      make_pair("type?", new op_typep),
+      make_pair("type", new op_type)
+      //make_pair("subtype", new op_subtype)
+  };
 
   foreign = {
       // ffi

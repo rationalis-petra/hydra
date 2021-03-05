@@ -4,10 +4,18 @@
 #include <list>
 
 #include "types/type.hpp"
+#include "expressions/oobject.hpp"
 
 struct type_derives : public hydra_type {
   void mark_node();
   hydra_object_object* object;
+  std::string to_string() const;
+  virtual hydra_object *check_type(hydra_object *obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
+};
+
+struct type_object : public hydra_type {
+  void mark_node();
   std::string to_string() const;
   virtual hydra_object *check_type(hydra_object *obj);
   hydra_type* constructor(std::list<hydra_object*> lst);

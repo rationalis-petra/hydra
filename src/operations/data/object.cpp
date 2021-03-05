@@ -52,3 +52,24 @@ hydra_object* op_object::call(hydra_object* alist, runtime &r, lexical_scope& s)
 
   return obj;
 }
+
+
+
+
+op_derive::op_derive() {
+  is_fn = true;
+  docstring = new hydra_string("Derives an object from the provided object");
+  // TODO : change to type_object
+  type->rest_type = new type_object;
+}
+
+hydra_object* op_derive::call(hydra_object* alist, runtime &r, lexical_scope& s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+  hydra_object_object* obj = new hydra_object_object;
+  hydra_object_object* prototype = dynamic_cast<hydra_object_object*>(arg_list.front());
+
+  obj->prototypes.insert(prototype);
+  obj->object_vals = prototype->object_vals;
+
+  return obj;
+}
