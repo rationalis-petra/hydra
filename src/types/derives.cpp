@@ -8,6 +8,10 @@ using std::string;
 using std::list;
 using std::set;
 
+type_derives::type_derives() {
+  object = new hydra_object_object();
+}
+
 void type_derives::mark_node() {
   marked = true;
   object->mark_node();

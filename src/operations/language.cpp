@@ -13,6 +13,7 @@ op_if::op_if() {
   type->arg_list.push_front(new type_nil);
   type->arg_list.push_front(new type_nil);
 }
+
 hydra_object *op_if::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   // aseert that list length is 3
@@ -63,13 +64,12 @@ op_set::op_set() {
   docstring = new hydra_string("Sets the value symbol (first argument) to the second argument");
 
   type->arg_list.push_front(new type_nil);
+  // OR symbol ref
   type->arg_list.push_front(new type_symbol);
 }
 hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
-  if (arg_list.size() != 2) {
-    throw "arglist to set invalid size";
-  }
+
   if (hydra_symbol *symbol = dynamic_cast<hydra_symbol *>(arg_list.front())) {
     hydra_object *value = arg_list.back();
 
@@ -254,4 +254,31 @@ hydra_object *op_exit::call(hydra_object *alist, runtime &r, lexical_scope &s) {
     delete obj;
   }
   exit(0);
+}
+
+op_ref::op_ref() {
+  is_fn = true;
+  docstring = new hydra_string("Returns a reference to the provided value");
+}
+
+hydra_object *op_ref::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+
+  hydra_ref* ref = new hydra_ref;
+  ref->ptr = arg_list.front();
+  return ref;
+}
+
+op_var::op_var() {
+  is_fn = true;
+  docstring = new hydra_string("Creates some mutable storage, and returns a handle to it");
+}
+
+hydra_object *op_var::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+
+  hydra_var* var = new hydra_var;
+  // TODO: add get-var function to objects?
+  var->val = arg_list.front();
+  return var;
 }

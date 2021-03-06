@@ -47,6 +47,16 @@ struct op_defined : hydra_oper {
 };
 
 
+struct op_var : hydra_oper {
+  op_var();
+  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
+};
+
+struct op_ref : hydra_oper {
+  op_ref();
+  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
+};
+
 struct op_quote : hydra_oper {
   op_quote();
   hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);

@@ -10,16 +10,16 @@ std::string lang = R"(
 
 "The list function"
 (export (current-module) (quote list))
-(set (quote list) 
+(bind (quote list) 
   (fn (:rest args)
    "Makes a list from its' args" 
     args))
 
 "The def function: like setq in common lisp"
 (export (current-module) (quote def))
-(set (quote def) 
+(bind (quote def) 
   (mac (symbol val :rest body)
-    [list (quote set) [list (quote quote) symbol]
+    [list (quote bind) [list (quote quote) symbol]
           (if body
               (if (and (defined? symbol) (type? (eval symbol) Gen))
                   [list (quote add-fn) 
@@ -30,7 +30,7 @@ std::string lang = R"(
 
 "The defn, i.e. define-function"
 (export (current-module) (quote defn))
-(set (quote defn) (mac (name arg1 :optional arg2 :rest body)
+(bind (quote defn) (mac (name arg1 :optional arg2 :rest body)
   (let ((arg-list (if (type? arg1 Symbol) arg2 arg1))
         (body (if (type? arg1 Symbol) body (cons arg2 body))))
    (list (quote def) name
@@ -40,16 +40,16 @@ std::string lang = R"(
           body))))))
 
 (export (current-module) (quote defgen))
-(set (quote defgen) (mac (name arg-list :rest body)
-  (list (quote set) (list (quote quote) name)
+(bind (quote defgen) (mac (name arg-list :rest body)
+  (list (quote bind) (list (quote quote) name)
     (cons (quote gen)
       (cons
         (cons (quote :self) (cons name arg-list))
          body)))))
 
 (export (current-module) (quote defimpl))
-(set (quote defimpl) (mac (name arg-list :rest body)
-  (list (quote set) (list (quote quote) name)
+(bind (quote defimpl) (mac (name arg-list :rest body)
+  (list (quote bind) (list (quote quote) name)
     (list (quote add-fn) name
       (cons (quote fn)
         (cons
@@ -57,8 +57,8 @@ std::string lang = R"(
            body))))))
 
 (export (current-module) (quote defvar))
-(set (quote defvar) (mac (name value)
-  (list (quote set) (list (quote quote) name) value)))
+(bind (quote defvar) (mac (name value)
+  (list (quote bind) (list (quote quote) name) value)))
 
 "The defmac, i.e. define macro"
 (export (current-module) (quote defmac))
@@ -242,7 +242,7 @@ std::string lang = R"(
 (export (current-module) 'ref)
 (def ref (value)
   (let ((sym (symbol "")))
-    (set sym value)
+    (bind sym value)
      sym))
 
 ;;; FUNCTIONALS
@@ -279,9 +279,6 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
         (insert module1 (car syms))
         (dolist (cdr syms))))
    (get-symbols module2)))
-
-;; (defn use-module-tree (module1 module2)
-;;   (let ((get-subtree () ))))
 
 (use-module &:hydra:io (current-module))
 (in-module &:hydra:io)

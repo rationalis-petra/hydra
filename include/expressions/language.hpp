@@ -50,4 +50,18 @@ struct hydra_pattern : public hydra_object {
   hydra_object *eval(runtime &r, lexical_scope &s);
 };
 
+struct hydra_ref : public hydra_object {
+  std::string to_string() const;
+  virtual void mark_node();
+
+  hydra_object *ptr;
+};
+
+struct hydra_var : public hydra_object {
+  std::string to_string() const;
+  virtual void mark_node();
+
+  hydra_object *val;
+};
+
 #endif

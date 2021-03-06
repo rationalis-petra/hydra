@@ -196,3 +196,23 @@ string hydra_iostream::to_string() const {
 hydra_iostream::~hydra_iostream() {
   delete stream;
 }
+
+void hydra_ref::mark_node() {
+  if (marked) return;
+  marked = true;
+  ptr->mark_node();
+}
+
+string hydra_ref::to_string() const{
+  return "[ref " + ptr->to_string() + "]";
+}
+
+void hydra_var::mark_node() {
+  if (marked) return;
+  marked = true;
+  val->mark_node();
+}
+
+string hydra_var::to_string() const{
+  return "[var " + val->to_string() + "]";
+}

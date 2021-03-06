@@ -206,7 +206,7 @@ void make_modules() {
 
       // symbols
 
-      make_pair("defined?", new op_defined), make_pair("set", new op_set),
+      make_pair("defined?", new op_defined), make_pair("bind", new op_set),
       make_pair("unset", new op_unset),
       make_pair("lock", new op_lock), make_pair("unlock", new op_unlock),
 
@@ -235,6 +235,7 @@ void make_modules() {
       make_pair("get-restarts", new op_get_restarts),
 
       // types
+      make_pair("Eql", new type_eql),
       make_pair("Derives", new type_derives),
       make_pair("Object", new type_object),
       make_pair("Tuple", new type_tuple),

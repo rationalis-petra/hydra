@@ -6,6 +6,7 @@
 #include <string>
 
 #include "expressions/object.hpp"
+#include "expressions/oobject.hpp"
 #include "expressions/operation.hpp"
 
 
@@ -70,21 +71,21 @@ struct type_union : public hydra_type {
   std::list<hydra_type*> types;
 };
 
-// struct type_or : public hydra_type {
-//   virtual void mark_node();
-//   std::string to_string() const;
-//   hydra_object* check_type(hydra_object* obj);
-//   hydra_type* constructor(std::list<hydra_object*> lst);
+struct type_derives : public hydra_type {
+  type_derives();
+  void mark_node();
+  hydra_object_object* object;
+  std::string to_string() const;
+  virtual hydra_object *check_type(hydra_object *obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
+};
 
-//   std::list<hydra_type*> types;
-// };
-
-// struct type_and : public hydra_type {
-//   virtual void mark_node();
-//   std::string to_string() const;
-//   hydra_object* check_type(hydra_object* obj);
-//   hydra_type* constructor(std::list<hydra_object*> lst);
-
-//   std::list<hydra_type*> types;
-// };
+struct type_eql : public hydra_type {
+  type_eql();
+  void mark_node();
+  hydra_object* object;
+  std::string to_string() const;
+  virtual hydra_object *check_type(hydra_object *obj);
+  hydra_type* constructor(std::list<hydra_object*> lst);
+};
 #endif

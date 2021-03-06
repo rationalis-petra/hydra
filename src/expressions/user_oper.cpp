@@ -281,9 +281,6 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
     scope->map[self] = this;
   }
 
-  // NEED TO FIND OUT WHAT SHOULD BE IN ROOT LIST BUT ISN'T
-  // WHY rec-cond SYMBOL's VALUE DELETED??
-
 
   hydra_object *out;
   if (is_fn) {
@@ -291,9 +288,15 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
   } else {
     out = expr->eval(r, *scope)->eval(r, s);
   }
+
+  // here, gc error is rooted! (maybe)
+  // TODO: why does this cause deletion of items???
   hydra_object::roots.insert(out);
-  hydra_object::collect_garbage(r);
+  hydra_object::roots.insert(this);
+  //hydra_object::collect_garbage(r);
+  hydra_object::roots.insert(this);
   hydra_object::roots.remove(out);
+
   return out;
 }
 

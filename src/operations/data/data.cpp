@@ -43,6 +43,7 @@ op_cdr::op_cdr() {
       new hydra_string("Takes a cons cell as input, and returns the cdr");
   type->arg_list.push_front(new type_cons);
 }
+
 hydra_object *op_cdr::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
@@ -64,6 +65,7 @@ op_car::op_car() {
       new hydra_string("Takes a cons cell as input, and returns the car");
   type->arg_list.push_front(new type_cons);
 }
+
 hydra_object *op_car::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   list<hydra_object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
