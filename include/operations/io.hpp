@@ -3,35 +3,16 @@
 
 #include "expressions.hpp"
 
-struct op_print : hydra_oper {
-  op_print();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
-};
-struct op_open_file : hydra_oper {
-  op_open_file();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
-};
-struct op_endp : hydra_oper {
-  op_endp();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
-};
+namespace op {
 
-struct op_next : hydra_oper {
-  op_next();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
-};
-struct op_peek : hydra_oper {
-  op_peek();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
-};
-struct op_put : hydra_oper {
-  op_put();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
-};
+  extern expr::Operator* print;
+  extern expr::Operator* open_file;
+  extern expr::Operator* close;
+  extern expr::Operator* endp;
 
-struct op_close : hydra_oper {
-  op_close();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
-};
+  extern expr::Operator* next;
+  extern expr::Operator* peek;
+  extern expr::Operator* put;
 
+} // namespace op
 #endif // __HYDRA_IO_HPP

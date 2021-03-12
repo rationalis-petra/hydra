@@ -3,18 +3,13 @@
 using std::list;
 using std::string;
 
-op_obj_get::op_obj_get() {
-  is_fn = true;
-  docstring = new hydra_string("Get a slot from an object");
-  type->arg_list.push_front(new type_symbol);
-  type->arg_list.push_front(new type_nil);
-}
+using namespace expr;
 
-hydra_object* op_obj_get::call(hydra_object* alist, runtime &r, lexical_scope& s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+Value* op_obj_get(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
 
-  hydra_object_object* obj = dynamic_cast<hydra_object_object*>(arg_list.front());
-  hydra_symbol* sym = dynamic_cast<hydra_symbol*>(arg_list.back());
+  Object* obj = dynamic_cast<Object*>(arg_list.front());
+  Symbol* sym = dynamic_cast<Symbol*>(arg_list.back());
 
   try {
     return obj->object_vals.at(sym);
@@ -24,21 +19,19 @@ hydra_object* op_obj_get::call(hydra_object* alist, runtime &r, lexical_scope& s
   }
 }
 
-op_object::op_object() {
-  is_fn = true;
-  docstring = new hydra_string("A generic getter function");
-  type->rest_type = new type_nil;
-}
+Operator* op::obj_get =
+  new InbuiltOperator("Get a slot from an object", op_obj_get,
+                      type::Fn::with_args({new type::Nil, new type::Symbol}), true);
 
-hydra_object* op_object::call(hydra_object* alist, runtime &r, lexical_scope& s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
-  hydra_object_object* obj = new hydra_object_object;
+Value* op_mk_object(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+  Object* obj = new Object;
 
   int count = 0;
-  hydra_symbol* key;
-  for (hydra_object* kvp : arg_list) {
+  Symbol* key;
+  for (Value* kvp : arg_list) {
     if (count == 0) {
-      key = dynamic_cast<hydra_symbol*>(kvp);
+      key = dynamic_cast<Symbol*>(kvp);
       if (key == nullptr) {
         string err = "key was nullptr in op_object";
         throw err;
@@ -53,23 +46,22 @@ hydra_object* op_object::call(hydra_object* alist, runtime &r, lexical_scope& s)
   return obj;
 }
 
+Operator* op::mk_obj =
+  new InbuiltOperator("Create a new object",
+                      op_mk_object, type::Fn::with_args({}), true);
 
-
-
-op_derive::op_derive() {
-  is_fn = true;
-  docstring = new hydra_string("Derives an object from the provided object");
-  // TODO : change to type_object
-  type->rest_type = new type_object;
-}
-
-hydra_object* op_derive::call(hydra_object* alist, runtime &r, lexical_scope& s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
-  hydra_object_object* obj = new hydra_object_object;
-  hydra_object_object* prototype = dynamic_cast<hydra_object_object*>(arg_list.front());
+Value* op_derive(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+  Object* obj = new Object;
+  Object* prototype = dynamic_cast<Object*>(arg_list.front());
 
   obj->prototypes.insert(prototype);
   obj->object_vals = prototype->object_vals;
 
   return obj;
 }
+
+Operator* op::derive =
+  new InbuiltOperator("Derives an object from the provided object",
+                      op_derive, type::Fn::with_rest(new type::Nil), true);
+

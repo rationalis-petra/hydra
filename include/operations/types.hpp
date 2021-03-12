@@ -3,19 +3,11 @@
 
 #include "expressions.hpp"
 
-struct op_typep : hydra_oper {
-  op_typep();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
-};
+namespace op {
 
-struct op_type : hydra_oper {
-  op_type();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
-};
+  extern expr::Operator* typep;
+  extern expr::Operator* mk_type;
+  extern expr::Operator* subtype;
 
-struct op_subtype : hydra_oper {
-  op_subtype();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
-};
-
+} // namespace op
 #endif

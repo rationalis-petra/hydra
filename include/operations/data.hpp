@@ -3,94 +3,39 @@
 
 #include "expressions.hpp"
 
-struct op_cons : hydra_oper {
-  op_cons();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-struct op_car : hydra_oper {
-  op_car();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-struct op_cdr : hydra_oper {
-  op_cdr();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-struct op_vec : hydra_oper {
-  op_vec();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
+namespace op {
 
+// Cons-Cell creation, Car, Cdr
+  extern expr::Operator* mk_cons;
+  extern expr::Operator* car;
+  extern expr::Operator* cdr;
 
-struct op_union : hydra_oper {
-  op_union();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-struct op_tuple : hydra_oper {
-  op_tuple();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-struct op_tuple_elt : hydra_oper {
-  op_tuple_elt();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
+// Vector operations: creation, indexing, length & concatenation
+  extern expr::Operator* mk_vec;
+  extern expr::Operator* vec_elt;
+  extern expr::Operator* vec_len;
+  extern expr::Operator* vec_cat;
 
-// GET DATA
-struct op_vec_elt : hydra_oper {
-  op_vec_elt();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-struct op_str_elt : hydra_oper {
-  op_str_elt();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
+  extern expr::Operator* mk_union;
 
-// Length
+  extern expr::Operator* mk_tuple;
+  extern expr::Operator* tuple_elt;
 
-struct op_vec_len : hydra_oper {
-  op_vec_len();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
+// Stirng operations: creation, indexing, length & concatenation
+  extern expr::Operator* str_elt;
+  extern expr::Operator* str_gr;
+  extern expr::Operator* str_len;
+  extern expr::Operator* str_cat;
 
-// COMPARISON
-struct op_str_gr : hydra_oper {
-  op_str_gr();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
+// Stirng operations: creation, slot retreival, inheritance (expr::Operator* op,
+// prototyping)
+  extern expr::Operator* mk_obj;
+  extern expr::Operator* obj_get;
+  extern expr::Operator* derive;
 
+// Symbol operations: making mutable/unmutable
+  extern expr::Operator* lock;
+  extern expr::Operator* unlock;
 
-// CONCATENATE
-struct op_vec_cat : hydra_oper {
-  op_vec_cat();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-struct op_str_cat : hydra_oper {
-  op_str_cat();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-
-struct op_lock : hydra_oper {
-  op_lock();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-struct op_unlock : hydra_oper {
-  op_unlock();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-
-// OBJECTS
-struct op_obj_get : hydra_oper {
-  op_obj_get();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-
-struct op_object : hydra_oper {
-  op_object();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-
-struct op_derive : hydra_oper {
-  op_derive();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
-
+} // namespace op
 #endif // __HYDRA_DATA_HPP

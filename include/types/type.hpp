@@ -9,83 +9,100 @@
 #include "expressions/oobject.hpp"
 #include "expressions/operation.hpp"
 
+namespace type {
 
-struct hydra_type : public hydra_object {
+struct Type : public virtual expr::Value {
 public:
-  virtual hydra_object* check_type(hydra_object* obj) = 0;
-  virtual hydra_type* constructor(std::list<hydra_object*> lst) = 0;
+  virtual expr::Value *check_type(expr::Value *obj) = 0;
 };
 
-struct type_symbol : public hydra_type {
+struct TypeConstructor : public virtual expr::Value {
+public:
+  virtual Type* constructor(std::list<expr::Value*> lst) = 0;
+};
+
+struct Symbol : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value* check_type(expr::Value* obj);
 };
 
 // TODO: TUPLE, UNION!!!
 
-struct type_cons : public hydra_type {
+struct Cons : public Type, public TypeConstructor {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value* check_type(expr::Value* obj);
+  Type* constructor(std::list<expr::Value*> lst);
 
-  hydra_type* type_car;
-  hydra_type* type_cdr;
+  Type* type_car;
+  Type* type_cdr;
 };
 
-struct type_vector : public hydra_type {
+struct Vector : public Type, public TypeConstructor {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value* check_type(expr::Value* obj);
+  Type* constructor(std::list<expr::Value*> lst);
 
-  hydra_type* type_elt;
+  Type* type_elt;
 };
 
-struct type_list : public hydra_type {
+struct List : public Type, public TypeConstructor {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value* check_type(expr::Value* obj);
+  Type* constructor(std::list<expr::Value*> lst);
 
-  hydra_type* elt_type;
+  Type* elt_type;
 };
 
-struct type_tuple : public hydra_type {
+struct Tuple : public Type, public TypeConstructor {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value* check_type(expr::Value* obj);
+  Type* constructor(std::list<expr::Value*> lst);
 
-  std::vector<hydra_type*> types;
+  std::vector<Type*> types;
 };
 
-struct type_union : public hydra_type {
+struct Union : public Type, public TypeConstructor {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value* check_type(expr::Value* obj);
+  Type* constructor(std::list<expr::Value*> lst);
 
-  std::list<hydra_type*> types;
+  std::list<Type*> types;
 };
 
-struct type_derives : public hydra_type {
-  type_derives();
+struct DerivesConstructor : public TypeConstructor {
   void mark_node();
-  hydra_object_object* object;
   std::string to_string() const;
-  virtual hydra_object *check_type(hydra_object *obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  Type* constructor(std::list<expr::Value*> lst);
 };
 
-struct type_eql : public hydra_type {
-  type_eql();
+struct Derives : public Type {
+  Derives();
   void mark_node();
-  hydra_object* object;
+  expr::Object* object;
   std::string to_string() const;
-  virtual hydra_object *check_type(hydra_object *obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  virtual expr::Value *check_type(expr::Value *obj);
 };
+
+struct EqlConstructor : public TypeConstructor{
+  void mark_node();
+  expr::Value* object;
+  std::string to_string() const;
+  Type* constructor(std::list<expr::Value*> lst);
+};
+
+struct Eql : public Type {
+  Eql(expr::Value* v);
+  void mark_node();
+  expr::Value* object;
+  std::string to_string() const;
+  virtual expr::Value *check_type(expr::Value *obj);
+};
+
+}
 #endif

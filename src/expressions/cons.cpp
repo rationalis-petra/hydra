@@ -5,26 +5,27 @@
 #include "expressions.hpp"
 
 using namespace std;
+using namespace expr;
 
-void hydra_cons::mark_node() {
+void Cons::mark_node() {
   if (marked) return;
   marked = true;
   car->mark_node();
   cdr->mark_node();
 }
 
-hydra_cons::hydra_cons(hydra_object *_car, hydra_object *_cdr)
+Cons::Cons(Value *_car, Value *_cdr)
     : car(_car), cdr(_cdr) {
 }
 
-hydra_object *hydra_cons::eval(runtime &r, lexical_scope &s) {
-  hydra_object *oper = car->eval(r, s);
-  hydra_object::roots.insert(oper);
-  hydra_oper *op;
-  if ((op = dynamic_cast<hydra_oper *>(oper))) {
+Value *Cons::eval(LocalRuntime &r, LexicalScope &s) {
+  Value *oper = car->eval(r, s);
+  Value::roots.insert(oper);
+  Operator *op;
+  if ((op = dynamic_cast<Operator *>(oper))) {
     try {
-      hydra_object *out = op->call(cdr, r, s);
-      hydra_object::roots.remove(oper);
+      Value *out = op->call(cdr, r, s);
+      Value::roots.remove(oper);
       return out;
     } catch (hydra_exception* e) {
       roots.remove(oper);
@@ -37,11 +38,11 @@ hydra_object *hydra_cons::eval(runtime &r, lexical_scope &s) {
   }
 }
 
-string hydra_cons::to_string() const {
+string Cons::to_string() const {
   string out = "(";
-  const hydra_object *elt = this;
+  const Value *elt = this;
   while (!elt->null()) {
-    if (const hydra_cons *obj = dynamic_cast<const hydra_cons *>(elt)) {
+    if (const Cons *obj = dynamic_cast<const Cons *>(elt)) {
       out += obj->car->to_string();
       if (!obj->cdr->null()) {
         out += " ";
@@ -54,3 +55,4 @@ string hydra_cons::to_string() const {
   out += ")";
   return out;
 }
+

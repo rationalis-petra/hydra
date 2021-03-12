@@ -7,82 +7,60 @@
 using std::string;
 using std::list;
 
+using namespace type;
+
 // INPUT-OUTPUT STREAM
-void type_iostream::mark_node() {
+void IOStream::mark_node() {
   marked = true;
 }
 
-string type_iostream::to_string() const {
+string IOStream::to_string() const {
   return "IOStream";
 }
 
-hydra_object *type_iostream::check_type(hydra_object* obj) {
-  if ((dynamic_cast<hydra_iostream*>(obj)) == nullptr) {
-    return hydra_nil::get();
+expr::Value *IOStream::check_type(expr::Value* obj) {
+  if ((dynamic_cast<expr::IOstream*>(obj)) == nullptr) {
+    return expr::nil::get();
   } else {
-    return hydra_t::get();
+    return expr::t::get();
   }
 }
 
-hydra_type *type_iostream::constructor(list<hydra_object*> lst) {
-  if (lst.size() == 0) {
-    return this;
-  } else {
-    string err = "Cannot provide argument to the IOStream Type constructor";
-    throw err;
-  }
-}
 
 // INPUT STREAM
-void type_istream::mark_node() {
+void Istream::mark_node() {
   marked = true;
 }
 
-string type_istream::to_string() const {
+string Istream::to_string() const {
   return "IStream";
 }
 
-hydra_object *type_istream::check_type(hydra_object* obj) {
-  if ((dynamic_cast<hydra_istream*>(obj)) == nullptr &&
-      (dynamic_cast<hydra_iostream*>(obj)) == nullptr) {
-    return hydra_nil::get();
+expr::Value *Istream::check_type(expr::Value* obj) {
+  if ((dynamic_cast<expr::Istream*>(obj)) == nullptr &&
+      (dynamic_cast<expr::IOstream*>(obj)) == nullptr) {
+    return expr::nil::get();
   } else {
-    return hydra_t::get();
+    return expr::t::get();
   }
 }
 
-hydra_type *type_istream::constructor(list<hydra_object*> lst) {
-  if (lst.size() == 0) {
-    return this;
-  } else {
-    string err = "Cannot provide argument to the IStream Type constructor";
-    throw err;
-  }
-}
 
 // OUTPUT STREAM
-void type_ostream::mark_node() {
+void Ostream::mark_node() {
   marked = true;
 }
 
-string type_ostream::to_string() const {
+string Ostream::to_string() const {
   return "OStream";
 }
 
-hydra_object *type_ostream::check_type(hydra_object* obj) {
-  if ((dynamic_cast<hydra_ostream*>(obj)) == nullptr &&
-      (dynamic_cast<hydra_iostream*>(obj)) == nullptr) {
-    return hydra_nil::get();
+expr::Value *Ostream::check_type(expr::Value* obj) {
+  if ((dynamic_cast<expr::Ostream*>(obj)) == nullptr &&
+      (dynamic_cast<expr::IOstream*>(obj)) == nullptr) {
+    return expr::nil::get();
   } else {
-    return hydra_t::get();
+    return expr::t::get();
   }
 }
 
-hydra_type *type_ostream::constructor(list<hydra_object*> lst) {
-  if (lst.size() == 0) {
-    return this;
-  } else {
-    string err = "Cannot provide argument to the OStream Type constructor";
-    throw err;
-  }
-}

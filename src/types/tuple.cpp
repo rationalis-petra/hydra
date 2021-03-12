@@ -6,42 +6,44 @@
 using std::string;
 using std::list;
 
-void type_tuple::mark_node() {
+using namespace type;
+
+void Tuple::mark_node() {
   marked = true;
 }
 
-string type_tuple::to_string() const {
+string Tuple::to_string() const {
   string str =  "{Tuple";
-  for (hydra_type* t : types) {
+  for (Type* t : types) {
     str += " " + t->to_string();
   }
   str += "}";
   return str;
 }
 
-hydra_object *type_tuple::check_type(hydra_object* obj) {
-  if (hydra_tuple* tup = dynamic_cast<hydra_tuple*>(obj)) {
+expr::Value *Tuple::check_type(expr::Value* obj) {
+  if (expr::Tuple* tup = dynamic_cast<expr::Tuple*>(obj)) {
     if (types.size() == 0) {
-      return hydra_t::get();
+      return expr::t::get();
     }
     if (tup->values.size() != types.size()) {
-      return hydra_nil::get();
+      return expr::nil::get();
     }
     for (unsigned i = 0 ; i < types.size(); i++) {
       if (types[i]->check_type(tup->values[i])->null()) {
-        return hydra_nil::get();
+        return expr::nil::get();
       }
     }
-    return hydra_t::get();
+    return expr::t::get();
   } else {
-    return hydra_nil::get();
+    return expr::nil::get();
   }
 }
 
-hydra_type *type_tuple::constructor(list<hydra_object*> lst) {
-  type_tuple * tup = new type_tuple;
-  for (hydra_object* obj : lst) {
-    if (hydra_type *t = dynamic_cast<hydra_type*>(obj)) {
+Type *Tuple::constructor(list<expr::Value*> lst) {
+  Tuple * tup = new Tuple;
+  for (expr::Value* obj : lst) {
+    if (Type *t = dynamic_cast<Type*>(obj)) {
       tup->types.push_back(t);
     }
   }

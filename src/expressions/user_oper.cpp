@@ -7,23 +7,27 @@
 #include "expressions.hpp"
 #include "operations.hpp"
 
+using namespace expr;
+
+using type::hydra_cast;
+
 using std::list;
 using std::map;
 using std::string;
 using std::function;
 
 // UTILITY FUNCTION: local to this file
-list<hydra_object *> make_list(hydra_object *obj) {
-  list<hydra_object *> lst;
+list<Value *> make_list(Value *obj) {
+  list<Value *> lst;
   while (!obj->null()) {
-    hydra_cons *cns = hydra_cast<hydra_cons>(obj);
+    Cons *cns = hydra_cast<Cons>(obj);
     lst.push_back(cns->car);
     obj = cns->cdr;
   }
   return lst;
 }
 
-string user_oper::to_string() const {
+string UserOperator::to_string() const {
   string name = is_fn ? "function" : "macro";
   if (self) {
     return "<" + name + ": " + self->to_string() + ">";
@@ -32,7 +36,7 @@ string user_oper::to_string() const {
   }
 }
 
-void user_oper::mark_node() {
+void UserOperator::mark_node() {
   if (marked) return;
   marked = true;
   docstring->mark_node();
@@ -43,10 +47,10 @@ void user_oper::mark_node() {
   }
 
   if (self) self->mark_node();
-  for (hydra_symbol* n : arg_names) {
+  for (Symbol* n : arg_names) {
     n->mark_node();
   }
-  for (hydra_symbol * s : optionals) {
+  for (Symbol * s : optionals) {
     s->mark_node();
   }
   for (auto pair : keys) {
@@ -62,31 +66,31 @@ void user_oper::mark_node() {
   }
 }
 
-user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
-                     lexical_scope &s) : hydra_oper() {
+UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
+                     LexicalScope &s) : Operator() {
   is_fn = _is_fn;
   rest = nullptr;
   self = nullptr;
   type->rest_type = nullptr;
-  scope = new lexical_scope(s);
+  scope = new LexicalScope(s);
 
   // if we have a symbol, try evaluating it to see if it's a type
 
   // operations have the form:
   // (fn/mac <optional name> <arg_list> rest)
-  if (hydra_cons *cns = dynamic_cast<hydra_cons *>(op_def)) {
+  if (Cons *cns = dynamic_cast<Cons *>(op_def)) {
 
-    hydra_object *name_list;
+    Value *name_list;
 
-    if (hydra_symbol *sym = dynamic_cast<hydra_symbol *>(cns->car)) {
-      hydra_object *raw_type = sym->eval(r, s);
-      if (hydra_type* ret_type = dynamic_cast<hydra_type*>(raw_type)) {
+    if (Symbol *sym = dynamic_cast<Symbol *>(cns->car)) {
+      Value *raw_type = sym->eval(r, s);
+      if (type::Type* ret_type = dynamic_cast<type::Type*>(raw_type)) {
         type->return_type = ret_type;
       } else {
         string err = "First argument to fn is neither type nor argument-list";
         throw err;
       }
-      if (hydra_cons* cns2 = dynamic_cast<hydra_cons *>(cns->cdr)) {
+      if (Cons* cns2 = dynamic_cast<Cons *>(cns->cdr)) {
         name_list = cns2->car;
         cns = cns2;
       } else {
@@ -98,25 +102,25 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
     }
 
 
-    list<hydra_object *> lst = make_list(name_list);
+    list<Value *> lst = make_list(name_list);
     bool optional = false;
     bool key = false;
 
     for (auto it = lst.begin(); it != lst.end(); it++) {
-      hydra_symbol* name;
-      hydra_type* t_type;
-      if (hydra_cons* symdef = dynamic_cast<hydra_cons*>(*it)) {
-        name = hydra_cast<hydra_symbol>(symdef->car);
-        t_type = hydra_cast<hydra_type>(hydra_cast<hydra_cons>(symdef->cdr)->car->eval(r, s));
+      Symbol* name;
+      type::Type* t_type;
+      if (Cons* symdef = dynamic_cast<Cons*>(*it)) {
+        name = hydra_cast<Symbol>(symdef->car);
+        t_type = hydra_cast<type::Type>(hydra_cast<Cons>(symdef->cdr)->car->eval(r, s));
       } else {
-        name = hydra_cast<hydra_symbol>(*it);
-        t_type = new type_nil;
+        name = hydra_cast<Symbol>(*it);
+        t_type = new type::Nil;
       }
       // :self keyword
-      if (name == hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+      if (name == hydra_cast<Module>(r.r.root->intern("keyword")->value)
                       ->get("self")) {
         if (++it != lst.end()) {
-          self = hydra_cast<hydra_symbol>(*it);
+          self = hydra_cast<Symbol>(*it);
           //type->return_type = t_type;
         } else {
           string err = "No self argument name!";
@@ -126,16 +130,16 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
 
       // :rest arguments
       else if (name ==
-               hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+               hydra_cast<Module>(r.r.root->intern("keyword")->value)
                    ->get("rest")) {
         if (++it != lst.end()) {
-          if (hydra_cons* cns = dynamic_cast<hydra_cons*>(*it)) {
-            rest = hydra_cast<hydra_symbol>(cns->car);
-            type->rest_type = hydra_cast<hydra_type>(hydra_cast<hydra_cons>(cns->cdr)->car->eval(r, s));
+          if (Cons* cns = dynamic_cast<Cons*>(*it)) {
+            rest = hydra_cast<Symbol>(cns->car);
+            type->rest_type = hydra_cast<type::Type>(hydra_cast<Cons>(cns->cdr)->car->eval(r, s));
           }
           else {
-            rest = hydra_cast<hydra_symbol>(*it);
-            type->rest_type = new type_nil;
+            rest = hydra_cast<Symbol>(*it);
+            type->rest_type = new type::Nil;
           }
         } else {
           string err = "No rest argument name provided!";
@@ -145,7 +149,7 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
 
       // :optional arguments
       else if (name ==
-               hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+               hydra_cast<Module>(r.r.root->intern("keyword")->value)
                    ->get("optional")) {
         if (key) {
           string err = "Cannot follow :key with :optional in function list";
@@ -156,7 +160,7 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
       }
 
       else if (name ==
-               hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+               hydra_cast<Module>(r.r.root->intern("keyword")->value)
                    ->get("key")) {
         key = true;
       }
@@ -164,8 +168,8 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
       // :key arguments
       else {
         if (key) {
-          hydra_symbol *keyword =
-              hydra_cast<hydra_module>(r.root->intern("keyword")->value)
+          Symbol *keyword =
+              hydra_cast<Module>(r.r.root->intern("keyword")->value)
                   ->intern(name->name);
           keys[keyword] = name;
           keyword->value = keyword;
@@ -183,33 +187,34 @@ user_oper::user_oper(hydra_object *op_def, bool _is_fn, runtime &r,
         }
       }
     }
-    hydra_object *expr_body = cns->cdr;
-    hydra_object *cdr = expr_body;
+    Value *expr_body = cns->cdr;
+    Value *cdr = expr_body;
 
-    if (hydra_cons *docons = (dynamic_cast<hydra_cons *>(expr_body))) {
-      if (hydra_string *dostring = dynamic_cast<hydra_string *>(docons->car)) {
-        docstring = dostring;
+    if (Cons *docons = (dynamic_cast<Cons *>(expr_body))) {
+      HString *dstring = dynamic_cast<HString *>(docons->car);
+      if (dstring) {
+        docstring = dstring;
       }
     }
 
-    hydra_symbol *progn = hydra_cast<hydra_symbol>(
-        hydra_cast<hydra_module>(
-            hydra_cast<hydra_symbol>(language_module->get("core"))->value)
+    Symbol *progn = hydra_cast<Symbol>(
+        hydra_cast<Module>(
+            hydra_cast<Symbol>(language_module->get("core"))->value)
             ->get("progn"));
     progn->name = "progn";
-    hydra_object *car = progn;
-    expr = new hydra_cons(car, cdr);
+    Value *car = progn;
+    expr = new Cons(car, cdr);
   } else {
     string err = "Non-cons provided to fn/mac";
     throw err;
   }
 }
 
-hydra_object *user_oper::call(hydra_object *alist, runtime &r,
-                              lexical_scope &s) {
+Value *UserOperator::call(Value *alist, LocalRuntime &r,
+                              LexicalScope &s) {
   // if this is a macro or function, argument evaluation (or lack thereof) is
   // taken care of by get_arg_list
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+  list<Value *> arg_list = get_arg_list(alist, r, s);
 
   // too few arguments OR too many arguments
   if ((arg_list.size() < arg_names.size()) ||
@@ -220,13 +225,13 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
   }
 
   // so, all we need to to is perform lexical substitution!
-  for (hydra_symbol *s : arg_names) {
+  for (Symbol *s : arg_names) {
     scope->map[s] = arg_list.front();
     arg_list.pop_front();
   }
-  for (hydra_symbol *s : optionals) {
+  for (Symbol *s : optionals) {
     if (arg_list.empty()) {
-      scope->map[s] = hydra_nil::get();
+      scope->map[s] = nil::get();
     } else {
       scope->map[s] = arg_list.front();
       arg_list.pop_front();
@@ -235,13 +240,13 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
 
   // set all keys to nil
   for (auto s : keys) {
-    scope->map[s.second] = hydra_nil::get();
+    scope->map[s.second] = nil::get();
   }
 
   int keycounter = keys.size();
   while (keycounter--) {
     if (!arg_list.empty()) {
-      hydra_symbol *sym = hydra_cast<hydra_symbol>(arg_list.front());
+      Symbol *sym = hydra_cast<Symbol>(arg_list.front());
       arg_list.pop_front();
       if (keys.find(sym) != keys.end()) {
         if (arg_list.empty()) {
@@ -261,17 +266,17 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
     // generate a list containing the rest of the arg_list
     // if list is empty, use nil!
     if (arg_list.empty()) {
-      scope->map[rest] = hydra_nil::get();
+      scope->map[rest] = nil::get();
     } else {
       // we use a recursive lambda to construct the rlist
-      function<hydra_object *()> gen_rest = [&](void) {
+      function<Value *()> gen_rest = [&](void) {
         if (arg_list.empty()) {
-          return (hydra_object *)hydra_nil::get();
+          return (Value *)nil::get();
         } else {
-          hydra_object *car = arg_list.front();
+          Value *car = arg_list.front();
           arg_list.pop_front();
-          hydra_object *cdr = gen_rest();
-          return (hydra_object *) new hydra_cons(car, cdr);
+          Value *cdr = gen_rest();
+          return (Value *) new Cons(car, cdr);
         }
       };
       scope->map[rest] = gen_rest();
@@ -282,7 +287,7 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
   }
 
 
-  hydra_object *out;
+  Value *out;
   if (is_fn) {
     out = expr->eval(r, *scope);
   } else {
@@ -291,15 +296,15 @@ hydra_object *user_oper::call(hydra_object *alist, runtime &r,
 
   // here, gc error is rooted! (maybe)
   // TODO: why does this cause deletion of items???
-  hydra_object::roots.insert(out);
-  hydra_object::roots.insert(this);
-  //hydra_object::collect_garbage(r);
-  hydra_object::roots.insert(this);
-  hydra_object::roots.remove(out);
+  Value::roots.insert(out);
+  Value::roots.insert(this);
+  //Value::collect_garbage(r);
+  Value::roots.insert(this);
+  Value::roots.remove(out);
 
   return out;
 }
 
-user_oper::~user_oper() {
+UserOperator::~UserOperator() {
   delete scope;
 }

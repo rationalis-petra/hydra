@@ -1,8 +1,9 @@
 #include "expressions.hpp"
 
 using std::string;
+using namespace expr;
 
-void hydra_object_object::mark_node() {
+void Object::mark_node() {
   marked = true;
   for (auto kvp : object_vals) {
     kvp.first->mark_node();
@@ -10,7 +11,7 @@ void hydra_object_object::mark_node() {
   }
 }
 
-string hydra_object_object::to_string() const {
+string Object::to_string() const {
   string out = "{";
   for (auto x : object_vals) {
     out += "[";
@@ -22,3 +23,4 @@ string hydra_object_object::to_string() const {
   out += "}";
   return out;
 }
+

@@ -1,5 +1,8 @@
 
 add_library(expressions OBJECT
+                        runtime.cpp
+                        lexical_scope.cpp
+
                         object.cpp
                         oobject.cpp
                         cons.cpp
@@ -9,6 +12,5 @@ add_library(expressions OBJECT
                         symbol.cpp
                         values.cpp
                         module.cpp
-                        foreign.cpp
-                        lexical_scope.cpp)
+                        foreign.cpp)
 

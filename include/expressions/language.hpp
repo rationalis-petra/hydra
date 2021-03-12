@@ -7,61 +7,58 @@
 
 #include "object.hpp"
 
-struct hydra_symbol;
-struct type_fn;
-struct hydra_string;
+namespace expr {
+
+struct Symbol;
+struct Vector;
 
 // modules are like packages or namepsaces in other languages
-struct hydra_module : public hydra_object {
+struct Module : public Value {
   virtual void mark_node();
 
-  hydra_module();
-  hydra_module(std::string name);
+  Module();
+  Module(std::string name);
   std::string to_string() const;
-  std::map<std::string, hydra_symbol *> symbols;
-  std::map<std::string, hydra_symbol *> exported_symbols;
+  std::map<std::string, Symbol *> symbols;
+  std::map<std::string, Symbol *> exported_symbols;
 
   std::string name;
 
-  hydra_object *get(std::string str);
-  hydra_object *get(std::list<std::string> str);
-  hydra_symbol *intern(std::string str);
-  hydra_symbol *intern(std::list<std::string> str);
+  Value *get(std::string str);
+  Value *get(std::list<std::string> str);
+  Symbol *intern(std::string str);
+  Symbol *intern(std::list<std::string> str);
 };
 
-struct hydra_symbol : public hydra_object {
+struct Symbol : public Value {
   virtual void mark_node();
 
-  hydra_object *value;
+  // mutability
+  bool mut;
+  Value *value;
   std::string name;
 
   // std::list<hydra_module*> modules;
 
-  hydra_symbol(std::string name);
+  Symbol(std::string name);
   std::string to_string() const;
-  hydra_object *eval(runtime &r, lexical_scope &s);
+  Value *eval(LocalRuntime &r, LexicalScope &s);
 };
 
-struct hydra_pattern : public hydra_object {
+struct Pattern : public Value {
   virtual void mark_node();
   std::string to_string() const;
 
-  hydra_object* match(hydra_object* o);
-  hydra_object *eval(runtime &r, lexical_scope &s);
+  Value* match(Value* o);
+  Value *eval(LocalRuntime &r, LexicalScope &s);
 };
 
-struct hydra_ref : public hydra_object {
+struct Ref : public Value {
   std::string to_string() const;
   virtual void mark_node();
 
-  hydra_object *ptr;
+  Value *ptr;
 };
 
-struct hydra_var : public hydra_object {
-  std::string to_string() const;
-  virtual void mark_node();
-
-  hydra_object *val;
-};
-
+}
 #endif

@@ -7,19 +7,21 @@
 using std::string;
 using std::list;
 
-void type_gen_fn::mark_node() {
+using namespace type;
+
+void GenFn::mark_node() {
   if (marked) return;
   marked = true;
-  for (hydra_type* t : arg_list) {
+  for (Type* t : arg_list) {
     t->mark_node();
   }
-  for (hydra_type* t : optional_list) {
+  for (Type* t : optional_list) {
     t->mark_node();
   }
-  for (hydra_type* t : keyword_list) {
+  for (Type* t : keyword_list) {
     t->mark_node();
   }
-  for (hydra_symbol* t : keyword_names) {
+  for (expr::Symbol* t : keyword_names) {
     t->mark_node();
   }
   if (rest_type) {
@@ -27,16 +29,16 @@ void type_gen_fn::mark_node() {
   }
 }
 
-type_gen_fn::type_gen_fn() {
+GenFn::GenFn() {
   rest_type = nullptr;
-  return_type = new type_nil;
+  return_type = new Nil;
 }
 
-std::string type_gen_fn::to_string() const {
+std::string GenFn::to_string() const {
   //return string("{type (") + ") -> " + return_type->to_string() + "}";
   string str = "Gen Fn (";
   bool once = false;
-  for (hydra_type* t : arg_list) {
+  for (Type* t : arg_list) {
     str += once ? " " : (once = true, "");
     str += t->to_string();
   }
@@ -48,15 +50,15 @@ std::string type_gen_fn::to_string() const {
   return str;
 }
 
-hydra_object *type_gen_fn::check_type(hydra_object *obj) {
-  if (dynamic_cast<combined_fn*>(obj)) {
-    return hydra_t::get();
+expr::Value *GenFn::check_type(expr::Value *obj) {
+  if (dynamic_cast<expr::CombinedFn*>(obj)) {
+    return expr::t::get();
   }
-  return hydra_nil::get();
+  return expr::nil::get();
 }
 
 
-hydra_type *type_gen_fn::constructor(list<hydra_object*> lst) {
+Type *GenFn::constructor(list<expr::Value*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {

@@ -1,10 +1,12 @@
 #include "expressions.hpp"
 #include <iostream>
 
+using namespace expr;
 using std::string;
+
 #include <types.hpp>
 
-void hydra_symbol::mark_node() {
+void Symbol::mark_node() {
   if (marked) return;
   marked = true;
   if (value) {
@@ -12,17 +14,17 @@ void hydra_symbol::mark_node() {
   }
 }
 
-string hydra_symbol::to_string() const {
+string Symbol::to_string() const {
   return name;
 }
 
-hydra_symbol::hydra_symbol(string _name) {
+Symbol::Symbol(string _name) {
   name = _name;
   value = nullptr;
   mut = true;
 }
 
-hydra_object* hydra_symbol::eval(runtime& r, lexical_scope& s) {
+Value* Symbol::eval(LocalRuntime& r, LexicalScope& s) {
   // fist, check the lexical scope
 
   auto loc = s.map.find(this);
@@ -38,3 +40,4 @@ hydra_object* hydra_symbol::eval(runtime& r, lexical_scope& s) {
     return value;
   }
 }
+

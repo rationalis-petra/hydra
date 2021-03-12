@@ -8,60 +8,66 @@ using std::string;
 using std::list;
 using std::set;
 
-type_derives::type_derives() {
-  object = new hydra_object_object();
+using namespace type;
+
+Derives::Derives() {
+  object = new expr::Object();
 }
 
-void type_derives::mark_node() {
+void Derives::mark_node() {
   marked = true;
   object->mark_node();
 }
 
-string type_derives::to_string() const {
+string Derives::to_string() const {
   return "{Derives " + object->to_string() +  "}";
 }
 
 
-hydra_object *derive_check(set<hydra_object_object*> ptypes, hydra_object_object* obj) {
+expr::Value *derive_check(set<expr::Object*> ptypes, expr::Object* obj) {
   for (auto* proto : ptypes) {
     if (proto == obj) {
-      return hydra_t::get();
+      return expr::t::get();
     }
     if (!derive_check(proto->prototypes, obj)->null()) {
-      return hydra_t::get();
+      return expr::t::get();
     }
   }
-  return hydra_nil::get();
+  return expr::nil::get();
 }
 
-hydra_object *type_derives::check_type(hydra_object* obj) {
-  hydra_object_object* oobj = dynamic_cast<hydra_object_object*>(obj);
+expr::Value *Derives::check_type(expr::Value* obj) {
+  expr::Object* oobj = dynamic_cast<expr::Object*>(obj);
   if (oobj == nullptr) {
-    return hydra_nil::get();
+    return expr::nil::get();
   } else {
     // an objetc derives itself
     if (oobj == object) {
-      return hydra_t::get(); 
+      return expr::t::get(); 
     }
-    set<hydra_object_object*> ptypes = oobj->prototypes;
+    set<expr::Object*> ptypes = oobj->prototypes;
     return derive_check(ptypes, object);
   }
 }
 
-hydra_type *type_derives::constructor(list<hydra_object*> lst) {
-  if (lst.size() == 0) {
-    return this;
-  } else {
-    type_derives* drv = new type_derives;
+void DerivesConstructor::mark_node() {
+  marked = true;
+}
 
-    for (hydra_object* obj : lst) {
-      if (auto proto = dynamic_cast<hydra_object_object*>(obj)) {
-        drv->object = proto;
-      } else {
-        string err = "non-obejct provided to type Derives constructor";
-        throw err;
-      }
+Type *DerivesConstructor::constructor(list<expr::Value*> lst) {
+  Derives *drv = new Derives;
+
+  for (expr::Value *obj : lst) {
+    if (auto proto = dynamic_cast<expr::Object *>(obj)) {
+      drv->object = proto;
+    } else {
+      string err = "non-obejct provided to type Derives constructor";
+      throw err;
     }
-    return drv;
   }
+  return drv;
+}
+
+string DerivesConstructor::to_string() const {
+  return "Type constructor for derives";
 }

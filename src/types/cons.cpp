@@ -7,23 +7,25 @@
 using std::string;
 using std::list;
 
-void type_cons::mark_node() {
+using namespace type;
+
+void Cons::mark_node() {
   marked = true;
 }
 
-string type_cons::to_string() const {
+string Cons::to_string() const {
   return "Cons";
 }
 
-hydra_object *type_cons::check_type(hydra_object* obj) {
-  if ((dynamic_cast<hydra_cons*>(obj)) == nullptr) {
-    return hydra_nil::get();
+expr::Value *Cons::check_type(expr::Value* obj) {
+  if ((dynamic_cast<expr::Cons*>(obj)) == nullptr) {
+    return expr::nil::get();
   } else {
-    return hydra_t::get();
+    return expr::t::get();
   }
 }
 
-hydra_type *type_cons::constructor(list<hydra_object*> lst) {
+Type *Cons::constructor(list<Value*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {

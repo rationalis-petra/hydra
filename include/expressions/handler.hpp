@@ -6,20 +6,22 @@
 #include "expressions/operation.hpp"
 #include "types/basic.hpp"
 
+namespace expr {
 struct condition_handler {
-  virtual hydra_object* handle(hydra_object* condition) = 0;
+  virtual Value* handle(Value* condition) = 0;
 };
 
 struct bind_handler : public condition_handler {
-  runtime& r;
-  lexical_scope& s;
-  std::list<hydra_object*> handling_code;
-  bind_handler(std::list<hydra_object*>, runtime& r, lexical_scope &s);
-  hydra_object* handle(hydra_object* condition);
+  bind_handler(std::list<Value*>, LocalRuntime& r, LexicalScope &s);
+
+  LocalRuntime& r;
+  LexicalScope& s;
+  std::list<Value*> handling_code;
+  Value* handle(Value* condition);
 };
 
 struct case_handler : public condition_handler {
-  hydra_object* handle(hydra_object* condition);
+  Value* handle(Value* condition);
 };
 
 enum exception_type {
@@ -28,13 +30,13 @@ enum exception_type {
 };
 
 
-struct hydra_restart : public hydra_oper {
-  hydra_restart(hydra_oper* o, hydra_symbol* s);
+struct hydra_restart : public Operator {
+  hydra_restart(Operator* o, Symbol* s);
   void mark_node();
 
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
-  hydra_oper* op;
-  hydra_symbol* sym;
+  Value *call(Value *arg_list, LocalRuntime &r, LexicalScope &s);
+  Operator* op;
+  Symbol* sym;
 };
 
 
@@ -45,14 +47,15 @@ struct hydra_exception {
 
   union {
     struct {
-      hydra_object* obj;
+      Value* obj;
     };
     struct {
       hydra_restart *res;
-      hydra_object *args;
-      lexical_scope *s;
+      Value *args;
+      LexicalScope *s;
     };
   };
 };
 
+}
 #endif

@@ -3,19 +3,12 @@
 
 #include "expressions.hpp"
 
-struct op_describe : hydra_oper {
-  op_describe();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
+namespace op {
 
-struct op_trace : hydra_oper {
-  op_trace();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
+  extern expr::Operator *describe;
+  extern expr::Operator *trace;
+  extern expr::Operator *time;
 
-struct op_time : hydra_oper {
-  op_time();
-  hydra_object* call(hydra_object* alist, runtime &r, lexical_scope& s);
-};
+} // namespace op
 
 #endif // __HYDRA_DATA_HPP

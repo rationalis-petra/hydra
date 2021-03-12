@@ -1,78 +1,78 @@
-#ifndef __HYDRA_TYPE_BASIC_HPP
-#define __HYDRA_TYPE_BASIC_HPP
+#ifndef __TYPE_BASIC_HPP
+#define __TYPE_BASIC_HPP
 
 #include <list>
 
 #include "types/type.hpp"
 
-struct type_object : public hydra_type {
-  void mark_node();
-  std::string to_string() const;
-  virtual hydra_object *check_type(hydra_object *obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
-};
+namespace type {
 
-struct type_nil : public hydra_type {
+// struct Type : public expr::Value {
+//   void mark_node();
+//   std::string to_string() const;
+//   virtual expr::Value *check_type(expr::Value *obj);
+//   Type *constructor(std::list<expr::Value *> lst);
+// };
+
+struct Nil : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  virtual hydra_object *check_type(hydra_object *obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  virtual expr::Value *check_type(expr::Value *obj);
 };
 
-struct type_integer : public hydra_type {
+struct Integer : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value *check_type(expr::Value *obj);
 };
 
-struct type_string : public hydra_type {
+struct TString : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value *check_type(expr::Value *obj);
 };
 
-struct type_module : public hydra_type {
+struct Module : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value *check_type(expr::Value *obj);
 };
 
-struct type_char : public hydra_type {
+struct Char : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value *check_type(expr::Value *obj);
 };
 
-struct type_iostream : public hydra_type {
+struct IOStream : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value *check_type(expr::Value *obj);
 };
 
-struct type_istream : public hydra_type {
+struct Istream : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value *check_type(expr::Value *obj);
 };
 
-struct type_ostream : public hydra_type {
+struct Ostream : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value *check_type(expr::Value *obj);
 };
 
-struct type_type : public hydra_type {
+struct MetaType : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  expr::Value *check_type(expr::Value *obj);
 };
 
+struct MetaConstructor : public Type {
+  virtual void mark_node();
+  std::string to_string() const;
+  expr::Value *check_type(expr::Value *obj);
+};
+
+} // namespace type
 #endif

@@ -6,53 +6,45 @@
 using std::list;
 using std::string;
 
-op_tuple::op_tuple() {
-  is_fn = true;
-  docstring =
-      new hydra_string("Will return a tuple whose elements are the arg-list");
-  type->rest_type = new type_nil;
-}
+using namespace expr;
 
-hydra_object *op_tuple::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
 
-  hydra_tuple *out = new hydra_tuple;
-  for (hydra_object *o : arg_list)
+Value *op_tuple(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+
+  Tuple *out = new Tuple;
+  for (Value *o : arg_list)
     out->values.push_back(o);
   return out;
 }
 
-op_tuple_elt::op_tuple_elt() {
-  is_fn = true;
-  docstring =
-      new hydra_string("Will return a tuple whose elements are the arg-list");
-  type->arg_list.push_front(new type_integer);
-  type->arg_list.push_front(new type_tuple);
-}
 
-hydra_object *op_tuple_elt::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Value *op_tuple_elt(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
 
-  hydra_tuple *tup = dynamic_cast<hydra_tuple*>(arg_list.front());
-  hydra_num *idx = dynamic_cast<hydra_num*>(arg_list.back());
+  Tuple *tup = dynamic_cast<Tuple*>(arg_list.front());
+  Integer *idx = dynamic_cast<Integer*>(arg_list.back());
 
   return tup->values[idx->value];
 }
 
+Value *op_union(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
 
-op_union::op_union() {
-  is_fn = true;
-  docstring =
-      new hydra_string("Will return tagged value");
-  type->arg_list.push_front(new type_nil);
-  type->arg_list.push_front(new type_symbol);
-}
-
-hydra_object *op_union::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
-
-  hydra_union *out = new hydra_union;
-  out->tag = dynamic_cast<hydra_symbol*>(arg_list.front());
+  Union *out = new Union;
+  out->tag = dynamic_cast<Symbol*>(arg_list.front());
   out->value = arg_list.back();
   return out;
 }
+
+Operator *op::mk_tuple =
+    new InbuiltOperator("Will return a tuple whose elements are the arg-list",
+                        op_tuple, type::Fn::with_rest(new type::Nil), true);
+
+Operator *op::tuple_elt =
+  new InbuiltOperator("Will return the nth element of a tuple",
+  op_tuple_elt, type::Fn::with_args({new type::Integer, new type::Tuple}), true);
+
+Operator *op::mk_union = new InbuiltOperator(
+    "Will return a tagged value", op_union,
+    type::Fn::with_args({new type::Nil, new type::Symbol}), true);

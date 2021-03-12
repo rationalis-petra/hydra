@@ -7,15 +7,12 @@
 using std::list;
 using std::string;
 
-op_if::op_if() {
-  is_fn = false;
-  type->arg_list.push_front(new type_nil);
-  type->arg_list.push_front(new type_nil);
-  type->arg_list.push_front(new type_nil);
-}
+using type::hydra_cast;
 
-hydra_object *op_if::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+using namespace expr;
+
+Value *op_if(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   // aseert that list length is 3
   int len = arg_list.size();
   if (len != 3) {
@@ -23,7 +20,7 @@ hydra_object *op_if::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   }
   // we now assume that arg_list is a list of length 3
 
-  hydra_object *condition = arg_list.front()->eval(r, s);
+  Value *condition = arg_list.front()->eval(r, s);
   arg_list.pop_front();
   // is nil?
   if (condition->null()) {
@@ -33,12 +30,17 @@ hydra_object *op_if::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   return arg_list.front()->eval(r, s);
 }
 
-op_while::op_while() { is_fn = false;
-  type->rest_type = new type_nil;
-  }
-hydra_object *op_while::call(hydra_object *alist, runtime &r,
-                             lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Operator *op::do_if =
+  new InbuiltOperator("Takes three expressions: evaluates the first one.\n"
+                      "If it is nil, then evaluate the second expression & return\n"
+                      "Otherwise, evaluate the first expression.",
+                      op_if,
+                      type::Fn::with_args({new type::Nil, new type::Nil, new type::Nil}),
+                      false);
+
+Value *op_while(Operator* op, Value *alist, LocalRuntime &r,
+                             LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   // assert that list length is 3
   int len = arg_list.size();
   if (len < 2) {
@@ -46,32 +48,31 @@ hydra_object *op_while::call(hydra_object *alist, runtime &r,
   }
   // we now assume that arg_list is a list of length 3
 
-  hydra_object *condition = arg_list.front();
+  Value *condition = arg_list.front();
   arg_list.pop_front();
   // is nil?
-  hydra_object* out = hydra_nil::get();
+  Value* out = nil::get();
   while (!condition->eval(r, s)->null()) {
-    for (hydra_object *o : arg_list) {
+    for (Value *o : arg_list) {
       out = o->eval(r, s);
     }
   }
   // otherwise
   return out;
 }
-op_set::op_set() {
-  is_fn = true;
 
-  docstring = new hydra_string("Sets the value symbol (first argument) to the second argument");
+Operator* op::do_while =
+  new InbuiltOperator("Evaluate the first expression. If it is nil, return\n"
+                      "Otherwise, evaluate rest of the expression(s), and repeat",
+                      op_while,
+                      type::Fn::with_rest(new type::Nil),
+                      false);
 
-  type->arg_list.push_front(new type_nil);
-  // OR symbol ref
-  type->arg_list.push_front(new type_symbol);
-}
-hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Value *op_bind(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
 
-  if (hydra_symbol *symbol = dynamic_cast<hydra_symbol *>(arg_list.front())) {
-    hydra_object *value = arg_list.back();
+  if (Symbol *symbol = dynamic_cast<Symbol *>(arg_list.front())) {
+    Value *value = arg_list.back();
 
     // if there is a lexical scope with the value
     if (s.map.find(symbol) != s.map.end()) {
@@ -79,13 +80,13 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
     } else if (symbol->mut) {
       symbol->value = value;
     } else {
-    string err = "Error: cannot set immutable symbol";
+    string err = "Error: cannot bind immutable symbol";
     throw err;
     }
 
-    hydra_object::roots.insert(symbol);
-    hydra_object::collect_garbage(r);
-    hydra_object::roots.remove(symbol);
+    Value::roots.insert(symbol);
+    Value::collect_garbage(r);
+    Value::roots.remove(symbol);
     return value;
   } else {
     string err = "Error: provided non-symbol as first argument of set";
@@ -93,17 +94,17 @@ hydra_object *op_set::call(hydra_object *alist, runtime &r, lexical_scope &s) {
   }
 }
 
-op_unset::op_unset() {
-  is_fn = true;
 
-  docstring = new hydra_string("Removes the value from a symbol");
+Operator* op::bind =
+  new InbuiltOperator("Sets the value symbol (first argument) to the second argument",
+                      op_bind,
+                      type::Fn::with_args({new type::Symbol, new type::Nil}),
+                      true);
 
-  type->arg_list.push_front(new type_symbol);
-}
-hydra_object *op_unset::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Value *op_unbind(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
 
-  hydra_symbol *symbol = dynamic_cast<hydra_symbol *>(arg_list.front());
+  Symbol *symbol = dynamic_cast<Symbol *>(arg_list.front());
 
   // if there is a lexical scope with the value
   if (s.map.find(symbol) != s.map.end()) {
@@ -112,173 +113,191 @@ hydra_object *op_unset::call(hydra_object *alist, runtime &r, lexical_scope &s) 
   } else if (symbol->mut) {
     symbol->value = nullptr;
   } else {
-    string err = "Error: cannot set immutable symbol";
+    string err = "Error: cannot unbind immutable symbol";
     throw err;
   }
 
-  hydra_object::roots.insert(symbol);
-  hydra_object::collect_garbage(r);
-  hydra_object::roots.remove(symbol);
+  Value::roots.insert(symbol);
+  Value::collect_garbage(r);
+  Value::roots.remove(symbol);
   return symbol;
 }
 
-op_defined::op_defined() {
-  is_fn = true;
-  docstring = new hydra_string("Returns t if symbol contains a value, and nil otherwise");
-  type->arg_list.push_back(new type_symbol);
-};
+Operator* op::unbind = 
+  new InbuiltOperator("Removes the value from a symbol",
+                      op_unbind,
+                      type::Fn::with_args({new type::Symbol}),
+                      true);
 
-hydra_object* op_defined::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
-  hydra_symbol* sym = hydra_cast<hydra_symbol>(arg_list.front());
+Value* op_definedp(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  Symbol* sym = hydra_cast<Symbol>(arg_list.front());
   if (sym->value) {
-    return hydra_t::get();
+    return t::get();
   } else {
-    return hydra_nil::get();
+    return nil::get();
   }
 }
 
-op_quote::op_quote() {
-  is_fn = false;
-  docstring = new hydra_string("Prevents evaluation of the argument it is provided");
-  type->arg_list.push_front(new type_nil);
-}
-hydra_object *op_quote::call(hydra_object *alist, runtime &r,
-                             lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Operator* op::definedp =
+  new InbuiltOperator("Returns t if symbol contains a value, and nil otherwise",
+                      op_definedp,
+                      type::Fn::with_args({new type::Symbol}),
+                      true);
+
+Value *op_quote(Operator* op, Value *alist, LocalRuntime &r,
+                             LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   return arg_list.front();
 }
 
-op_eval::op_eval() {
-  is_fn = true;
-  docstring = new hydra_string("Evaluates it's argument as if it was a hydra program");
-  type->arg_list.push_front(new type_nil);
-}
-hydra_object *op_eval::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+
+Operator* op::quote =
+  new InbuiltOperator("Prevents evaluation of the argument it is provided",
+                      op_quote,
+                      type::Fn::with_args({new type::Nil}),
+                      false);
+
+Value *op_eval(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments to eval";
     throw err;
   }
   // eval evaluates in a null lexical scope!
-  lexical_scope new_scope;
-  hydra_object* value = arg_list.front()->eval(r, new_scope);
-  hydra_object::roots.insert(value);
-  hydra_object::collect_garbage(r);
-  hydra_object::roots.remove(value);
+  LexicalScope new_scope;
+  Value* value = arg_list.front()->eval(r, new_scope);
+  Value::roots.insert(value);
+  Value::collect_garbage(r);
+  Value::roots.remove(value);
   return value;
 }
 
-op_progn::op_progn() {
-  is_fn = false;
-  docstring = new hydra_string("Evaluates its arguments in sequential order, returning the value\n"
-                               "of the last one");
-  type->rest_type = new type_nil;
-}
-hydra_object *op_progn::call(hydra_object *alist, runtime &r,
-                             lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
-  hydra_object *out = nullptr;
-  for (hydra_object *arg : arg_list) {
+
+Operator* op::eval =
+  new InbuiltOperator("Evaluates it's argument as if it was a hydra program",
+                      op_eval,
+                      type::Fn::with_args({new type::Nil}),
+                      true);
+
+Value *op_progn(Operator* op, Value *alist, LocalRuntime &r,
+                             LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  Value *out = nullptr;
+  for (Value *arg : arg_list) {
     out = arg->eval(r, s);
   }
   if (!out)
-    out = hydra_nil::get();
+    out = nil::get();
   return out;
 }
 
-op_gen::op_gen() {
-  docstring = new hydra_string("Generates a new generic function object");
-  is_fn = false;
-  type->arg_list.push_front(new type_list);
-  type->rest_type = new type_nil;
-}
-hydra_object *op_gen::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
-  combined_fn* out = new combined_fn;
-  out->type->rest_type = new type_nil;
+Operator* op::progn =
+  new InbuiltOperator("Evaluates its arguments in sequential order, returning the value\n"
+                      "of the last one",
+                      op_progn,
+                      type::Fn::with_rest(new type::Nil),
+                      false);
+
+
+Value *op_gen(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+  CombinedFn* out = new CombinedFn;
+  out->type->rest_type = new type::Nil;
   arg_list.pop_front();
   if (!arg_list.empty()) {
-    if (hydra_string* str = dynamic_cast<hydra_string*>(arg_list.front())) {
+    if (HString* str = dynamic_cast<HString*>(arg_list.front())) {
       out->docstring = str;
     }
   }
   return out;
 }
 
-op_fn::op_fn() {
-  is_fn = false;
-  docstring = new hydra_string("Generates a new function object");
-  type->rest_type = new type_nil;
-}
-hydra_object *op_fn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  return (hydra_object*) new user_oper(alist, true, r, s);
+Operator* op::genfn =
+  new InbuiltOperator("Generates a new generic function object",
+                      op_gen,
+                      type::Fn::with_all({new type::List}, new type::Nil, new type::GenFn),
+                      false);
+
+Value *op_fn(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  return (Value*) new UserOperator(alist, true, r, s);
 }
 
-op_mac::op_mac() {
-  is_fn = false;
-  docstring = new hydra_string("Generates a new macro object");
-  type->arg_list.push_front(new type_cons);
-  type->rest_type = new type_nil;
-}
-hydra_object *op_mac::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  return (hydra_object*) new user_oper(alist, false, r, s);
+Operator* op::fn =
+  new InbuiltOperator("Generates a new function object",
+                      op_fn,
+                      type::Fn::with_rest(new type::Nil),
+                      false);
+
+Value *op_mac(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  return (Value*) new UserOperator(alist, false, r, s);
 }
 
-op_addfn::op_addfn() {
-  is_fn = true;
-  docstring = new hydra_string("Combines functions into an effective function");
-  type->arg_list.push_front(new type_gen_fn);
-  type->rest_type = new type_nil;
-}
-hydra_object *op_addfn::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
-  combined_fn* f = dynamic_cast<combined_fn*>(arg_list.front());
+
+Operator* op::mac =
+  new InbuiltOperator("Generates a new macro object",
+                      op_mac,
+                      type::Fn::with_all({new type::Cons}, new type::Nil, new type::Mac),
+                      false);
+
+Value *op_addfn(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+  CombinedFn* f = dynamic_cast<CombinedFn*>(arg_list.front());
   arg_list.pop_front();
 
-  for (hydra_object* o : arg_list) {
-    hydra_oper* op = hydra_cast<hydra_oper>(o);
+  for (Value* o : arg_list) {
+    Operator* op = hydra_cast<Operator>(o);
     f->add(op);
   }
 
-  return (hydra_object*) f;
+  return (Value*) f;
 }
 
-op_exit::op_exit() {
-  is_fn = false;
-  docstring = new hydra_string("Exits the current running application");
-}
+Operator* op::addfn =
+  new InbuiltOperator("Combines functions into an effective function",
+                      op_addfn,
+                      type::Fn::with_all({new type::GenFn}, new type::Fn, new type::GenFn),
+                      true);
 
-hydra_object *op_exit::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  for (hydra_object* obj : hydra_object::node_list) {
+Value *op_exit(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  for (Value* obj : Value::node_list) {
     delete obj;
   }
   exit(0);
 }
 
-op_ref::op_ref() {
-  is_fn = true;
-  docstring = new hydra_string("Returns a reference to the provided value");
-}
+Operator* op::exit =
+  new InbuiltOperator("Exits the current running application",
+                      op_exit,
+                      type::Fn::with_args({}),
+                      true);
 
-hydra_object *op_ref::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
 
-  hydra_ref* ref = new hydra_ref;
+Value *op_ref(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+
+  Ref* ref = new Ref;
   ref->ptr = arg_list.front();
   return ref;
 }
 
-op_var::op_var() {
-  is_fn = true;
-  docstring = new hydra_string("Creates some mutable storage, and returns a handle to it");
-}
+Operator* op::ref  =
+  new InbuiltOperator("Returns a reference to the provided value",
+                      op_ref,
+                      type::Fn::with_args({new type::Nil}),
+                      true);
 
-hydra_object *op_var::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+// op_var::op_var() {
+//   is_fn = true;
+//   docstring = new HString("Creates some mutable storage, and returns a handle to it");
+//   type->arg_list.push_front(new type_nil);
+// }
 
-  hydra_var* var = new hydra_var;
-  // TODO: add get-var function to objects?
-  var->val = arg_list.front();
-  return var;
-}
+// Value *op_var::call(Value *alist, LocalRuntime &r, LexicalScope &s) {
+//   list<Value*> arg_list = get_arg_list(alist, r, s);
+
+//   hydra_var* var = new hydra_var;
+//   // TODO: add get-var function to objects?
+//   var->val = arg_list.front();
+//   return var;
+// }

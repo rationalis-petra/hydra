@@ -10,30 +10,32 @@
 #include "types.hpp"
 #include "object.hpp"
 
+namespace expr {
+
 enum foreign_type { Int32, Pointer, String, Void };
 
-struct hydra_foreign_lib : public hydra_object {
+struct ForeignLib : public Value {
   virtual void mark_node();
 
-  hydra_foreign_lib(lt_dlhandle lib);
+  ForeignLib(lt_dlhandle lib);
   std::string to_string() const;
 
   lt_dlhandle lib;
 };
 
-struct hydra_foreign_sym : public hydra_object {
+struct ForeignSymbol : public Value {
   virtual void mark_node();
 
-  hydra_foreign_sym(void *addr);
+  ForeignSymbol(void *addr);
   std::string to_string() const;
 
   void* address;
 };
 
-struct hydra_foreign_oper : public hydra_oper {
+struct ForeignOperator : public Operator {
+  ForeignOperator();
 
-  hydra_object* call(hydra_object* args, runtime& r, lexical_scope &s);
-  hydra_foreign_oper();
+  Value* call(Value* args, LocalRuntime& r, LexicalScope &s);
 
   std::list<foreign_type> arg_types;
   foreign_type return_type;
@@ -41,4 +43,5 @@ struct hydra_foreign_oper : public hydra_oper {
   void(*fn_address)(void);
 };
 
+}
 #endif // __HYDRA_FOREIGN_HPP

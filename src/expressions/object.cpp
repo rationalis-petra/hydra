@@ -5,34 +5,35 @@ using std::string;
 using std::ostream;
 using std::list;
 
-list<hydra_object*> hydra_object::node_list;
-list<lexical_scope*> hydra_object::context_list;
-hydra_roots hydra_object::roots; 
+using namespace expr;
 
-unsigned long hydra_object::counter = 0;
-//runtime *hydra_object::r;
+list<Value*> Value::node_list;
+list<LexicalScope*> Value::context_list;
+hydra_roots Value::roots; 
 
-hydra_object::hydra_object() {
+unsigned long Value::counter = 0;
+//runtime *Value::r;
+
+Value::Value() {
   node_list.push_front(this);
   marked = false;
-  mut = false;
   counter++;
 
   // check for the number of 
 }
 
-hydra_object::~hydra_object() {}
+Value::~Value() {}
 
-bool hydra_object::null() const {
+bool Value::null() const {
   return false;
 }
 
 // the default behaviour is to self-evaluate
-hydra_object* hydra_object::eval(runtime& r, lexical_scope& s) {
+Value* Value::eval(LocalRuntime& r, LexicalScope& s) {
   return this;
 }
 
-ostream &operator<<(ostream &os, const hydra_object *obj) {
+ostream &expr::operator<<(ostream &os, const Value *obj) {
   os << obj->to_string();
   return os;
 }

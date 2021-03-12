@@ -21,7 +21,7 @@ std::string lang = R"(
   (mac (symbol val :rest body)
     [list (quote bind) [list (quote quote) symbol]
           (if body
-              (if (and (defined? symbol) (type? (eval symbol) Gen))
+              (if (and (defined? symbol) (type? Gen (eval symbol)))
                   [list (quote add-fn) 
                         symbol
                         [cons (quote fn) [cons val body]]]
@@ -31,8 +31,8 @@ std::string lang = R"(
 "The defn, i.e. define-function"
 (export (current-module) (quote defn))
 (bind (quote defn) (mac (name arg1 :optional arg2 :rest body)
-  (let ((arg-list (if (type? arg1 Symbol) arg2 arg1))
-        (body (if (type? arg1 Symbol) body (cons arg2 body))))
+  (let ((arg-list (if (type? Symbol arg1) arg2 arg1))
+        (body (if (type? Symbol arg1) body (cons arg2 body))))
    (list (quote def) name
      (cons (quote fn)
        (cons

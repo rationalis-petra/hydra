@@ -6,24 +6,26 @@
 using std::string;
 using std::to_string;
 
+using namespace expr;
+
 /// TRUE
 
 // compound types: string, array
-void hydra_t::mark_node() {
+void t::mark_node() {
   marked = true;
 }
 
-hydra_t* hydra_t::singleton = nullptr;
-hydra_t::hydra_t() {}
-hydra_t* hydra_t::get() {
+t* t::singleton = nullptr;
+t::t() {}
+t* t::get() {
   if (singleton == nullptr) {
-    singleton = new hydra_t;
+    singleton = new t;
     roots.insert(singleton);
   }
   return singleton;
 }
 
-string hydra_t::to_string() const {
+string t::to_string() const {
   return "t";
 }
 
@@ -31,16 +33,16 @@ string hydra_t::to_string() const {
 
 //// STRING
 
-void hydra_string::mark_node() {
+void HString::mark_node() {
   marked = true;
 }
 
-hydra_string::hydra_string() {}
-hydra_string::hydra_string(string str) {
+HString::HString() {}
+HString::HString(string str) {
   value = str;
 }
 
-string hydra_string::to_string() const {
+string HString::to_string() const {
   return '"' + value + '"';
 }
 
@@ -48,13 +50,13 @@ string hydra_string::to_string() const {
 
 /// ARRAY
 
-void hydra_vector::mark_node() {
+void Vector::mark_node() {
   marked = true;
-  for (hydra_object* o : array) {
+  for (Value* o : array) {
     o->mark_node();
   }
 }
-string hydra_vector::to_string() const {
+string Vector::to_string() const {
   string out = "[@v ";
 
   for (unsigned i = 0; i < array.size() ; i++) {
@@ -69,13 +71,13 @@ string hydra_vector::to_string() const {
 
 /// TUPLE
 
-void hydra_tuple::mark_node() {
+void Tuple::mark_node() {
   marked = true;
-  for (hydra_object* o : values) {
+  for (Value* o : values) {
     o->mark_node();
   }
 }
-string hydra_tuple::to_string() const {
+string Tuple::to_string() const {
   string out = "[@t ";
 
   for (unsigned i = 0; i < values.size() ; i++) {
@@ -89,13 +91,13 @@ string hydra_tuple::to_string() const {
 
 /// UNION
 
-void hydra_union::mark_node() {
+void Union::mark_node() {
   marked = true;
   tag->mark_node();
   value->mark_node();
 }
 
-string hydra_union::to_string() const {
+string Union::to_string() const {
   string out = "[";
   out += tag->to_string();
   out += " ";
@@ -110,109 +112,99 @@ string hydra_union::to_string() const {
 
 
 // single-words: integer, characters
-void hydra_num::mark_node() {
+void Integer::mark_node() {
   marked = true;
 }
-string hydra_num::to_string() const {
+string Integer::to_string() const {
   return ::to_string(value);
 }
 
-hydra_num::hydra_num(int num) : value(num) {}
+Integer::Integer(int num) : value(num) {}
 
 //// CHARACTER
-void hydra_char::mark_node() {
+void Char::mark_node() {
   marked = true;
 }
-hydra_char::hydra_char() : hydra_object() {}
-hydra_char::hydra_char(int c) : value(c) {}
-string hydra_char::to_string() const {
+Char::Char() : Value() {}
+Char::Char(int c) : value(c) {}
+string Char::to_string() const {
   return string("") + ((char) value);
 }
 
 /// NIL
 
-void hydra_nil::mark_node() {
+void nil::mark_node() {
   marked = true;
 }
 
-hydra_nil::hydra_nil() {};
-hydra_nil* hydra_nil::singleton = nullptr;
-hydra_nil* hydra_nil::get() {
+nil::nil() {};
+nil* nil::singleton = nullptr;
+nil* nil::get() {
   if (singleton == nullptr) {
-    singleton = new hydra_nil;
+    singleton = new nil;
     roots.insert(singleton);
   }
   return singleton;
 }
-bool hydra_nil::null() const {
+bool nil::null() const {
   return true;
 }
 
-string hydra_nil::to_string() const {
+string nil::to_string() const {
   return "nil";
 }
 
 
 /* STREAMS */
 // INPUT STREAM
-void hydra_istream::mark_node() {
+void Istream::mark_node() {
   marked = true;
 }
 
-string hydra_istream::to_string() const {
+string Istream::to_string() const {
   return "input stream";
 }
 
-hydra_istream::~hydra_istream() {
+Istream::~Istream() {
   if (stream != &std::cin) {
     delete stream;
   }
 }
 
 // OUTPUT STREAM
-void hydra_ostream::mark_node() {
+void Ostream::mark_node() {
   marked = true;
 }
 
-string hydra_ostream::to_string() const {
+string Ostream::to_string() const {
   return "output stream";
 }
 
-hydra_ostream::~hydra_ostream() {
+Ostream::~Ostream() {
   if (stream != &std::cout) {
     delete stream;
   }
 }
 
 // INPUT-OUTPUT STREAM
-void hydra_iostream::mark_node() {
+void IOstream::mark_node() {
   marked = true;
 }
 
-string hydra_iostream::to_string() const {
+string IOstream::to_string() const {
   return "input/output stream";
 }
 
-hydra_iostream::~hydra_iostream() {
+IOstream::~IOstream() {
   delete stream;
 }
 
-void hydra_ref::mark_node() {
+void Ref::mark_node() {
   if (marked) return;
   marked = true;
   ptr->mark_node();
 }
 
-string hydra_ref::to_string() const{
+string Ref::to_string() const{
   return "[ref " + ptr->to_string() + "]";
-}
-
-void hydra_var::mark_node() {
-  if (marked) return;
-  marked = true;
-  val->mark_node();
-}
-
-string hydra_var::to_string() const{
-  return "[var " + val->to_string() + "]";
 }

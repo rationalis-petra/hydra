@@ -5,30 +5,38 @@
 #include "types.hpp"
 
 using std::string;
-using std::list;
 
-void type_type::mark_node() {
+using namespace type;
+
+void MetaType::mark_node() {
   marked = true;
 }
 
-string type_type::to_string() const {
+string MetaType::to_string() const {
   return "Type";
 }
 
-hydra_object *type_type::check_type(hydra_object* obj) {
-  if (dynamic_cast<hydra_type*>(obj)) {
-    return hydra_t::get();
+expr::Value *MetaType::check_type(expr::Value* obj) {
+  if (dynamic_cast<Type*>(obj)) {
+    return expr::t::get();
   } else {
-    return hydra_nil::get();
+    return expr::nil::get();
   }
 }
 
-hydra_type *type_type::constructor(list<hydra_object*> lst) {
-  if (lst.size() == 0) {
-    return this;
-  } else {
-    string err = "Cannot provide argument to the Type Type constructor";
-    throw err;
-  }
+
+void MetaConstructor::mark_node() {
+  marked = true;
 }
 
+string MetaConstructor::to_string() const {
+  return "{Type Constructor}";
+}
+
+expr::Value *MetaConstructor::check_type(expr::Value* obj) {
+  if (dynamic_cast<TypeConstructor*>(obj)) {
+    return expr::t::get();
+  } else {
+    return expr::nil::get();
+  }
+}

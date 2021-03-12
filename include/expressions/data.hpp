@@ -5,112 +5,116 @@
 
 #include "object.hpp"
 
-struct hydra_t : public hydra_object {
+namespace expr {
+struct t : public Value {
   virtual void mark_node();
 
   std::string to_string() const;  
-  static hydra_t* get();
+  static t* get();
 private:
-  static hydra_t* singleton;
-  hydra_t();
+  static t* singleton;
+  t();
 };
 
-struct hydra_nil : public hydra_object {
+struct nil : public Value {
   virtual void mark_node();
 
   std::string to_string() const;
-  static hydra_nil* get();
+  static nil* get();
   bool null() const;
 private:
-  static hydra_nil* singleton;
-  hydra_nil();
+  static nil* singleton;
+  nil();
 };
 
-struct hydra_cons : public hydra_object {
+struct Cons : public Value {
   virtual void mark_node();
 
   std::string to_string() const; 
-  hydra_cons(hydra_object* car, hydra_object* cdr);
-  hydra_object* eval(runtime& r, lexical_scope& s);
+  Cons(Value* car, Value* cdr);
+  Value* eval(LocalRuntime& r, LexicalScope& s);
 
-  hydra_object* car;
-  hydra_object* cdr;
+  Value* car;
+  Value* cdr;
 
   unsigned len();
 };
 
-struct hydra_num : public hydra_object {
+struct Integer : public Value {
   virtual void mark_node();
 
-  hydra_num(int num);
+  Integer(int num);
   std::string to_string() const;
 
   int value;
 };
 
-struct hydra_istream : public hydra_object {
+struct Istream : public Value {
   virtual void mark_node();
 
   std::string to_string() const;
   std::istream *stream;  
-  ~hydra_istream();
+  ~Istream();
 };
 
-struct hydra_ostream : public hydra_object {
+struct Ostream : public Value {
   virtual void mark_node();
 
   std::string to_string() const;
   std::ostream *stream;
-  ~hydra_ostream();
+  ~Ostream();
 };
 
-struct hydra_iostream : public hydra_object {
+struct IOstream : public Value {
   virtual void mark_node();
 
   std::string to_string() const;
   std::iostream *stream;
-  ~hydra_iostream();
+  ~IOstream();
 };
 
-struct hydra_vector : public hydra_object {
+struct Vector : public Value {
   virtual void mark_node();
 
   std::string to_string() const;
-  std::vector<hydra_object*> array;
+  std::vector<Value*> array;
 };
 
 
-struct hydra_string : public hydra_object {
+struct HString : public Value {
   virtual void mark_node();
 
-  hydra_string();
-  hydra_string(std::string str);
+  HString();
+  HString(std::string str);
 
   std::string to_string() const;
   std::string value;  
 };
 
-struct hydra_char : public hydra_object {
+struct Char : public Value {
   virtual void mark_node();
 
-  hydra_char();
-  hydra_char(int c);
+  Char();
+  Char(int c);
   std::string to_string() const;
   int value;
 };
 
-struct hydra_tuple : public hydra_object {
+struct Tuple : public Value {
   virtual void mark_node();
 
   std::string to_string() const;
-  std::vector<hydra_object*> values;
+  std::vector<Value*> values;
 };
 
-struct hydra_symbol;
-struct hydra_union : public hydra_object {
+struct Symbol;
+
+struct Union : public Value {
   virtual void mark_node();
 
   std::string to_string() const;
-  hydra_symbol* tag;
-  hydra_object* value;
+  Symbol* tag;
+  Value* value;
 };
+
+}

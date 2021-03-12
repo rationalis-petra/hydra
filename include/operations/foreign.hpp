@@ -5,29 +5,18 @@
 
 #include "expressions.hpp"
 
-
 // define-foreign-library
-struct op_foreign_lib : hydra_oper {
-  op_foreign_lib();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope& s);
-};
+namespace op {
 
-struct op_foreign_sym : hydra_oper {
-  op_foreign_sym();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope& s);
-};
+  // Find a foreign library on disk & return handle
+  extern expr::Operator* foreign_lib;
+  // Find a foreign symbol in a given library
+  extern expr::Operator* foreign_sym;
+  // Convert a foreign symbol into a native function
+  extern expr::Operator* internalize;
+  // get a foreign variable as an internal variable
+  extern expr::Operator* foreign_get;
 
-// take a foreign symbol, give it a type & return a hydra object
-// that can be used normally
-struct op_internalize : hydra_oper {
-  op_internalize();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
-};
-
-// get foreign value
-struct op_foreign_get : hydra_oper {
-  op_foreign_get();
-  hydra_object *call(hydra_object *body, runtime &r, lexical_scope &s);
-};
+}; // namespace op
 
 #endif // __HYDRA_FFI_HPP

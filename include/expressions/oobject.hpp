@@ -7,15 +7,18 @@
 #include "object.hpp"
 
 
-struct hydra_object_object : public hydra_object {
+namespace expr {
+
+struct Object : public Value {
   void mark_node();
   std::string to_string() const;
-  std::map<hydra_symbol*, hydra_object*> object_vals;
+  std::map<Symbol*, Value*> object_vals;
 
-  std::set<hydra_object_object*> prototypes;
-  std::set<hydra_object_object*> derivatives;
+  std::set<Object*> prototypes;
+  std::set<Object*> derivatives;
 };
 
+}
 #endif
 // operations: set 
 // operation: get

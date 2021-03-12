@@ -6,23 +6,27 @@
 using std::string;
 using std::list;
 
-void type_vector::mark_node() {
+using type::Vector;
+using type::Type;
+using expr::Value;
+
+void Vector::mark_node() {
   marked = true;
 }
 
-string type_vector::to_string() const {
+string Vector::to_string() const {
   return "Vector";
 }
 
-hydra_object *type_vector::check_type(hydra_object* obj) {
-  if ((dynamic_cast<hydra_vector*>(obj)) || obj->null()) {
-    return hydra_t::get();
+Value *Vector::check_type(Value* obj) {
+  if ((dynamic_cast<Vector*>(obj)) || obj->null()) {
+    return expr::t::get();
   } else {
-    return hydra_nil::get();
+    return expr::nil::get();
   }
 }
 
-hydra_type *type_vector::constructor(list<hydra_object*> lst) {
+Type *Vector::constructor(list<Value*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {

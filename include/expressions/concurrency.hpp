@@ -2,18 +2,21 @@
 
 #include "expressions/object.hpp"
 
+namespace expr {
 
-struct hydra_thread : public hydra_object {
-  virtual void mark_node();
+struct Thread : public Value {
+  void mark_node();
   std::string to_string() const;
 };
 
-struct hydra_mutex : public hydra_object {
-  virtual void mark_node();
+struct Mutex : public Value {
+  void mark_node();
   std::string to_string() const;
 };
 
-struct hydra_semaphore : public hydra_object {
-  virtual void mark_node();
+struct Semaphore : public Value {
+  void mark_node();
   std::string to_string() const;
 };
+
+}

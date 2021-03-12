@@ -7,30 +7,32 @@
 using std::string;
 using std::list;
 
-void type_list::mark_node() {
+using namespace type;
+
+void List::mark_node() {
   marked = true;
 }
 
-string type_list::to_string() const {
+string List::to_string() const {
   return "{List " + elt_type->to_string() + "}";
 }
 
-hydra_object *type_list::check_type(hydra_object* obj) {
-  if ((dynamic_cast<hydra_cons*>(obj)) || obj->null()) {
-    return hydra_t::get();
+expr::Value *List::check_type(expr::Value* obj) {
+  if ((dynamic_cast<expr::Cons*>(obj)) || obj->null()) {
+    return expr::t::get();
   } else {
-    return hydra_nil::get();
+    return expr::nil::get();
   }
 }
 
-hydra_type *type_list::constructor(list<hydra_object*> lst) {
-  type_list* ret = new type_list();
+Type *List::constructor(list<expr::Value*> lst) {
+  List* ret = new List();
 
   if (lst.size() == 0) {
-    ret->elt_type = new type_nil;
+    ret->elt_type = new Nil;
     return ret;
   } else if (lst.size() == 1) {
-    if (hydra_type* tp = dynamic_cast<hydra_type*>(lst.front())) {
+    if (Type* tp = dynamic_cast<Type*>(lst.front())) {
       ret->elt_type = tp;
       return ret;
     } else {

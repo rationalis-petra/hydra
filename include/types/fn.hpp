@@ -9,36 +9,56 @@
 
 #include "types/type.hpp"
 
-struct type_fn : public hydra_type {
+namespace type {
+struct Fn : public Type {
   virtual void mark_node();
 
-  type_fn();
-  std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_object* check_args(std::list<hydra_object*> alist);
-  hydra_type* constructor(std::list<hydra_object*> lst);
+  Fn();
 
-  hydra_type* return_type;
-  hydra_type* rest_type;
-  std::list<hydra_type*> arg_list;
-  std::list<hydra_type*> optional_list;
-  std::list<hydra_symbol*> keyword_names;
-  std::list<hydra_type*> keyword_list;
+  // factory methods
+  static Fn* with_rest(Type* tp);
+  static Fn* with_args(std::vector<Type*> args);
+  static Fn* with_args_optional(std::vector<Type*> args, std::vector<Type*> opts);
+  static Fn* with_all(std::vector<Type*> args, Type* rest, Type* ret);
+
+  std::string to_string() const;
+  expr::Value* check_type(expr::Value* obj);
+  expr::Value* check_args(std::list<expr::Value*> alist);
+
+  Type* constructor(std::list<expr::Value*> lst);
+
+  Type* return_type;
+  Type* rest_type;
+  std::vector<Type*> arg_list;
+  std::vector<Type*> optional_list;
+  std::list<expr::Symbol*> keyword_names;
+  std::list<Type*> keyword_list;
 };
 
-struct type_gen_fn : public hydra_type {
+struct Mac : public Fn {
   virtual void mark_node();
 
-  type_gen_fn();
   std::string to_string() const;
-  hydra_object* check_type(hydra_object* obj);
-  hydra_type* constructor(std::list<hydra_object*> lst);
-
-  hydra_type* return_type;
-  hydra_type* rest_type;
-  std::list<hydra_type*> arg_list;
-  std::list<hydra_type*> optional_list;
-  std::list<hydra_symbol*> keyword_names;
-  std::list<hydra_type*> keyword_list;
+  expr::Value* check_type(expr::Value* obj);
+  expr::Value* check_args(std::list<expr::Value*> alist);
+  Type* constructor(std::list<expr::Value*> lst);
 };
+
+struct GenFn : public Type {
+  virtual void mark_node();
+
+  GenFn();
+  std::string to_string() const;
+  expr::Value* check_type(expr::Value* obj);
+  Type* constructor(std::list<expr::Value*> lst);
+
+  Type* return_type;
+  Type* rest_type;
+  std::list<Type*> arg_list;
+  std::list<Type*> optional_list;
+  std::list<expr::Symbol*> keyword_names;
+  std::list<Type*> keyword_list;
+};
+
+}
 #endif

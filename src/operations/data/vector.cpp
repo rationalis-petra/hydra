@@ -6,36 +6,29 @@
 using std::list;
 using std::string;
 
-op_vec::op_vec() {
-  is_fn = true;
-  docstring =
-      new hydra_string("Will return an array whose elements are the arg-list");
-  type->rest_type = new type_nil;
-}
-hydra_object *op_vec::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+using namespace expr;
 
-  hydra_vector *out = new hydra_vector;
-  for (hydra_object *o : arg_list)
+Value *op_vec(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+
+  Vector *out = new Vector;
+  for (Value *o : arg_list)
     out->array.push_back(o);
   return out;
 }
-op_vec_cat::op_vec_cat() {
-  is_fn = true;
-  docstring = new hydra_string(
-      "Concatenates two vectors");
-  type->rest_type = new type_vector;
-}
 
+Operator *op::mk_vec = new expr::InbuiltOperator(
+    "Will return an array whose elements are the arg-list", op_vec,
+    type::Fn::with_rest(new type::Nil), true);
 
-
-hydra_object *op_vec_cat::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
-  hydra_vector* vec = new hydra_vector;
-  for (hydra_object* obj : arg_list) {
-    hydra_vector* a = dynamic_cast<hydra_vector*>(obj);
+Value *op_vec_cat(Operator *op, Value *alist, LocalRuntime &r,
+                  LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  Vector *vec = new Vector;
+  for (Value *obj : arg_list) {
+    Vector *a = dynamic_cast<Vector *>(obj);
     if (a) {
-      for (hydra_object* o : a->array) {
+      for (Value *o : a->array) {
         vec->array.push_back(o);
       }
     }
@@ -43,22 +36,19 @@ hydra_object *op_vec_cat::call(hydra_object *alist, runtime &r, lexical_scope &s
   return vec;
 }
 
-op_vec_elt::op_vec_elt() {
-  is_fn = true;
-  docstring = new hydra_string(
-      "Takes an array and an index, and returns the element at that index");
-  type->arg_list.push_front(new type_integer);
-  type->arg_list.push_front(new type_vector);
-}
+Operator *op::vec_cat = new InbuiltOperator(
+    "Concatenates two vectors", op_vec_cat,
+    type::Fn::with_all({}, new type::Vector, new type::Vector), true);
 
-hydra_object *op_vec_elt::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Value *op_vec_elt(Operator *op, Value *alist, LocalRuntime &r,
+                  LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "invalid number of args to elt";
     throw err;
   }
-  hydra_vector *arr = dynamic_cast<hydra_vector *>(arg_list.front());
-  hydra_num *idx = dynamic_cast<hydra_num *>(arg_list.back());
+  Vector *arr = dynamic_cast<Vector *>(arg_list.front());
+  Integer *idx = dynamic_cast<Integer *>(arg_list.back());
   if (!arr) {
     string err = "First element to elt should be array";
     throw err;
@@ -70,16 +60,21 @@ hydra_object *op_vec_elt::call(hydra_object *alist, runtime &r, lexical_scope &s
   return arr->array.at(idx->value);
 }
 
-op_vec_len::op_vec_len() {
-  is_fn = true;
-  docstring = new hydra_string("");
-  type->arg_list.push_front(new type_vector);
+Operator *op::vec_elt = new InbuiltOperator(
+    "Takes an array and an index, and returns the element at that index",
+    op_vec_elt,
+    type::Fn::with_all({new type::Vector, new type::Integer}, nullptr,
+                       new type::Nil),
+    true);
+Value *op_vec_len(Operator *op, Value *alist, LocalRuntime &r,
+                  LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+
+  Vector *arr = dynamic_cast<Vector *>(arg_list.front());
+
+  return new Integer(arr->array.size());
 }
 
-hydra_object* op_vec_len::call(hydra_object *alist, runtime &r, lexical_scope&s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
-
-  hydra_vector* arr = dynamic_cast<hydra_vector*>(arg_list.front());
-
-  return new hydra_num(arr->array.size());
-}
+Operator *op::vec_len = new InbuiltOperator(
+    "Returns the length of a given vector", op_vec_len,
+    type::Fn::with_all({new type::Vector}, nullptr, new type::Integer), true);

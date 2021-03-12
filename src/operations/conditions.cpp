@@ -6,21 +6,18 @@
 using std::list;
 using std::string;
 
-// HANDLING CONDITIONS
-op_handler_catch::op_handler_catch() {
-  is_fn = false;
-  docstring = new hydra_string("Catches a thrown exepction");
-  type->arg_list.push_front(new type_nil);
-  type->rest_type = new type_cons;
-}
+using type::hydra_cast;
 
-hydra_object* op_handler_catch::call(hydra_object* alist, runtime &r, lexical_scope& s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+using namespace expr;
+
+// HANDLING CONDITIONS
+Value* op_handler_catch(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
   try {
     // add self to list of handlers
-    // runtime.handlers.add (new catch_handler())
+    // LocalRuntime.handlers.add (new catch_handler())
     r.handlers.push_front(new case_handler);
-    hydra_object* out = arg_list.front()->eval(r, s);
+    Value* out = arg_list.front()->eval(r, s);
     r.handlers.pop_front();
     return out;
   }
@@ -31,15 +28,15 @@ hydra_object* op_handler_catch::call(hydra_object* alist, runtime &r, lexical_sc
 
     r.handlers.pop_front();
     arg_list.pop_front();
-    for (hydra_object *o : arg_list) {
+    for (Value *o : arg_list) {
 
-      hydra_object* fst = dynamic_cast<hydra_cons*>(o)->car;
-      hydra_object* ty = hydra_cast<hydra_cons>(fst)->car;
-      hydra_type *t = dynamic_cast<hydra_type*>(ty->eval(r, s));
+      Value* fst = dynamic_cast<Cons*>(o)->car;
+      Value* ty = hydra_cast<Cons>(fst)->car;
+      type::Type *t = dynamic_cast<type::Type*>(ty->eval(r, s));
 
       if (!t->check_type(exc->obj)->null()) {
         delete exc;
-        return dynamic_cast<hydra_cons *>(dynamic_cast<hydra_cons *>(o)->cdr)
+        return dynamic_cast<Cons *>(dynamic_cast<Cons *>(o)->cdr)
             ->car->eval(r, s);
       }
     }
@@ -47,23 +44,20 @@ hydra_object* op_handler_catch::call(hydra_object* alist, runtime &r, lexical_sc
   }
 }
 
-op_handler_bind::op_handler_bind() {
-  is_fn = false;
-  docstring = new hydra_string("Catches a thrown exepction");
-  type->arg_list.push_front(new type_nil);
-  type->rest_type = new type_cons;
-}
+Operator* op::handler_catch =
+  new InbuiltOperator("Catches a thrown exepction",
+                      op_handler_catch, type::Fn::with_all({new type::Nil}, new type::Cons, new type::Nil),
+                      false);
 
-
-hydra_object* op_handler_bind::call(hydra_object* alist, runtime &r, lexical_scope& s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+Value* op_handler_bind(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
   // add self to the stack of handlers
-  // runtime.handlers.add(new bind_handler(arg_list))
-  hydra_object *code = arg_list.front();
+  // LocalRuntime.handlers.add(new bind_handler(arg_list))
+  Value *code = arg_list.front();
   arg_list.pop_front();
   r.handlers.push_front(new bind_handler(arg_list, r, s));
   try {
-    hydra_object *out = code->eval(r, s);
+    Value *out = code->eval(r, s);
     r.handlers.pop_front();
     return out;
   } catch (hydra_exception* e) {
@@ -75,30 +69,27 @@ hydra_object* op_handler_bind::call(hydra_object* alist, runtime &r, lexical_sco
   }
 }
 
-// RESTARTS
-op_add_restart::op_add_restart () {
-  is_fn = false;
-  docstring = new hydra_string("signals an object as an exception");
+Operator* op::handler_bind =
+  new InbuiltOperator("Catches a thrown exepction",
+                      op_handler_bind,
+                      type::Fn::with_all({new type::Nil}, new type::Cons, new type::Nil),false);
 
-  type->arg_list.push_front(new type_nil);
-  type->arg_list.push_front(new type_nil);
-  type->arg_list.push_front(new type_nil);
-}
+// RESTARTS
 
 // (with-restart <restart_name> <function> <code>)
-hydra_object* op_add_restart::call(hydra_object* alist, runtime &r, lexical_scope& s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Value* op_add_restart(Operator* op2, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value *> arg_list = op2->get_arg_list(alist, r, s);
 
-  hydra_symbol* sym = dynamic_cast<hydra_symbol*> (arg_list.front()->eval(r, s));
+  Symbol* sym = dynamic_cast<Symbol*> (arg_list.front()->eval(r, s));
   arg_list.pop_front();
-  hydra_oper* op = dynamic_cast<hydra_oper*>(arg_list.front()->eval(r, s));
+  Operator* op = dynamic_cast<Operator*>(arg_list.front()->eval(r, s));
   arg_list.pop_front();
   hydra_restart* res = new hydra_restart(op, sym);
 
   r.restarts.push_front(res);
 
   try {
-    hydra_object* ret = arg_list.front()->eval(r, s);
+    Value* ret = arg_list.front()->eval(r, s);
 
     // NOTE: it seems that the restart wdoesn't get registered until we return??
     r.restarts.pop_front();
@@ -107,7 +98,7 @@ hydra_object* op_add_restart::call(hydra_object* alist, runtime &r, lexical_scop
   } catch (hydra_exception* ex) {
     if (ex->type == RESTART_CALL && ex->res == res) {
       r.restarts.pop_front();
-      lexical_scope s = *(ex->s);
+      LexicalScope s = *(ex->s);
       delete ex->s;
       delete ex;
       return res->op->call(ex->args, r, s);
@@ -118,37 +109,36 @@ hydra_object* op_add_restart::call(hydra_object* alist, runtime &r, lexical_scop
   }
 }
 
-op_get_restarts::op_get_restarts () {
-  is_fn = true;
-  docstring =
-      new hydra_string("Returns the list (stack) of all active restarts!");
-}
+Operator* op::add_restart =
+  new InbuiltOperator("signals an object as an exception",
+                      op_add_restart,
+                      type::Fn::with_args({new type::Nil, new type::Nil, new type::Nil}),
+                      false);
 
-hydra_object* gen_list(std::list<hydra_restart*> lst) {
+Value* gen_list(std::list<hydra_restart*> lst) {
   if (lst.empty()) {
-    return hydra_nil::get();
+    return nil::get();
   } else {
     hydra_restart* r = lst.front();
     lst.pop_front();
-    return new hydra_cons(r, gen_list(lst));
+    return new Cons(r, gen_list(lst));
   }
 }
-hydra_object *op_get_restarts::call(hydra_object *alist, runtime &r,
-                                    lexical_scope &s) {
+
+Value *op_get_restarts(Operator *op, Value *alist, LocalRuntime &r,
+                       LexicalScope &s) {
   return gen_list(r.restarts);
 }
 
+Operator* op::get_restarts =
+  new InbuiltOperator("Returns the list (stack) of all active restarts!",
+                      op_get_restarts,
+                      type::Fn::with_args({}),
+                      true);
 
 // SIGNALLING CONDITIONS
-op_signal_condition::op_signal_condition() {
-  is_fn = true;
-  docstring = new hydra_string("signals an object as an exception");
-  type->arg_list.push_front(new type_nil);
-}
-
-
-hydra_object* op_signal_condition::call(hydra_object* alist, runtime &r, lexical_scope& s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
+Value* op_signal_condition(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
   while (!r.handlers.empty()) {
     try {
       return r.handlers.front()->handle(arg_list.front());
@@ -164,3 +154,10 @@ hydra_object* op_signal_condition::call(hydra_object* alist, runtime &r, lexical
   ex->obj = arg_list.front();
   throw ex;
 }
+
+
+Operator* op::signal_condition =
+  new InbuiltOperator("signals an object as an exception",
+                      op_signal_condition,
+                      type::Fn::with_args({new type::Nil}),
+                      true);

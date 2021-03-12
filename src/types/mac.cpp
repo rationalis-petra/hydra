@@ -1,3 +1,4 @@
+
 #include <string>
 #include <iostream>
 
@@ -8,10 +9,10 @@ using std::string;
 using std::list;
 
 using expr::Value;
-using type::Fn;
+using type::Mac;
 using type::Type;
 
-void Fn::mark_node() {
+void Mac::mark_node() {
   if (marked) return;
   marked = true;
   for (Type* t : arg_list) {
@@ -31,12 +32,8 @@ void Fn::mark_node() {
   }
 }
 
-Fn::Fn() {
-  rest_type = nullptr;
-  return_type = new type::Nil;
-}
 
-std::string Fn::to_string() const {
+std::string Mac::to_string() const {
   //return string("{type (") + ") -> " + return_type->to_string() + "}";
   string str = "fn (";
   bool once = false;
@@ -52,14 +49,15 @@ std::string Fn::to_string() const {
   return str;
 }
 
-Value *Fn::check_type(Value *obj) {
+Value *Mac::check_type(Value *obj) {
+  // TODO: fix me!!
   if (dynamic_cast<expr::Operator*>(obj)) {
     return expr::t::get();
   }
   return expr::nil::get();
 }
 
-Value *Fn::check_args(list<Value*> alist) {
+Value *Mac::check_args(list<Value*> alist) {
   for (auto type : arg_list) {
     if (alist.empty()) {
       string err = "Too few arguments to function";
@@ -98,42 +96,12 @@ Value *Fn::check_args(list<Value*> alist) {
 }
 
 
-Type *Fn::constructor(list<Value*> lst) {
+Type *Mac::constructor(list<Value*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {
-    string err = "type_fn::constructor unimplemented";
+    string err = "type_mac::constructor unimplemented";
     throw err;
   }
 }
 
-Fn *Fn::with_all(std::vector<Type *> args, Type *rest, Type *ret) {
-  Fn* tfn = new Fn;
-  tfn->arg_list = args;
-  tfn->rest_type = rest;
-  tfn->return_type = ret;
-  return tfn; 
-}
-
-Fn *Fn::with_args(std::vector<Type *> args) {
-  Fn* tfn = new Fn;
-  tfn->arg_list = args;
-  tfn->rest_type = nullptr;
-  return tfn; 
-}
-
-Fn *Fn::with_rest(Type *tp) {
-  Fn* tfn = new Fn;
-  tfn->rest_type = tp;
-  return tfn;
-}
-
-Fn *Fn::with_args_optional(std::vector<Type *> args, std::vector<Type *> opts) {
-  Fn* tfn = new Fn;
-  tfn->arg_list = args;
-  tfn->optional_list = opts;
-  tfn->rest_type = nullptr;
-  return tfn;
-}
-
-  

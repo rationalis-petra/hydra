@@ -1,35 +1,36 @@
+#include <iostream>
 #include <istream>
 #include <sstream>
 #include <string>
-#include <iostream>
 
 #include "expressions.hpp"
 #include "operations.hpp"
 
+using std::invalid_argument;
 using std::list;
 using std::string;
-using std::invalid_argument;
 using std::stringstream;
 
-hydra_object *read(hydra_object *raw, runtime &r);
+using namespace expr;
 
-hydra_object *to_value(string token, runtime & r) {
+Value *read(Value *raw, LocalRuntime &r);
+
+Value *to_value(string token, LocalRuntime &r) {
   // boolean literals
   if (token == "nil")
-    return hydra_nil::get();
+    return nil::get();
   if (token == "t")
-    return hydra_t::get();
+    return t::get();
 
   // character literal
   if (token[0] == '#') {
-    hydra_char* ch = new hydra_char;
+    Char *ch = new Char;
     if (token.size() == 2) {
       ch->value = token[1];
     } else {
       if (token == "#newline") {
         ch->value = '\n';
-      }
-      else {
+      } else {
         string err = "non-regognized character: " + token;
         throw err;
       }
@@ -38,10 +39,10 @@ hydra_object *to_value(string token, runtime & r) {
   }
   try {
     int num = stoi(token);
-    return new hydra_num(num);
+    return new Integer(num);
   } catch (invalid_argument &) {
   }
-  //it is a symbol, first split based on ':'
+  // it is a symbol, first split based on ':'
   list<string> path;
   string current = "";
   for (char c : token) {
@@ -59,37 +60,37 @@ hydra_object *to_value(string token, runtime & r) {
     path.pop_front();
     // if path is empty, we get the root object itself!
     if (path.empty()) {
-      return r.root;
+      return r.r.root;
     }
-    hydra_object* obj = r.root->intern(path);
+    Value *obj = r.r.root->intern(path);
     return obj;
     // ':' at beginning is implicit ketword package
   } else if (path.front() == "") {
     path.pop_front();
     path.push_front("keyword");
-    hydra_symbol* sym = r.root->intern(path);
+    Symbol *sym = r.r.root->intern(path);
     sym->value = sym;
     return sym;
     // keyword
   } else {
-    hydra_object *obj = r.active_module->intern(path);
+    Value *obj = r.active_module->intern(path);
     return obj;
   }
 }
 
-hydra_object *to_cons(list<hydra_object *> list) {
+Value *to_cons(list<Value *> list) {
   if (list.empty()) {
-    return hydra_nil::get();
+    return nil::get();
   } else {
-    hydra_object* car = list.front();
+    Value *car = list.front();
     list.pop_front();
-    return new hydra_cons(car, to_cons(list));
+    return new Cons(car, to_cons(list));
   }
 }
 
-hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
+Value *mac_lparen(Istream *is, char c, LocalRuntime &r) {
   // continue to add tokens to list until we hit a ')'
-  list<hydra_object *> list;
+  list<Value *> list;
 
   while (!is->stream->eof()) {
     c = is->stream->peek();
@@ -105,8 +106,7 @@ hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
       is->stream->read(&c, 1);
       return to_cons(list);
       break;
-    }
-      break;
+    } break;
     default:
       list.push_back(read(is, r));
       break;
@@ -115,10 +115,7 @@ hydra_object *mac_lparen(hydra_istream *is, char c, runtime &r) {
   throw "( or [with no matching ) or ]!";
 }
 
-
-
-
-hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
+Value *mac_token(Istream *is, char c, LocalRuntime &r) {
   string token = string("");
   bool cond = false;
   while (!is->stream->eof()) {
@@ -159,9 +156,9 @@ hydra_object *mac_token(hydra_istream *is, char c, runtime &r) {
   return to_value(token, r);
 }
 
-hydra_object *mac_string(hydra_istream* is, char c, runtime& r) {
+Value *mac_string(Istream *is, char c, LocalRuntime &r) {
   is->stream->read(&c, 1);
-  hydra_string *str = new hydra_string;
+  HString *str = new HString;
   while (!is->stream->eof()) {
     if (c == '"') {
       return str;
@@ -170,8 +167,7 @@ hydra_object *mac_string(hydra_istream* is, char c, runtime& r) {
       is->stream->read(&c, 1);
       str->value += c;
       is->stream->read(&c, 1);
-    }
-    else {
+    } else {
       str->value += c;
       is->stream->read(&c, 1);
     }
@@ -180,34 +176,34 @@ hydra_object *mac_string(hydra_istream* is, char c, runtime& r) {
   throw err;
 }
 
-hydra_object *read(hydra_object *raw, runtime &r) {
+Value *read(Value *raw, LocalRuntime &r) {
   // strings work too!
-  hydra_istream *is;
-  hydra_iostream *ios = nullptr;
-  if (hydra_string *str = dynamic_cast<hydra_string *>(raw)) {
-    is = new hydra_istream();
+  Istream *is;
+  IOstream *ios = nullptr;
+  if (HString *str = dynamic_cast<HString *>(raw)) {
+    is = new Istream();
     is->stream = new stringstream(str->value);
-  } else if (!(is = dynamic_cast<hydra_istream*>(raw)) &&
-             !(ios = dynamic_cast<hydra_iostream*>(raw))) {
+  } else if (!(is = dynamic_cast<Istream *>(raw)) &&
+             !(ios = dynamic_cast<IOstream *>(raw))) {
     string err = "Non-stream type provided to read!";
     throw err;
   }
   char c;
 
   if (ios) {
-    is = new hydra_istream;
+    is = new Istream;
     is->stream = ios->stream;
   }
   is->stream->read(&c, 1);
   while (!is->stream->eof()) {
 
-    if (r.readtable.find(c) != r.readtable.end()) {
-      hydra_cons *cns = new hydra_cons(new hydra_char(c), hydra_nil::get());
-      hydra_cons *cns2 = new hydra_cons(is, cns);
+    if (r.r.readtable.find(c) != r.r.readtable.end()) {
+      Cons *cns = new Cons(new Char(c), nil::get());
+      Cons *cns2 = new Cons(is, cns);
 
       // generate a blank 'dummy' scope
-      lexical_scope s;
-      return r.readtable[c]->call(cns2, r, s);
+      LexicalScope s;
+      return r.r.readtable[c]->call(cns2, r, s);
     }
     switch (c) {
       // whitespace characters
@@ -227,8 +223,7 @@ hydra_object *read(hydra_object *raw, runtime &r) {
     case ')': {
       string err = "error: ') or ]' with no matching '( or ['!";
       throw err;
-    }
-      break;
+    } break;
     case '"': {
       return mac_string(is, c, r);
     }
@@ -242,40 +237,35 @@ hydra_object *read(hydra_object *raw, runtime &r) {
   }
 
   // todo: more advanced read options!
-  return hydra_nil::get();
+  return nil::get();
 }
 
-op_read::op_read() {
-  is_fn = true;
-  docstring = new hydra_string("Takes a string or input stream, and returns a hydra expression.\n"
-                               "Programmable via set-macro-character");
-  type->arg_list.push_front(new type_nil);
-}
-hydra_object *op_read::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Value *op_read(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments provided to read";
     throw err;
   }
-  hydra_object* obj = read(arg_list.front(), r);
+  Value *obj = read(arg_list.front(), r);
   return obj;
 }
 
-op_set_mac_char::op_set_mac_char() {
-  is_fn = true;
-  docstring = new hydra_string("Updates the readtable entry for the character (first argument)\n"
-                               "to point to the provided function (second argumetn)");
-  type->arg_list.push_front(new type_fn);
-  type->arg_list.push_front(new type_nil);
-}
-hydra_object* op_set_mac_char::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Operator *op::read = new InbuiltOperator(
+    "Takes a string or input stream, and returns a hydra expression.\n"
+    "Programmable via set-macro-character",
+    //type (Union Input-stream String)
+    op_read, type::Fn::with_args({new type::Nil}), true);
+
+Value *op_set_mac_char(Operator *op, Value *alist, LocalRuntime &r,
+                       LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
-    string err = "Incorrect number of arguments provided to set-macro-character";
+    string err =
+        "Incorrect number of arguments provided to set-macro-character";
     throw err;
   }
-  hydra_char* character = dynamic_cast<hydra_char *>(arg_list.front());
-  hydra_oper* function = dynamic_cast<hydra_oper *>(arg_list.back());
+  Char *character = dynamic_cast<Char *>(arg_list.front());
+  Operator *function = dynamic_cast<Operator *>(arg_list.back());
   if (!character) {
     string err = "set-macro-character expects character as first argument";
     throw err;
@@ -284,6 +274,11 @@ hydra_object* op_set_mac_char::call(hydra_object *alist, runtime &r, lexical_sco
     string err = "set-macro-character expects function as second argument";
     throw err;
   }
-  r.readtable[character->value] = function;
+  r.r.readtable[character->value] = function;
   return function;
 }
+
+Operator *op::set_mac_char = new InbuiltOperator(
+    "Updates the readtable entry for the character (first argument)\n"
+    "to point to the provided function (second argumetn)",
+    op_set_mac_char, type::Fn::with_args({new type::Char, new type::Fn}), true);

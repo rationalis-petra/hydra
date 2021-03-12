@@ -3,21 +3,13 @@
 
 #include "expressions.hpp"
 
-struct op_eq : hydra_oper {
-  op_eq();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
-};
-struct op_and : hydra_oper {
-  op_and();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
-};
-struct op_or : hydra_oper {
-  op_or();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
-};
-struct op_not : hydra_oper {
-  op_not();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
-};
+namespace op {
+
+  extern expr::Operator* eq;
+  extern expr::Operator* do_and;
+  extern expr::Operator* do_or;
+  extern expr::Operator* do_not;
+
+} // namespace op
 
 #endif // __LOGIC_HPP

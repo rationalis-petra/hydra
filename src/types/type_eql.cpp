@@ -7,35 +7,46 @@
 using std::string;
 using std::list;
 
-type_eql::type_eql() {
-  object = nullptr;
+using type::Type;
+using type::Eql;
+using type::EqlConstructor;
+using expr::Value;
+
+Eql::Eql(Value* v) {
+  object = v;
 }
 
-void type_eql::mark_node() {
+void Eql::mark_node() {
   if (marked) return;
   marked = true;
   object->mark_node();
 }
 
-string type_eql::to_string() const {
+string Eql::to_string() const {
   return "{Eql " + object->to_string() + "}";
 }
 
-hydra_object *type_eql::check_type(hydra_object* obj) {
+Value *Eql::check_type(Value* obj) {
   if (obj == object) {
-    return hydra_t::get();
+    return expr::t::get();
   } else {
-    return hydra_nil::get();
+    return expr::nil::get();
   }
 }
 
-hydra_type *type_eql::constructor(list<hydra_object*> lst) {
-  type_eql* out = new type_eql;
+void EqlConstructor::mark_node() {
+  marked = true;
+}
+
+Type* EqlConstructor::constructor(list<Value*> lst) {
   if (lst.size() == 0) {
-    string err = "type_eql constructor needs value to be provided";
+    string err = "Eql constructor needs value to be provided";
     throw err;
   } else {
-    out->object = lst.front();
+    return new Eql(lst.front());
   }
-  return out;
+}
+
+string EqlConstructor::to_string() const {
+  return "Constructor for the Eql type";
 }

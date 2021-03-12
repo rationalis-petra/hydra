@@ -11,7 +11,9 @@
 
 //void fn_typecheck(hydra_type t, hydra_object* o);
 
-template <typename T> T *hydra_cast(hydra_object *inp) {
+namespace type {
+
+  template <typename T> T *hydra_cast(expr::Value *inp) {
   T *obj = dynamic_cast<T *>(inp);
   if (obj == nullptr) {
     std::string err = std::string("Failed typecast, expected ") + typeid(T).name() +
@@ -21,4 +23,5 @@ template <typename T> T *hydra_cast(hydra_object *inp) {
   return obj;
 }
 
+}
 #endif //__HYDRA_TYPES_HPP

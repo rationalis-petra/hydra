@@ -1,10 +1,10 @@
+#include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
-#include <variant>
-#include <fstream>
 #include <utility>
+#include <variant>
 
 #include "expressions.hpp"
 #include "operations.hpp"
@@ -12,72 +12,78 @@ using namespace std;
 
 extern string lang;
 
-hydra_module* language_module;
-vector<pair<string, hydra_object*>> inbuilts;
+using namespace expr;
+Module *expr::language_module;
 
-vector<pair<string, hydra_object*>> dev;
-vector<pair<string, hydra_object*>> core;
-vector<pair<string, hydra_object*>> foreign;
-vector<pair<string, hydra_object*>> io;
+using type::hydra_cast;
+
+vector<pair<string, Value *>> inbuilts;
+
+vector<pair<string, Value *>> dev;
+vector<pair<string, Value *>> core;
+vector<pair<string, Value *>> foreign;
+vector<pair<string, Value *>> io;
 // net
 // concurrent / parallel
 
+Runtime g;
+LocalRuntime r(g);
+
+Value *read(Istream *istm);
 void make_modules();
 
 int main(int argc, char **argv) {
   make_modules();
 
-  runtime r;
-  //hydra_object::r = &r;
+  // Value::r = &r;
 
-
-  r.root = new hydra_module("");
-  hydra_symbol* sym = r.root->intern("hydra");
+  g.root = new Module("");
+  Symbol *sym = g.root->intern("hydra");
   sym->value = language_module;
   r.active_module = language_module;
-  sym = r.root->intern("keyword");
-  sym->value = new hydra_module("keyword");
+  sym = g.root->intern("keyword");
+  sym->value = new Module("keyword");
   // arithmetic
 
-
-  hydra_module *mod = language_module;
+  Module *mod = language_module;
   for (auto p : inbuilts) {
-    hydra_symbol* sym = mod->intern(p.first);
+    Symbol *sym = mod->intern(p.first);
     sym->value = p.second;
   }
 
-  vector<pair<string, vector<pair<string, hydra_object *>>>> moddefs = {
+  vector<pair<string, vector<pair<string, Value *>>>> moddefs = {
       make_pair("core", core), make_pair("io", io),
       make_pair("foreign", foreign), make_pair("dev", dev)};
 
   for (auto m : moddefs) {
-    mod = hydra_cast<hydra_module>(
-        hydra_cast<hydra_symbol>(language_module->get(m.first))->value);
+    mod = hydra_cast<Module>(
+        hydra_cast<Symbol>(language_module->get(m.first))->value);
     for (auto p : m.second) {
-      hydra_symbol *sym = mod->intern(p.first);
+      Symbol *sym = mod->intern(p.first);
       mod->exported_symbols[p.first] = sym;
       sym->value = p.second;
     }
   }
 
-  hydra_istream *stm = new hydra_istream();
+  Istream *stm = new Istream();
   stm->stream = &cin;
-  sym = hydra_cast<hydra_module>(language_module->intern("io")->value)->intern("+cin+");
+  sym =
+      hydra_cast<Module>(language_module->intern("io")->value)->intern("+cin+");
   sym->value = stm;
 
   string in = lang;
-  hydra_istream *prog = new hydra_istream();
+  Istream *prog = new Istream();
   prog->stream = new stringstream(lang);
-  hydra_object *ast;
-  hydra_object *out;
+  Value *ast;
+  Value *out;
 
   // if argc > 1, assume they are file names
   int count = argc;
   while (count > 0) {
     try {
       while (!prog->stream->eof()) {
-        lexical_scope s;
-        ast = read(prog, r);
+        LexicalScope s;
+        ast = read(prog);
         out = ast->eval(r, s);
       }
     } catch (string e) {
@@ -88,21 +94,22 @@ int main(int argc, char **argv) {
     count--;
     if (count != 0) {
       delete prog->stream;
-      prog->stream = new stringstream("(eval (load \"" + string(argv[argc - count]) + "\"))");
+      prog->stream = new stringstream("(eval (load \"" +
+                                      string(argv[argc - count]) + "\"))");
     }
   }
 
   while (true) {
     try {
       cout << r.active_module->name << "> ";
-      lexical_scope s;
-      ast = read(stm, r);
-      hydra_object::roots.insert(ast);
+      LexicalScope s;
+      ast = read(stm);
+      Value::roots.insert(ast);
       out = ast->eval(r, s);
       cout << "* " << out << endl;
-      hydra_object::roots.remove(ast);
-      hydra_object::collect_garbage(r);
-    } catch (hydra_exception* e) {
+      Value::roots.remove(ast);
+      Value::collect_garbage(r);
+    } catch (hydra_exception *e) {
       cout << "Top-level exception thrown!" << endl;
       cout << "Value: " << e->obj << endl;
     } catch (string e) {
@@ -114,8 +121,8 @@ int main(int argc, char **argv) {
     getline(cin, in);
   }
 
-  cout << hydra_object::node_list.size() << endl;
-  for (hydra_object* obj : hydra_object::node_list) {
+  cout << Value::node_list.size() << endl;
+  for (Value *obj : Value::node_list) {
     cout << obj << endl;
     delete obj;
   }
@@ -123,152 +130,172 @@ int main(int argc, char **argv) {
 }
 
 void make_modules() {
-  language_module = new hydra_module("hydra");
-  inbuilts = {
-      // other modules
-      make_pair("core", new hydra_module("core")),
-      make_pair("io", new hydra_module("io")),
-      make_pair("foreign", new hydra_module("foreign")),
-      make_pair("concurrent", new hydra_module("concurrent")),
-      make_pair("dev", new hydra_module("dev"))
-  };
+  language_module = new Module("hydra");
+  inbuilts = {// other modules
+              make_pair("core", new Module("core")),
+              make_pair("io", new Module("io")),
+              make_pair("foreign", new Module("foreign")),
+              make_pair("concurrent", new Module("concurrent")),
+              make_pair("dev", new Module("dev"))};
 
-  dev = {
-    make_pair("doc", new op_describe),
-    make_pair("time", new op_time)
-  };
+  dev = {make_pair("doc", op::describe), make_pair("time", op::time)};
 
-  combined_fn* gn_elt = new combined_fn;
+  CombinedFn *gn_elt = new CombinedFn;
   gn_elt->is_fn = true;
-  gn_elt->type->rest_type = new type_nil;
-  gn_elt->add(new op_vec_elt);
-  gn_elt->add(new op_str_elt);
-  gn_elt->add(new op_tuple_elt);
+  gn_elt->type->rest_type = new type::Nil;
+  gn_elt->add(op::vec_elt);
+  gn_elt->add(op::str_elt);
+  gn_elt->add(op::tuple_elt);
 
-  
-  combined_fn* gn_len = new combined_fn;
+  CombinedFn *gn_len = new CombinedFn;
   gn_len->is_fn = true;
-  gn_len->type->rest_type = new type_nil;
-  gn_len->add(new op_vec_len);
-  //gn_elt->add(new op_str_elt);
+  gn_len->type->rest_type = new type::Nil;
+  gn_len->add(op::vec_len);
+  // gn_elt->add(op::str_elt);
 
-
-  combined_fn* gn_concat = new combined_fn;
+  CombinedFn *gn_concat = new CombinedFn;
   gn_concat->is_fn = true;
-  gn_concat->type->rest_type = new type_nil;
-  gn_concat->add(new op_str_cat);
-  gn_concat->add(new op_vec_cat);
+  gn_concat->type->rest_type = new type::Nil;
+  gn_concat->add(op::str_cat);
+  gn_concat->add(op::vec_cat);
 
-  combined_fn* gn_gr = new combined_fn;
+  CombinedFn *gn_gr = new CombinedFn;
   gn_gr->is_fn = true;
-  gn_gr->type->arg_list.push_front(new type_nil);
-  gn_gr->type->arg_list.push_front(new type_nil);
+  gn_gr->type->arg_list.push_back(new type::Nil);
+  gn_gr->type->arg_list.push_back(new type::Nil);
 
-  gn_gr->add(new op_int_gr);
-  gn_gr->add(new op_str_gr);
+  gn_gr->add(op::int_gr);
+  gn_gr->add(op::str_gr);
 
-  combined_fn* gn_get = new combined_fn;
+  CombinedFn *gn_get = new CombinedFn;
   gn_get->is_fn = true;
-  gn_get->type->arg_list.push_front(new type_nil);
-  gn_get->type->arg_list.push_front(new type_nil);
-  gn_get->add(new op_obj_get);
-  gn_get->add(new op_get);
+  gn_get->type->arg_list.push_back(new type::Nil);
+  gn_get->type->arg_list.push_back(new type::Nil);
+  gn_get->add(op::obj_get);
+  gn_get->add(op::get);
 
   core = {
 
-      // arithmetic
-      make_pair("+", new op_plus), make_pair("-", new op_minus),
-      make_pair("*", new op_multiply), make_pair("/", new op_divide),
-      make_pair(">", gn_gr),
-      // data
-      make_pair("object", new op_object), 
-      make_pair("tuple", new op_tuple),
-      make_pair("union", new op_union),
-      make_pair("vector", new op_vec),
-      make_pair("cons", new op_cons),
-      make_pair("car", new op_car),
-      make_pair("cdr", new op_cdr),
-      make_pair("elt", gn_elt),
-      make_pair("concat", gn_concat),
-      make_pair("len", gn_len),
+    // arithmetic
+    make_pair("+", op::plus),
+    make_pair("-", op::minus),
+    make_pair("*", op::multiply),
+    make_pair("/", op::divide),
+    make_pair(">", gn_gr),
+    // data
+    make_pair("object", op::mk_obj),
+    make_pair("tuple", op::mk_tuple),
+    make_pair("union", op::mk_union),
+    make_pair("vector", op::mk_vec),
+    make_pair("cons", op::mk_cons),
+    make_pair("car", op::car),
+    make_pair("cdr", op::cdr),
+    make_pair("elt", gn_elt),
+    make_pair("concat", gn_concat),
+    make_pair("len", gn_len),
 
-      make_pair("get", gn_get),
-      make_pair("derive", new op_derive),
+    make_pair("ref", op::ref),
+    //make_pair("var", op::var),
 
-      // streams
-      make_pair("peek", new op_peek), make_pair("put", new op_put),
-      make_pair("next", new op_next), make_pair("end?", new op_endp),
-      make_pair("eval", new op_eval), make_pair("read", new op_read),
-      make_pair("set-macro-character", new op_set_mac_char),
-      // logic
-      make_pair("=", new op_eq), make_pair("or", new op_or),
-      make_pair("and", new op_and), make_pair("not", new op_not),
+    make_pair("get", gn_get),
+    make_pair("derive", op::derive),
 
-      // symbols
+    // streams
+    make_pair("peek", op::peek),
+    make_pair("put", op::put),
+    make_pair("next", op::next),
+    make_pair("end?", op::endp),
+    make_pair("eval", op::eval),
+    make_pair("read", op::read),
+    make_pair("set-macro-character", op::set_mac_char),
+    // logic
+    make_pair("=", op::eq),
+    make_pair("or", op::do_or),
+    make_pair("and", op::do_and),
+    make_pair("not", op::do_not),
 
-      make_pair("defined?", new op_defined), make_pair("bind", new op_set),
-      make_pair("unset", new op_unset),
-      make_pair("lock", new op_lock), make_pair("unlock", new op_unlock),
+    // symbols
 
-      // language/control-flow
-      make_pair("if", new op_if), make_pair("while", new op_while),
-      make_pair("fn", new op_fn), make_pair("gen", new op_gen),
-      make_pair("mac", new op_mac), make_pair("quote", new op_quote),
-      make_pair("progn", new op_progn), make_pair("add-fn", new op_addfn),
-      make_pair("exit", new op_exit),
+    make_pair("defined?", op::definedp),
+    make_pair("bind", op::bind),
+    make_pair("unbind", op::unbind),
+    make_pair("lock", op::lock),
+    make_pair("unlock", op::unlock),
 
-      make_pair("module", new op_make_module),
-      make_pair("symbol", new op_make_symbol),
-      make_pair("in-module", new op_in_module),
-      make_pair("current-module", new op_get_module),
-      make_pair("get-symbols", new op_get_symbols),
-      make_pair("export", new op_export),
-      make_pair("insert", new op_insert),
-      make_pair("intern", new op_intern),
-      make_pair("remove", new op_remove),
+    // language/control-flow
+    make_pair("if", op::do_if),
+    make_pair("while", op::do_while),
+    make_pair("fn", op::fn),
+    make_pair("gen", op::genfn),
+    make_pair("mac", op::mac),
+    make_pair("quote", op::quote),
+    make_pair("progn", op::progn),
+    make_pair("add-fn", op::addfn),
+    make_pair("exit", op::exit),
 
-      // CONDiTIONS
-      make_pair("signal-condition", new op_signal_condition),
-      make_pair("handler-case", new op_handler_catch),
-      make_pair("handler-bind", new op_handler_bind),
-      make_pair("with-restart", new op_add_restart),
-      make_pair("get-restarts", new op_get_restarts),
+    make_pair("module", op::mk_module),
+    make_pair("symbol", op::mk_symbol),
+    make_pair("in-module", op::in_module),
+    make_pair("current-module", op::get_module),
+    make_pair("get-symbols", op::get_symbols),
+    make_pair("export", op::do_export),
+    make_pair("insert", op::insert),
+    make_pair("intern", op::intern),
+    make_pair("remove", op::remove),
 
-      // types
-      make_pair("Eql", new type_eql),
-      make_pair("Derives", new type_derives),
-      make_pair("Object", new type_object),
-      make_pair("Tuple", new type_tuple),
-      make_pair("Integer", new type_integer),
-      make_pair("Vector", new type_vector),
-      make_pair("Type", new type_type),
-      make_pair("String", new type_string),
-      make_pair("Module", new type_module),
-      make_pair("Nil", new type_nil),
-      make_pair("Symbol", new type_symbol),
-      make_pair("List", new type_list),
-      make_pair("IOStream", new type_iostream),
-      make_pair("IStream", new type_istream),
-      make_pair("OStream", new type_ostream),
-      // Mac
-      // Op
-      make_pair("Fn", new type_fn),
-      make_pair("Gen", new type_gen_fn),
+    // CONDiTIONS
+    make_pair("signal-condition", op::signal_condition),
+    make_pair("handler-case", op::handler_catch),
+    make_pair("handler-bind", op::handler_bind),
+    make_pair("with-restart", op::add_restart),
+    make_pair("get-restarts", op::get_restarts),
 
-      make_pair("type?", new op_typep),
-      make_pair("type", new op_type)
-      //make_pair("subtype", new op_subtype)
+    // types
+    make_pair("Eql", new type::EqlConstructor),
+    make_pair("Derives", new type::DerivesConstructor),
+    //make_pair("Object", new type::Object),
+    make_pair("Tuple", new type::Tuple),
+    make_pair("Integer", new type::Integer),
+    make_pair("Vector", new type::Vector),
+    make_pair("Type", new type::MetaType),
+    make_pair("String", new type::TString),
+    make_pair("Module", new type::Module),
+    make_pair("Nil", new type::Nil),
+    make_pair("Symbol", new type::Symbol),
+    make_pair("List", new type::List),
+    make_pair("IOStream", new type::IOStream),
+    make_pair("IStream", new type::Istream),
+    make_pair("OStream", new type::Ostream),
+    // Mac
+    // Op
+    make_pair("Fn", new type::Fn),
+    make_pair("Gen", new type::GenFn),
+
+    make_pair("type?", op::typep),
+    make_pair("type", op::mk_type)
+    // make_pair("subtype", op::subtype)
   };
 
-  foreign = {
-      // ffi
-      make_pair("load-c-library", new op_foreign_lib),
-      make_pair("get-c-symbol", new op_foreign_sym),
-      make_pair("internalize", new op_internalize)};
+  foreign = {// ffi
+             make_pair("load-c-library", op::foreign_lib),
+             make_pair("get-c-symbol", op::foreign_sym),
+             make_pair("internalize", op::internalize)};
 
-   io = {
-      // io
-      make_pair("print", new op_print),
-      make_pair("open-file", new op_open_file),
-      make_pair("close-file", new op_close)};
+  io = {// io
+        make_pair("print", op::print),
+        make_pair("open-file", op::open_file),
+        make_pair("close-file", op::close)};
+}
+
+Value *read(Istream *istm) {
+  // blank scope
+  LexicalScope scope;
+  Symbol *cores = language_module->intern("core");
+  Module *corem = hydra_cast<Module>(cores->eval(r, scope));
+
+  Symbol* s = corem->intern("read");
+  Value *v = s->eval(r, scope);
+  Operator *op = hydra_cast<Operator>(v);
+  Value* arg = new Cons(istm, nil::get());
+  return op->call(arg, r, scope);
 }

@@ -6,52 +6,55 @@
 #include <set>
 #include <map>
 
-struct runtime;
-struct lexical_scope;
-struct hydra_object;
+
+namespace expr {
+
+struct LocalRuntime;
+struct LexicalScope;
+struct Value;
 
 struct hydra_roots {
 public:
-  void remove(hydra_object* obj);
-  void insert(hydra_object* obj);
-  std::map<hydra_object*, unsigned long> data;
+  void remove(Value* obj);
+  void insert(Value* obj);
+  std::map<Value*, unsigned long> data;
 };
 
-struct hydra_object {
+struct Value {
   //std::string docstring;
 
   virtual bool null() const;
   virtual std::string to_string() const = 0;
-  virtual hydra_object* eval(runtime& r, lexical_scope& s);
-  hydra_object();
-  virtual ~hydra_object();
+  virtual Value* eval(LocalRuntime& r, LexicalScope& s);
+  Value();
+  virtual ~Value();
 
-  // mutability
-  bool mut;
 
   // mark & sweep garbage collection
   // local variables/functions
   bool marked;
   virtual void mark_node() = 0;
+  //virtual Value* copy() const = 0;
 
-  //static runtime *r;
   // how many objects exist?
   static unsigned long counter;
   // number of objects after most recent collection
   static unsigned long last;
   // The list of all hydra objects
-  static std::list<hydra_object*> node_list; 
+  static std::list<Value*> node_list; 
   // The list of root hydra objects - these are objects
   // which should not be deleted for reasons 'outside'
   static hydra_roots roots; 
 
   // the list of all lexical contexts
-  static std::list<lexical_scope*> context_list; 
+  static std::list<LexicalScope*> context_list; 
   // self-explanatory
-  static void collect_garbage(runtime& r);
+  static void collect_garbage(LocalRuntime& r);
 };
 
 
-std::ostream &operator<<(std::ostream &os, const hydra_object *obj);
+std::ostream &operator<<(std::ostream &os, const Value *obj);
 
-#endif // __HYDRA_OBJECT_HPP
+}
+
+#endif // __VALUE_HPP

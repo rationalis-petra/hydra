@@ -6,58 +6,58 @@
 #include "operations.hpp"
 
 using namespace std::chrono;
+using namespace expr;
+
 using std::list;
 using std::string;
 
-op_describe::op_describe() {
-  is_fn = true;
-  docstring = new hydra_string("describes the provided argument");
-  type->arg_list.push_front(new type_nil);
-};
 
+Value* op_describe(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
 
-hydra_object* op_describe::call(hydra_object* alist, runtime &r, lexical_scope& s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
-
-  if (user_oper* uop = dynamic_cast<user_oper*>(arg_list.front())) {
+  if (UserOperator* uop = dynamic_cast<UserOperator*>(arg_list.front())) {
     string str = "generic function:\n" + uop->docstring->value +
                  "\nlambda-list: " +
       "\ntype: " + uop->type->to_string();
       //str += "\n expression:\n";
       //str += "(fn " + uop->expr->to_string() + ")";
-    return new hydra_string(str);
-  } else if (combined_fn* generic = dynamic_cast<combined_fn*>(arg_list.front())) {
+    return new HString(str);
+  } else if (CombinedFn* generic = dynamic_cast<CombinedFn*>(arg_list.front())) {
     string str = "generic function:\n" + generic->docstring->value +
                  "\nlambda-list: " +
       "\ntype: " + generic->type->to_string();
-    return new hydra_string(str);
-  } if (hydra_oper* op = dynamic_cast<hydra_oper*>(arg_list.front())) {
+    return new HString(str);
+  } if (Operator* op = dynamic_cast<Operator*>(arg_list.front())) {
     string str = "function:\n" + op->docstring->value +
                  "\nlambda-list: " +
       "\ntype: " + op->type->to_string();
-    return new hydra_string(str);
+    return new HString(str);
   } else {
-    return new hydra_string("no documentation for this type");
+    return new HString("no documentation for this type");
   }
 }
 
+Operator* op::describe =
+  new InbuiltOperator("describes the provided argument",
+                      op_describe,
+                      type::Fn::with_args({new type::Nil}),
+                      true);
+
 // currently returns a string of time, not a time object... fix this!!!
-op_time::op_time() {
-  is_fn = true;
-  docstring = new hydra_string("evaluates the argument(s), and returns a time object");
-  type->arg_list.push_front(new type_nil);
-};
-
-
-
-hydra_object* op_time::call(hydra_object* alist, runtime &r, lexical_scope& s) {
-  list<hydra_object*> arg_list = get_arg_list(alist, r, s);
-  hydra_object* obj = arg_list.front();
+Value* op_time(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+  Value* obj = arg_list.front();
   steady_clock::time_point start = steady_clock::now();
   obj->eval(r, s);
   steady_clock::time_point end = steady_clock::now();
 
   duration<double> time = duration_cast<duration<double>>(end - start);
 
-  return new hydra_string(std::to_string(time.count()));
+  return new HString(std::to_string(time.count()));
 }
+
+Operator* op::time =
+  new InbuiltOperator("evaluates the argument(s), and returns a time object",
+                      op_time,
+                      type::Fn::with_args({new type::Nil}),
+                      true);

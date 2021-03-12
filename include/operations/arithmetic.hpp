@@ -3,25 +3,14 @@
 
 #include "expressions.hpp"
 
-struct op_plus : hydra_oper {
-  op_plus();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope& s);
-};
-struct op_minus : hydra_oper {
-  op_minus();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope& s);
-};
-struct op_multiply : hydra_oper {
-  op_multiply();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope& s);
-};
-struct op_divide : hydra_oper {
-  op_divide();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope& s);
-};
-struct op_int_gr : hydra_oper {
-  op_int_gr();
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope& s);
-};
+namespace op {
+
+  extern expr::Operator *plus;
+  extern expr::Operator *minus;
+  extern expr::Operator *multiply;
+  extern expr::Operator *divide;
+  extern expr::Operator *int_gr;
+
+} // namespace op
 
 #endif // __HYDRA_ARITHMETIC_HPP

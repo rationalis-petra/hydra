@@ -8,113 +8,107 @@ using std::list;
 using std::string;
 using std::to_string;
 
-op_plus::op_plus() {
-  is_fn = true;
-  docstring = new hydra_string("Returns the sum of its arguemnts. When "
-                               "provided with no arguments, returns 0");
-  type->rest_type = new type_integer;
-}
+using namespace expr;
+using type::hydra_cast;
 
-hydra_object *op_plus::call(hydra_object *alist, runtime &r, lexical_scope &s) {
+
+Value *op_plus(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   // we guarantee that this is a cons object
-  std::list<hydra_object *> arg_list = get_arg_list(alist, r, s);
-  hydra_num *out = new hydra_num(0);
+  std::list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  Integer *out = new Integer(0);
 
-  for (hydra_object *o : arg_list) {
-    hydra_num *num = hydra_cast<hydra_num>(o);
+  for (Value *o : arg_list) {
+    Integer *num = hydra_cast<Integer>(o);
     out->value += num->value;
   }
   return out;
 }
 
-op_minus::op_minus() {
-  is_fn = true;
-  docstring = new hydra_string(
-      "Subtract the second and all subsequent arguments from the first");
-  type->rest_type = new type_integer;
-}
-
-hydra_object *op_minus::call(hydra_object *alist, runtime &r,
-                             lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Value *op_minus(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '-' function";
   }
-  hydra_num *out = new hydra_num(0);
-  out->value = hydra_cast<hydra_num>(arg_list.front())->value;
+  Integer *out = new Integer(0);
+  out->value = hydra_cast<Integer>(arg_list.front())->value;
   arg_list.pop_front();
 
-  for (hydra_object *arg : arg_list) {
-    hydra_num *num = hydra_cast<hydra_num>(arg);
+  for (Value *arg : arg_list) {
+    Integer *num = hydra_cast<Integer>(arg);
     out->value -= num->value;
   }
   return out;
 }
 
-op_multiply::op_multiply() {
-  is_fn = true;
-  docstring = new hydra_string("Returns the product of all its arguments,\n or "
-                               "one if no arguments provided");
-  type->rest_type = new type_integer;
-}
-hydra_object *op_multiply::call(hydra_object *alist, runtime &r,
-                                lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
-  hydra_num *out = new hydra_num(1);
+Value *op_multiply(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  Integer *out = new Integer(1);
 
-  for (hydra_object *arg : arg_list) {
-    if (hydra_num *num = dynamic_cast<hydra_num *>(arg))
+  for (Value *arg : arg_list) {
+    if (Integer *num = dynamic_cast<Integer *>(arg))
       out->value *= num->value;
   }
   return out;
 }
 
-op_divide::op_divide() {
-  is_fn = true;
-  docstring = new hydra_string(
-      "Divides the first argument by the second and all subsequent arguments");
-  type->rest_type = new type_integer;
-}
-hydra_object *op_divide::call(hydra_object *alist, runtime &r,
-                              lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+
+Value *op_divide(Operator* op, Value *alist, LocalRuntime &r,
+                              LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '/' function";
   }
-  hydra_num *out = new hydra_num(0);
+  Integer *out = new Integer(0);
 
-  out->value = dynamic_cast<hydra_num *>(arg_list.front())->value;
+  out->value = dynamic_cast<Integer *>(arg_list.front())->value;
   arg_list.pop_front();
 
-  for (hydra_object *arg : arg_list) {
-    hydra_num *num = dynamic_cast<hydra_num *>(arg);
+  for (Value *arg : arg_list) {
+    Integer *num = dynamic_cast<Integer *>(arg);
     out->value /= num->value;
   }
   return out;
 }
 
-op_int_gr::op_int_gr() {
-  is_fn = true;
-  docstring = new hydra_string("Returns t iff the first argument is greater "
-                               "than the second, and nil otherwise");
-  type->arg_list.push_front(new type_integer);
-  type->arg_list.push_front(new type_integer);
-}
-hydra_object *op_int_gr::call(hydra_object *alist, runtime &r, lexical_scope &s) {
-  list<hydra_object *> arg_list = get_arg_list(alist, r, s);
+Value *op_int_gr(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Value *> arg_list = op->get_arg_list(alist, r, s);
   // we now ASSERT that arg_list is a list of length 2
   // does it contain integers?
 
-  hydra_num *a1 = dynamic_cast<hydra_num *>(arg_list.front());
+  Integer *a1 = dynamic_cast<Integer *>(arg_list.front());
   arg_list.pop_front();
-  hydra_num *a2 = dynamic_cast<hydra_num *>(arg_list.front());
+  Integer *a2 = dynamic_cast<Integer *>(arg_list.front());
   // so arg_list is a list containing integers!
   int arg1 = a1->value;
   int arg2 = a2->value;
 
   if (arg1 >= arg2) {
-    return hydra_t::get();
+    return t::get();
   } else {
-    return hydra_nil::get();
+    return nil::get();
   }
 }
+
+expr::Operator *op::plus =
+    new InbuiltOperator("Returns the sum of its arguemnts. When "
+                        "provided with no arguments, returns 0",
+                        op_plus, type::Fn::with_rest(new type::Integer), true);
+
+expr::Operator *op::minus =
+    new InbuiltOperator("Subtract the second and all subsequent"
+                        "arguments from the first",
+                        op_minus, type::Fn::with_rest(new type::Integer), true);
+
+expr::Operator *op::multiply =
+    new InbuiltOperator("Returns the product of all its arguments,\n or "
+                        "one if no arguments provided",
+                        op_multiply, type::Fn::with_rest(new type::Integer), true);
+
+expr::Operator *op::divide = new InbuiltOperator(
+    "Divides the first argument by the second and all subsequent arguments",
+    op_divide, type::Fn::with_rest(new type::Integer), true);
+
+expr::Operator *op::int_gr =
+    new InbuiltOperator("Returns t iff the first argument is greater "
+                        "than the second, and nil otherwise",
+                        op_int_gr, type::Fn::with_rest(new type::Integer), true);

@@ -4,58 +4,77 @@
 #include <map>
 #include <set>
 #include <string>
+#include <functional>
 
 #include "object.hpp"
 
-struct hydra_symbol;
-struct type_fn;
-struct hydra_string;
+namespace type {
+  struct Fn;
+}
 
-struct hydra_oper : public hydra_object {
+namespace expr {
+
+struct Symbol;
+struct Vector;
+struct HString;
+
+struct Operator : public Value {
+  Operator();
+
   virtual void mark_node();
-  hydra_oper();
   std::string to_string() const;
   bool is_fn;
 
-  type_fn* type;
-  hydra_string *docstring;
+  type::Fn* type;
+  HString *docstring;
 
-  virtual hydra_object *call(hydra_object *arg_list, runtime &r,
-                             lexical_scope &s) = 0;
+  virtual Value *call(Value *arg_list, LocalRuntime &r,
+                             LexicalScope &s) = 0;
 
-protected:
-  std::list<hydra_object *> get_arg_list(hydra_object *arg_list, runtime &r,
-                                         lexical_scope &s);
+  std::list<Value *> get_arg_list(Value *arg_list, LocalRuntime &r,
+                                         LexicalScope &s);
 };
 
-struct user_oper : public hydra_oper {
+struct UserOperator : public Operator {
   virtual void mark_node();
 
-  ~user_oper();
+  ~UserOperator();
   std::string to_string() const;
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
+  Value *call(Value *arg_list, LocalRuntime &r, LexicalScope &s);
 
-  hydra_symbol *rest; // for accepting variable arguments
-  hydra_symbol *self; // name of function within function's scope
-  std::list<hydra_symbol *> optionals;
-  std::map<hydra_symbol *, hydra_symbol*> keys;
+  Symbol *rest; // for accepting variable arguments
+  Symbol *self; // name of function within function's scope
+  std::list<Symbol *> optionals;
+  std::map<Symbol *, Symbol*> keys;
 
-  std::list<hydra_symbol *> arg_names;
-  hydra_object *expr;
+  std::list<Symbol *> arg_names;
+  Value *expr;
 
   // captured scope for closures
-  lexical_scope *scope;
-  user_oper(hydra_object *op_def, bool eval_args, runtime &r, lexical_scope &s);
+  LexicalScope *scope;
+  UserOperator(Value *op_def, bool eval_args, LocalRuntime &r, LexicalScope &s);
 };
 
-struct combined_fn : public hydra_oper {
+struct CombinedFn : public Operator {
   virtual void mark_node();
 
-  void add (hydra_oper* op);
+  void add (Operator* op);
   std::string to_string() const;
-  hydra_object *call(hydra_object *arg_list, runtime &r, lexical_scope &s);
+  Value *call(Value *arg_list, LocalRuntime &r, LexicalScope &s);
 
-  std::list<hydra_oper*> functions;
+  std::list<Operator*> functions;
 };
+
+struct InbuiltOperator : public Operator {
+  InbuiltOperator(std::string str,
+                  Value* (*call)(Operator *op, Value *arg_list, LocalRuntime &r,
+                              LexicalScope &s),
+                  type::Fn *t, bool is_fn);
+
+  Value *call(Value *arg_list, LocalRuntime &r, LexicalScope &s);
+  Value *(*fnc)(Operator *op, Value *arg_list, LocalRuntime &r, LexicalScope &s);
+};
+
+} // namespace expr
 
 #endif

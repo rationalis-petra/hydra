@@ -1,6 +1,7 @@
 
 add_library(types OBJECT cons.cpp
                          integer.cpp
+                         mac.cpp
                          object.cpp
                          list.cpp
                          derives.cpp

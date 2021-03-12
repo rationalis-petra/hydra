@@ -6,27 +6,21 @@
 using std::string;
 using std::list;
 
-void type_integer::mark_node() {
+using namespace type;
+
+void Integer::mark_node() {
   marked = true;
 }
 
-string type_integer::to_string() const {
+string Integer::to_string() const {
   return "Integer";
 }
 
-hydra_object *type_integer::check_type(hydra_object* obj) {
-  if (dynamic_cast<hydra_num*>(obj)) {
-    return hydra_t::get();
+expr::Value *Integer::check_type(expr::Value* obj) {
+  if (dynamic_cast<expr::Integer*>(obj)) {
+    return expr::t::get();
   } else {
-    return hydra_nil::get();
+    return expr::nil::get();
   }
 }
 
-hydra_type *type_integer::constructor(list<hydra_object*> lst) {
-  if (lst.size() == 0) {
-    return this;
-  } else {
-    string err = "Cannot provide argument to the Integer Type constructor";
-    throw err;
-  }
-}
