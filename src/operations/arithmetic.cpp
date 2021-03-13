@@ -6,39 +6,68 @@
 
 using std::list;
 using std::string;
-using std::to_string;
 
 using namespace expr;
 using type::hydra_cast;
 
 
 Value *op_plus(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  // we guarantee that this is a cons object
+  // ASSUME: all values in arg_list are rooted
   std::list<Value *> arg_list = op->get_arg_list(alist, r, s);
   Integer *out = new Integer(0);
 
   for (Value *o : arg_list) {
+    Value::roots.remove(o);
     Integer *num = hydra_cast<Integer>(o);
     out->value += num->value;
   }
   return out;
 }
+expr::Operator *op::plus =
+    new InbuiltOperator("Returns the sum of its arguemnts. When "
+                        "provided with no arguments, returns 0",
+                        op_plus, type::Fn::with_rest(new type::Integer), true);
+
+
+
+
+
+
+
+
 
 Value *op_minus(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   list<Value *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '-' function";
   }
+
+
   Integer *out = new Integer(0);
   out->value = hydra_cast<Integer>(arg_list.front())->value;
+  Value::roots.remove(arg_list.front());
+
   arg_list.pop_front();
 
   for (Value *arg : arg_list) {
     Integer *num = hydra_cast<Integer>(arg);
     out->value -= num->value;
+  Value::roots.remove(arg);
   }
   return out;
 }
+
+expr::Operator *op::minus =
+    new InbuiltOperator("Subtract the second and all subsequent"
+                        "arguments from the first",
+                        op_minus, type::Fn::with_rest(new type::Integer), true);
+
+
+
+
+
+
+
 
 Value *op_multiply(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   list<Value *> arg_list = op->get_arg_list(alist, r, s);
@@ -50,6 +79,20 @@ Value *op_multiply(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s)
   }
   return out;
 }
+
+expr::Operator *op::multiply =
+    new InbuiltOperator("Returns the product of all its arguments,\n or "
+                        "one if no arguments provided",
+                        op_multiply, type::Fn::with_rest(new type::Integer), true);
+
+
+
+
+
+
+
+
+
 
 
 Value *op_divide(Operator* op, Value *alist, LocalRuntime &r,
@@ -70,6 +113,21 @@ Value *op_divide(Operator* op, Value *alist, LocalRuntime &r,
   return out;
 }
 
+expr::Operator *op::divide = new InbuiltOperator(
+    "Divides the first argument by the second and all subsequent arguments",
+    op_divide, type::Fn::with_rest(new type::Integer), true);
+
+
+
+
+
+
+
+
+
+
+
+
 Value *op_int_gr(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   list<Value *> arg_list = op->get_arg_list(alist, r, s);
   // we now ASSERT that arg_list is a list of length 2
@@ -88,25 +146,6 @@ Value *op_int_gr(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
     return nil::get();
   }
 }
-
-expr::Operator *op::plus =
-    new InbuiltOperator("Returns the sum of its arguemnts. When "
-                        "provided with no arguments, returns 0",
-                        op_plus, type::Fn::with_rest(new type::Integer), true);
-
-expr::Operator *op::minus =
-    new InbuiltOperator("Subtract the second and all subsequent"
-                        "arguments from the first",
-                        op_minus, type::Fn::with_rest(new type::Integer), true);
-
-expr::Operator *op::multiply =
-    new InbuiltOperator("Returns the product of all its arguments,\n or "
-                        "one if no arguments provided",
-                        op_multiply, type::Fn::with_rest(new type::Integer), true);
-
-expr::Operator *op::divide = new InbuiltOperator(
-    "Divides the first argument by the second and all subsequent arguments",
-    op_divide, type::Fn::with_rest(new type::Integer), true);
 
 expr::Operator *op::int_gr =
     new InbuiltOperator("Returns t iff the first argument is greater "

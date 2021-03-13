@@ -20,14 +20,22 @@ Value *op_if(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   }
   // we now assume that arg_list is a list of length 3
 
+  for (Value* v : arg_list)
+    Value::roots.remove(v);
+
   Value *condition = arg_list.front()->eval(r, s);
+  Value::roots.insert(condition);
   arg_list.pop_front();
   // is nil?
   if (condition->null()) {
-    return arg_list.back()->eval(r, s);
+    Value* out =  arg_list.back()->eval(r, s);
+    Value::roots.remove(condition);
+    return out;
   }
   // otherwise
-  return arg_list.front()->eval(r, s);
+  Value* out = arg_list.front()->eval(r, s);
+  Value::roots.remove(condition);
+  return out;
 }
 
 Operator *op::do_if =
@@ -41,12 +49,7 @@ Operator *op::do_if =
 Value *op_while(Operator* op, Value *alist, LocalRuntime &r,
                              LexicalScope &s) {
   list<Value *> arg_list = op->get_arg_list(alist, r, s);
-  // assert that list length is 3
-  int len = arg_list.size();
-  if (len < 2) {
-    throw "arglist to while invalid size!";
-  }
-  // we now assume that arg_list is a list of length 3
+  // assert that list length is >2
 
   Value *condition = arg_list.front();
   arg_list.pop_front();
@@ -56,6 +59,9 @@ Value *op_while(Operator* op, Value *alist, LocalRuntime &r,
     for (Value *o : arg_list) {
       out = o->eval(r, s);
     }
+  }
+  for (Value* v : arg_list) {
+    Value::roots.remove(v);
   }
   // otherwise
   return out;

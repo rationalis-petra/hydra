@@ -1,40 +1,26 @@
-#include <iostream>
 #include "expressions.hpp"
 
 using std::string;
-using std::ostream;
-using std::list;
-
 using namespace expr;
 
-list<Value*> Value::node_list;
-list<LexicalScope*> Value::context_list;
-hydra_roots Value::roots; 
-Runtime Value::r; 
-
-unsigned long Value::counter = 0;
-//runtime *Value::r;
-
-Value::Value() {
-  node_list.push_front(this);
-  marked = false;
-  counter++;
-
-  // check for the number of 
+void Object::mark_node() {
+  marked = true;
+  for (auto kvp : object_vals) {
+    kvp.first->mark_node();
+    kvp.second->mark_node();
+  }
 }
 
-Value::~Value() {}
-
-bool Value::null() const {
-  return false;
+string Object::to_string() const {
+  string out = "{";
+  for (auto x : object_vals) {
+    out += "[";
+    out += x.first->to_string();
+    out += " ";
+    out += x.second->to_string();
+    out += "]\n";
+  }
+  out += "}";
+  return out;
 }
 
-// the default behaviour is to self-evaluate
-Value* Value::eval(LocalRuntime& r, LexicalScope& s) {
-  return this;
-}
-
-ostream &expr::operator<<(ostream &os, const Value *obj) {
-  os << obj->to_string();
-  return os;
-}

@@ -17,6 +17,7 @@ using std::string;
 using std::function;
 
 // UTILITY FUNCTION: local to this file
+// Convert a cons-list into a c++ list
 list<Value *> make_list(Value *obj) {
   list<Value *> lst;
   while (!obj->null()) {
@@ -68,6 +69,10 @@ void UserOperator::mark_node() {
 
 UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
                      LexicalScope &s) : Operator() {
+  // EVAL is called when evaluating
+  // therefore, we must add ourselves to the root list
+  // ASSUME op_def already there
+  Value::roots.insert(this);
   is_fn = _is_fn;
   rest = nullptr;
   self = nullptr;
@@ -111,6 +116,7 @@ UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
       type::Type* t_type;
       if (Cons* symdef = dynamic_cast<Cons*>(*it)) {
         name = hydra_cast<Symbol>(symdef->car);
+        // type
         t_type = hydra_cast<type::Type>(hydra_cast<Cons>(symdef->cdr)->car->eval(r, s));
       } else {
         name = hydra_cast<Symbol>(*it);
@@ -208,13 +214,17 @@ UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
     string err = "Non-cons provided to fn/mac";
     throw err;
   }
+
+  // see beginning of function
+  Value::roots.remove(this);
 }
 
 Value *UserOperator::call(Value *alist, LocalRuntime &r,
                               LexicalScope &s) {
-  // if this is a macro or function, argument evaluation (or lack thereof) is
-  // taken care of by get_arg_list
+  // ASSUME that this and the alist are rooted
+  // ASSUME all values in arg_list are rooted
   list<Value *> arg_list = get_arg_list(alist, r, s);
+
 
   // too few arguments OR too many arguments
   if ((arg_list.size() < arg_names.size()) ||
@@ -227,6 +237,8 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
   // so, all we need to to is perform lexical substitution!
   for (Symbol *s : arg_names) {
     scope->map[s] = arg_list.front();
+    // unroot values as we add them to a scope
+    Value::roots.remove(arg_list.front());
     arg_list.pop_front();
   }
   for (Symbol *s : optionals) {
@@ -234,6 +246,7 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
       scope->map[s] = nil::get();
     } else {
       scope->map[s] = arg_list.front();
+      Value::roots.remove(arg_list.front());
       arg_list.pop_front();
     }
   }
@@ -254,14 +267,18 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
           throw err;
         } else {
           scope->map[keys[sym]] = arg_list.front();
+          Value::roots.remove(arg_list.front());
           arg_list.pop_front();
         }
       } else {
         string err = "Invalid keyword provided";
         throw err;
       }
+      // we are done with sym, unroot it
+      Value::roots.remove(sym);
     }
   }
+
   if (rest) {
     // generate a list containing the rest of the arg_list
     // if list is empty, use nil!
@@ -274,6 +291,7 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
           return (Value *)nil::get();
         } else {
           Value *car = arg_list.front();
+          Value::roots.remove(arg_list.front());
           arg_list.pop_front();
           Value *cdr = gen_rest();
           return (Value *) new Cons(car, cdr);
@@ -291,7 +309,10 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
   if (is_fn) {
     out = expr->eval(r, *scope);
   } else {
-    out = expr->eval(r, *scope)->eval(r, s);
+    Value* intermediate = expr->eval(r, *scope);
+    Value::roots.insert(intermediate);
+    out = intermediate->eval(r, s);
+    Value::roots.remove(intermediate);
   }
 
   return out;

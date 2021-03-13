@@ -18,9 +18,13 @@ Value* op_handler_catch(Operator* op, Value* alist, LocalRuntime &r, LexicalScop
     // LocalRuntime.handlers.add (new catch_handler())
     r.handlers.push_front(new case_handler);
     Value* out = arg_list.front()->eval(r, s);
+    for (Value* v : arg_list) {
+      Value::roots.remove(v);
+    }
     r.handlers.pop_front();
     return out;
   }
+
   catch (hydra_exception* exc) {
     // is this for me?
     if (exc->type != CASE_THROW)
@@ -33,11 +37,17 @@ Value* op_handler_catch(Operator* op, Value* alist, LocalRuntime &r, LexicalScop
       Value* fst = dynamic_cast<Cons*>(o)->car;
       Value* ty = hydra_cast<Cons>(fst)->car;
       type::Type *t = dynamic_cast<type::Type*>(ty->eval(r, s));
+      Value::roots.insert(t);
 
       if (!t->check_type(exc->obj)->null()) {
         delete exc;
-        return dynamic_cast<Cons *>(dynamic_cast<Cons *>(o)->cdr)
+        Value* out =  dynamic_cast<Cons *>(dynamic_cast<Cons *>(o)->cdr)
             ->car->eval(r, s);
+        Value::roots.remove(t);
+        for (Value *v : arg_list) {
+          Value::roots.remove(v);
+        }
+        return out;
       }
     }
     throw exc;
@@ -56,14 +66,25 @@ Value* op_handler_bind(Operator* op, Value* alist, LocalRuntime &r, LexicalScope
   Value *code = arg_list.front();
   arg_list.pop_front();
   r.handlers.push_front(new bind_handler(arg_list, r, s));
+
+
   try {
+    // EXCEPTION THROWN HERRE
     Value *out = code->eval(r, s);
+
+
     r.handlers.pop_front();
+    for (Value *v : arg_list) {
+      Value::roots.remove(v);
+    }
     return out;
   } catch (hydra_exception* e) {
     // if the exception is a restart, then pop
     if (e->type == RESTART_CALL) {
       r.handlers.pop_front();
+    }
+    for (Value *v : arg_list) {
+      Value::roots.remove(v);
     }
     throw e;
   }

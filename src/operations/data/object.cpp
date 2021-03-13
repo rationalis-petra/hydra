@@ -27,20 +27,11 @@ Value* op_mk_object(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s
   list<Value*> arg_list = op->get_arg_list(alist, r, s);
   Object* obj = new Object;
 
-  int count = 0;
-  Symbol* key;
   for (Value* kvp : arg_list) {
-    if (count == 0) {
-      key = dynamic_cast<Symbol*>(kvp);
-      if (key == nullptr) {
-        string err = "key was nullptr in op_object";
-        throw err;
-      }
-      count++;
-    } else {
-      count--;
-      obj->object_vals[key] = kvp;
-    }
+    Tuple* tup = dynamic_cast<Tuple*>(kvp);
+    Symbol* slot = dynamic_cast<Symbol*>(tup->values[0]);
+    Value* value = dynamic_cast<Value*>(tup->values[1]);
+    obj->object_vals[slot] = value;
   }
 
   return obj;
@@ -48,7 +39,7 @@ Value* op_mk_object(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s
 
 Operator* op::mk_obj =
   new InbuiltOperator("Create a new object",
-                      op_mk_object, type::Fn::with_all({}, new type::Any, new type::Object), true);
+                      op_mk_object, type::Fn::with_all({}, new type::Tuple({new type::Symbol, new type::Any}), new type::Object), true);
 
 Value* op_obj_set(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
   list<Value*> arg_list = op->get_arg_list(alist, r, s);

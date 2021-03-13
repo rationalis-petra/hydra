@@ -2,6 +2,7 @@
 
 using namespace expr;
 
+// HANDLER BIND
 bind_handler::bind_handler(std::list<Value *> lst, LocalRuntime &run,
                            LexicalScope &sc)
     : r(run), s(sc) {
@@ -9,7 +10,6 @@ bind_handler::bind_handler(std::list<Value *> lst, LocalRuntime &run,
 }
 
 Value *bind_handler::handle(Value *condition) {
-
   for (Value *o : handling_code) {
     Value *fst = dynamic_cast<Cons *>(o)->car;
     Value *ty = type::hydra_cast<Cons>(fst)->car;
@@ -29,6 +29,9 @@ Value *case_handler::handle(Value *condition) {
   ex->obj = condition;
   throw ex;
 }
+
+
+// A RESTART
 
 hydra_restart::hydra_restart(Operator *o, Symbol *s) : op(o), sym(s) {}
 

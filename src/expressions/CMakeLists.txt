@@ -3,8 +3,8 @@ add_library(expressions OBJECT
                         runtime.cpp
                         lexical_scope.cpp
 
+                        value.cpp
                         object.cpp
-                        oobject.cpp
                         cons.cpp
                         oper.cpp
                         handler.cpp

@@ -58,6 +58,8 @@ struct List : public Type, public TypeConstructor {
 };
 
 struct Tuple : public Type, public TypeConstructor {
+  Tuple();
+  Tuple(std::vector<Type*> types);
   virtual void mark_node();
   std::string to_string() const;
   expr::Value* check_type(expr::Value* obj);

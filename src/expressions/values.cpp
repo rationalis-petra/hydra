@@ -56,6 +56,7 @@ void Vector::mark_node() {
     o->mark_node();
   }
 }
+
 string Vector::to_string() const {
   string out = "(vector ";
 
@@ -77,6 +78,7 @@ void Tuple::mark_node() {
     o->mark_node();
   }
 }
+
 string Tuple::to_string() const {
   string out = "[";
 

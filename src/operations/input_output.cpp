@@ -8,7 +8,6 @@
 #include "types.hpp"
 
 using std::cout;
-using std::endl;
 using std::list;
 using std::string;
 // streams
@@ -23,14 +22,14 @@ using namespace expr;
 
 Value *op_print(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   list<Value *> arg_list = op->get_arg_list(alist, r, s);
-  if (arg_list.size() != 1) {
-    throw "Invalid number of arguments to print: print takes 1 argument";
-  }
+
   if (HString *str = dynamic_cast<HString *>(arg_list.front())) {
     cout << str->value;
   } else {
     cout << arg_list.front()->to_string();
   }
+
+  Value::roots.remove(arg_list.front());
   return arg_list.front();
 }
 
@@ -43,6 +42,7 @@ Value *op_open_file(Operator *op, Value *alist, LocalRuntime &r,
                     LexicalScope &s) {
   list<Value *> arg_list = op->get_arg_list(alist, r, s);
   Value *filename = arg_list.front();
+  Value* out;
 
   Symbol *method;
   if (arg_list.size() == 2) {
@@ -52,17 +52,17 @@ Value *op_open_file(Operator *op, Value *alist, LocalRuntime &r,
   }
   if (HString *strfilename = dynamic_cast<HString *>(filename)) {
     if (method->name == "input") {
-      Istream *out = new Istream();
-      out->stream = new ifstream(strfilename->value);
-      return out;
+      Istream *outs = new Istream();
+      outs->stream = new ifstream(strfilename->value);
+      out = outs;
     } else if (method->name == "output") {
-      Ostream *out = new Ostream();
-      out->stream = new ofstream(strfilename->value);
-      return out;
+      Ostream *outs = new Ostream();
+      outs->stream = new ofstream(strfilename->value);
+      out = outs;
     } else if (method->name == "both") {
-      IOstream *out = new IOstream();
-      out->stream = new fstream(strfilename->value);
-      return out;
+      IOstream *outs = new IOstream();
+      outs->stream = new fstream(strfilename->value);
+      out = outs;
     } else {
       string err = "Invalid argument to open: " + method->name;
       throw err;
@@ -71,6 +71,10 @@ Value *op_open_file(Operator *op, Value *alist, LocalRuntime &r,
     string err = "Inavalid argument to open-file: " + filename->to_string();
     throw err;
   }
+  for (Value* v : arg_list) {
+    Value::roots.remove(v);
+  }
+  return out;
 }
 
 Operator *op::open_file = new InbuiltOperator(
@@ -95,6 +99,11 @@ Value *op_next(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 
   char ch;
   stream->get(ch);
+
+  for (Value* v : arg_list) {
+    Value::roots.remove(v);
+  }  
+
   return new Char(ch);
 }
 
@@ -116,6 +125,9 @@ Value *op_peek(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   } else {
     string err = "Non-istream argument provided to peek";
     throw err;
+  }
+  for (Value* v : arg_list) {
+    Value::roots.remove(v);
   }
 
   char ch = stream->peek();

@@ -30,7 +30,9 @@ void Operator::mark_node() {
 
 list<Value *> Operator::get_arg_list(Value *arg_list, LocalRuntime &r,
                                      LexicalScope &s) {
+  // ASSUME that arg_list is rooted
   Value *original_list = arg_list;
+
   list<Value *> out_list;
   while (!arg_list->null()) {
     Cons *list_elt = dynamic_cast<Cons *>(arg_list);
@@ -40,6 +42,11 @@ list<Value *> Operator::get_arg_list(Value *arg_list, LocalRuntime &r,
     } else {
       out_list.push_back(arg);
     }
+
+    // we just added a value to the arg_list: we need to root it
+    // This means that a value will be 'double-rooted' for macros,
+    // but better safe than sorry!
+    Value::roots.insert(out_list.back());
     arg_list = list_elt->cdr;
   }
   if (type->check_args(out_list)->null()) {
@@ -58,6 +65,7 @@ string CombinedFn::to_string() const { return "<generic function>"; }
 void CombinedFn::mark_node() {
   if (marked)
     return;
+
   marked = true;
   type->mark_node();
   docstring->mark_node();
@@ -80,11 +88,20 @@ void CombinedFn::add(Operator *fn) {
 }
 
 Value *CombinedFn::call(Value *alist, LocalRuntime &r, LexicalScope &s) {
+  // ASSUME that the function itself is marked
+
+  // All values in the arg_list are rooted by the get_arg_list function
   list<Value *> arg_list = get_arg_list(alist, r, s);
 
   for (Operator *fn : functions) {
     if (!fn->type->check_args(arg_list)->null()) {
-      return fn->call(alist, r, s);
+      Value* out =  fn->call(alist, r, s);
+
+      // we need to unroot values in the arg_list
+      for (Value* v : arg_list) {
+        Value::roots.remove(v);
+      }
+      return out;
     }
   }
   string err = "No matching function in combined function";
@@ -104,5 +121,7 @@ InbuiltOperator::InbuiltOperator(string _docstring,
 
 Value *InbuiltOperator::call(Value *arg_list, LocalRuntime &r,
                              LexicalScope &s) {
+  // ASSUME arg_list is rooted
+  // WE delegate rooting to inbuilt functions
   return fnc(this, arg_list, r, s);
 }

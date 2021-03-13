@@ -17,13 +17,15 @@ void Cons::mark_node() {
 Cons::Cons(Value *_car, Value *_cdr)
     : car(_car), cdr(_cdr) {
   roots.insert(this);
-  //collect_garbage();
+  collect_garbage();
   roots.remove(this);
 }
 
 Value *Cons::eval(LocalRuntime &r, LexicalScope &s) {
   Value *oper = car->eval(r, s);
+
   Value::roots.insert(oper);
+
   Operator *op;
   if ((op = dynamic_cast<Operator *>(oper))) {
     try {
@@ -37,6 +39,7 @@ Value *Cons::eval(LocalRuntime &r, LexicalScope &s) {
   } else {
     string excp = "Attempted to call " + oper->to_string() +
                   " which is not an operation!";
+    roots.remove(oper);
     throw excp;
   }
 }

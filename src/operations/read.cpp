@@ -78,6 +78,16 @@ Value *to_value(string token, LocalRuntime &r) {
   }
 }
 
+Value *to_cons(list<Value *> list) {
+  if (list.empty()) {
+    return nil::get();
+  } else {
+    Value *car = list.front();
+    list.pop_front();
+    return new Cons(car, to_cons(list));
+  }
+}
+
 Value *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
   // continue to add tokens to list until we hit a ')'
   list<Value *> list;
@@ -92,11 +102,7 @@ Value *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
       break;
     case ']': {
       is->stream->read(&c, 1);
-      Tuple* t = new Tuple;
-      for (Value* v : list) {
-        t->values.push_back(v);
-      }
-      return t;
+      return new Cons(op::mk_tuple, to_cons(list));
       break;
     } break;
     default:
@@ -107,15 +113,6 @@ Value *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
   throw "read error: [ with no matching ]!";
 }
 
-Value *to_cons(list<Value *> list) {
-  if (list.empty()) {
-    return nil::get();
-  } else {
-    Value *car = list.front();
-    list.pop_front();
-    return new Cons(car, to_cons(list));
-  }
-}
 Value *mac_lparen(Istream *is, char c, LocalRuntime &r) {
   // continue to add tokens to list until we hit a ')'
   list<Value *> list;
