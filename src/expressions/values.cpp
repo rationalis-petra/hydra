@@ -57,14 +57,14 @@ void Vector::mark_node() {
   }
 }
 string Vector::to_string() const {
-  string out = "[@v ";
+  string out = "(vector ";
 
   for (unsigned i = 0; i < array.size() ; i++) {
     out += array[i]->to_string();
     if (i != array.size() - 1)
       out += " ";
   }
-  out += "]";
+  out += ")";
   return out;
 }
 
@@ -78,7 +78,7 @@ void Tuple::mark_node() {
   }
 }
 string Tuple::to_string() const {
-  string out = "[@t ";
+  string out = "[";
 
   for (unsigned i = 0; i < values.size() ; i++) {
     out += values[i]->to_string();
@@ -98,11 +98,11 @@ void Union::mark_node() {
 }
 
 string Union::to_string() const {
-  string out = "[";
+  string out = "(Sum ";
   out += tag->to_string();
   out += " ";
   out += value->to_string();
-  out += "]";
+  out += ")";
   return out;
 }
 
@@ -206,5 +206,5 @@ void Ref::mark_node() {
 }
 
 string Ref::to_string() const{
-  return "[ref " + ptr->to_string() + "]";
+  return "(ref " + ptr->to_string() + ")";
 }

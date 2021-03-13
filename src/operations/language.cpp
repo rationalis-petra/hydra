@@ -84,9 +84,6 @@ Value *op_bind(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
     throw err;
     }
 
-    Value::roots.insert(symbol);
-    Value::collect_garbage(r);
-    Value::roots.remove(symbol);
     return value;
   } else {
     string err = "Error: provided non-symbol as first argument of set";
@@ -117,9 +114,6 @@ Value *op_unbind(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
     throw err;
   }
 
-  Value::roots.insert(symbol);
-  Value::collect_garbage(r);
-  Value::roots.remove(symbol);
   return symbol;
 }
 
@@ -167,9 +161,6 @@ Value *op_eval(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   // eval evaluates in a null lexical scope!
   LexicalScope new_scope;
   Value* value = arg_list.front()->eval(r, new_scope);
-  Value::roots.insert(value);
-  Value::collect_garbage(r);
-  Value::roots.remove(value);
   return value;
 }
 

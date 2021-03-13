@@ -7,12 +7,12 @@
 
 namespace type {
 
-// struct Type : public expr::Value {
-//   void mark_node();
-//   std::string to_string() const;
-//   virtual expr::Value *check_type(expr::Value *obj);
-//   Type *constructor(std::list<expr::Value *> lst);
-// };
+
+struct Object : public Type {
+  virtual void mark_node();
+  std::string to_string() const;
+  virtual expr::Value *check_type(expr::Value *obj);
+};
 
 struct Nil : public Type {
   virtual void mark_node();
@@ -49,7 +49,6 @@ struct IOStream : public Type {
   std::string to_string() const;
   expr::Value *check_type(expr::Value *obj);
 };
-
 struct Istream : public Type {
   virtual void mark_node();
   std::string to_string() const;

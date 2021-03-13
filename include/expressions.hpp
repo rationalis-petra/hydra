@@ -9,6 +9,7 @@
 #include "ltdl.h"
 
 
+#include "expressions/runtime.hpp"
 #include "expressions/operation.hpp"
 #include "expressions/oobject.hpp"
 #include "expressions/language.hpp"
@@ -22,29 +23,6 @@
 
 namespace expr {
 
-struct LocalRuntime;
-
-struct Runtime {
-  Module* root;
-  std::map<char, Operator*> readtable;
-  std::vector<LocalRuntime*> local_runtimes;
-};
-
-// A runtime containing thread-local variables
-struct LocalRuntime {
-  LocalRuntime(Runtime& r);
-  Runtime& r;
-  std::list<condition_handler*> handlers;
-  std::list<hydra_restart*> restarts;
-  Module* active_module;
-};
-
-// the lexical scope contians a mapping of symbols to their local values
-struct LexicalScope {
-  std::map<Symbol*, Value*> map;
-  LexicalScope();
-  ~LexicalScope();
-};
 
 extern Module* language_module;
 

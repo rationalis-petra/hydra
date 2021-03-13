@@ -4,14 +4,18 @@
 // the garbage collector for the language
 using namespace expr;
 
+using std::string;
 using std::list;
 
-using std::list;
-
-void mark(LocalRuntime& r) {
+void mark() {
   // mark all objects accessible from the root and active module
-  r.r.root->mark_node();
-  for (LocalRuntime* loc : r.r.local_runtimes) {
+  Value::r.root->mark_node();
+  if (Value::r.local_runtimes.size() > 1) {
+    string err = "Error in collect_garbage: using multiple threads when this is not yet supported!!";
+    throw err;
+  }
+
+  for (LocalRuntime* loc : Value::r.local_runtimes) {
     loc->active_module->mark_node();
     for (auto o : loc->restarts) {
       o->mark_node();
@@ -47,11 +51,11 @@ void sweep() {
   Value::node_list = new_list;
 }
 
-void Value::collect_garbage(LocalRuntime& r) {
+void Value::collect_garbage() {
   if (counter > 10000) {
     counter = 0;
 
-    mark(r);
+    mark();
     sweep();
   }
 }

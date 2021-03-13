@@ -48,8 +48,25 @@ Value* op_mk_object(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s
 
 Operator* op::mk_obj =
   new InbuiltOperator("Create a new object",
-                      op_mk_object, type::Fn::with_args({}), true);
+                      op_mk_object, type::Fn::with_all({}, new type::Nil, new type::Object), true);
 
+Value* op_obj_set(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+
+  Object* obj = dynamic_cast<Object*>(arg_list.front());
+  arg_list.pop_front();
+  Symbol* sym = dynamic_cast<Symbol*>(arg_list.front());
+  Value* newval = arg_list.back();
+
+  obj->object_vals[sym] = newval;
+  return newval;
+}
+
+Operator* op::obj_set =
+  new InbuiltOperator("Set a particular slot in an object to a vlue",
+                      op_obj_set,
+                      type::Fn::with_args({new type::Object, new type::Symbol, new type::Nil}),
+                      true);
 Value* op_derive(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
   list<Value*> arg_list = op->get_arg_list(alist, r, s);
   Object* obj = new Object;
@@ -64,4 +81,5 @@ Value* op_derive(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
 Operator* op::derive =
   new InbuiltOperator("Derives an object from the provided object",
                       op_derive, type::Fn::with_rest(new type::Nil), true);
+
 

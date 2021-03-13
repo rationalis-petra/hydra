@@ -3,12 +3,12 @@
 using namespace expr;
 
 bind_handler::bind_handler(std::list<Value *> lst, LocalRuntime &run,
-                           LexicalScope &sc) 
+                           LexicalScope &sc)
     : r(run), s(sc) {
   handling_code = lst;
 }
 
-Value* bind_handler::handle(Value* condition) {
+Value *bind_handler::handle(Value *condition) {
 
   for (Value *o : handling_code) {
     Value *fst = dynamic_cast<Cons *>(o)->car;
@@ -24,13 +24,13 @@ Value* bind_handler::handle(Value* condition) {
   throw false;
 }
 
-Value* case_handler::handle(Value* condition) {
-  hydra_exception* ex = new hydra_exception(CASE_THROW);
+Value *case_handler::handle(Value *condition) {
+  hydra_exception *ex = new hydra_exception(CASE_THROW);
   ex->obj = condition;
   throw ex;
 }
 
-hydra_restart::hydra_restart(Operator* o, Symbol *s) : op(o), sym(s) {}
+hydra_restart::hydra_restart(Operator *o, Symbol *s) : op(o), sym(s) {}
 
 void hydra_restart::mark_node() {
   marked = true;
@@ -38,10 +38,9 @@ void hydra_restart::mark_node() {
   sym->mark_node();
 }
 
-Value *hydra_restart::call(Value *arg_list, LocalRuntime &r,
-                                  LexicalScope &s) {
+Value *hydra_restart::call(Value *arg_list, LocalRuntime &r, LexicalScope &s) {
   // invokesn a restart
-  hydra_exception* e = new hydra_exception(RESTART_CALL);
+  hydra_exception *e = new hydra_exception(RESTART_CALL);
   e->res = this;
   e->args = arg_list;
   e->s = new LexicalScope(s);
@@ -49,4 +48,3 @@ Value *hydra_restart::call(Value *arg_list, LocalRuntime &r,
 }
 
 hydra_exception::hydra_exception(exception_type _type) : type(_type) {}
-

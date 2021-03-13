@@ -19,14 +19,14 @@ std::string lang = R"(
 (export (current-module) (quote def))
 (bind (quote def) 
   (mac (symbol val :rest body)
-    [list (quote bind) [list (quote quote) symbol]
+    (list (quote bind) (list (quote quote) symbol)
           (if body
               (if (and (defined? symbol) (type? Gen (eval symbol)))
-                  [list (quote add-fn) 
+                  (list (quote add-fn) 
                         symbol
-                        [cons (quote fn) [cons val body]]]
-                  [cons (quote fn) [cons val body]])
-              val)]))
+                        (cons (quote fn) (cons val body)))
+                  (cons (quote fn) (cons val body)))
+              val))))
 
 "The defn, i.e. define-function"
 (export (current-module) (quote defn))
@@ -233,7 +233,7 @@ std::string lang = R"(
           ((>= (len (car binding)) 3)
             (cons (cons 'fn 
                     ;; argument list
-                    (cons (concat [@l :self (car (car binding))]
+                    (cons (concat (@l :self (car (car binding)))
                                   (car (cdr (car binding))))
                           (cdr (cdr (car binding))))) ;; the body
                   (get-vals (cdr binding))))))
@@ -252,7 +252,7 @@ std::string lang = R"(
   (let ((quotify (fn (lst :self quotify)
         "Will quote all elements in a list"
           (when lst 
-            (cons [@l 'quote (car lst)]
+            (cons (@l 'quote (car lst))
                       (quotify (cdr lst)))))))
   (eval (cons fnc (quotify values)))))
 

@@ -26,7 +26,7 @@ vector<pair<string, Value *>> io;
 // net
 // concurrent / parallel
 
-Runtime g;
+Runtime& g = Value::r;
 LocalRuntime r(g);
 
 Value *read(Istream *istm);
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
       out = ast->eval(r, s);
       cout << "* " << out << endl;
       Value::roots.remove(ast);
-      Value::collect_garbage(r);
+      Value::collect_garbage();
     } catch (hydra_exception *e) {
       cout << "Top-level exception thrown!" << endl;
       cout << "Value: " << e->obj << endl;
@@ -197,6 +197,7 @@ void make_modules() {
     make_pair("ref", op::ref),
     //make_pair("var", op::var),
 
+    make_pair("set", op::obj_set),
     make_pair("get", gn_get),
     make_pair("derive", op::derive),
 

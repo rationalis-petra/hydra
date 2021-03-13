@@ -294,14 +294,6 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
     out = expr->eval(r, *scope)->eval(r, s);
   }
 
-  // here, gc error is rooted! (maybe)
-  // TODO: why does this cause deletion of items???
-  Value::roots.insert(out);
-  Value::roots.insert(this);
-  //Value::collect_garbage(r);
-  Value::roots.insert(this);
-  Value::roots.remove(out);
-
   return out;
 }
 

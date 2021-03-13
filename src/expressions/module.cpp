@@ -25,7 +25,7 @@ string Module::to_string() const {
   if (name == "") {
     return "<anonymous module>";
   } else {
-    return "[@m " + name + "]";
+    return "(module " + name + ")";
   }
 }
 

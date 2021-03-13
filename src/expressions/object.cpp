@@ -10,6 +10,7 @@ using namespace expr;
 list<Value*> Value::node_list;
 list<LexicalScope*> Value::context_list;
 hydra_roots Value::roots; 
+Runtime Value::r; 
 
 unsigned long Value::counter = 0;
 //runtime *Value::r;

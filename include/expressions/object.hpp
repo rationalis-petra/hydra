@@ -6,11 +6,10 @@
 #include <set>
 #include <map>
 
+#include "expressions/runtime.hpp"
 
 namespace expr {
 
-struct LocalRuntime;
-struct LexicalScope;
 struct Value;
 
 struct hydra_roots {
@@ -36,6 +35,11 @@ struct Value {
   virtual void mark_node() = 0;
   //virtual Value* copy() const = 0;
 
+  // self-explanatory
+  static void collect_garbage();
+
+  // A global Runtime
+  static Runtime r;
   // how many objects exist?
   static unsigned long counter;
   // number of objects after most recent collection
@@ -45,11 +49,8 @@ struct Value {
   // The list of root hydra objects - these are objects
   // which should not be deleted for reasons 'outside'
   static hydra_roots roots; 
-
   // the list of all lexical contexts
   static std::list<LexicalScope*> context_list; 
-  // self-explanatory
-  static void collect_garbage(LocalRuntime& r);
 };
 
 

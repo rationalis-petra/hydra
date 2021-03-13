@@ -78,6 +78,35 @@ Value *to_value(string token, LocalRuntime &r) {
   }
 }
 
+Value *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
+  // continue to add tokens to list until we hit a ')'
+  list<Value *> list;
+
+  while (!is->stream->eof()) {
+    c = is->stream->peek();
+    switch (c) {
+    case ' ':
+    case '\n':
+    case '\t':
+      is->stream->read(&c, 1);
+      break;
+    case ']': {
+      is->stream->read(&c, 1);
+      Tuple* t = new Tuple;
+      for (Value* v : list) {
+        t->values.push_back(v);
+      }
+      return t;
+      break;
+    } break;
+    default:
+      list.push_back(read(is, r));
+      break;
+    }
+  }
+  throw "read error: [ with no matching ]!";
+}
+
 Value *to_cons(list<Value *> list) {
   if (list.empty()) {
     return nil::get();
@@ -87,7 +116,6 @@ Value *to_cons(list<Value *> list) {
     return new Cons(car, to_cons(list));
   }
 }
-
 Value *mac_lparen(Istream *is, char c, LocalRuntime &r) {
   // continue to add tokens to list until we hit a ')'
   list<Value *> list;
@@ -101,7 +129,6 @@ Value *mac_lparen(Istream *is, char c, LocalRuntime &r) {
       is->stream->read(&c, 1);
       break;
     case '}':
-    case ']':
     case ')': {
       is->stream->read(&c, 1);
       return to_cons(list);
@@ -213,10 +240,11 @@ Value *read(Value *raw, LocalRuntime &r) {
       break;
 
     case '{':
-    case '[':
     case '(':
       return mac_lparen(is, c, r);
       break;
+    case '[':
+      return mac_lsquare(is, c, r);
 
     case '}':
     case ']':
