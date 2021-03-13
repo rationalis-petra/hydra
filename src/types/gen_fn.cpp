@@ -50,7 +50,7 @@ std::string GenFn::to_string() const {
   return str;
 }
 
-expr::Value *GenFn::check_type(expr::Value *obj) {
+expr::Object *GenFn::check_type(expr::Object *obj) {
   if (dynamic_cast<expr::CombinedFn*>(obj)) {
     return expr::t::get();
   }
@@ -58,7 +58,7 @@ expr::Value *GenFn::check_type(expr::Value *obj) {
 }
 
 
-Type *GenFn::constructor(list<expr::Value*> lst) {
+Type *GenFn::constructor(list<expr::Object*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {

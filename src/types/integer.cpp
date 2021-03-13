@@ -16,7 +16,7 @@ string Integer::to_string() const {
   return "Integer";
 }
 
-expr::Value *Integer::check_type(expr::Value* obj) {
+expr::Object *Integer::check_type(expr::Object* obj) {
   if (dynamic_cast<expr::Integer*>(obj)) {
     return expr::t::get();
   } else {

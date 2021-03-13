@@ -10,9 +10,9 @@ using std::list;
 using type::Type;
 using type::Eql;
 using type::EqlConstructor;
-using expr::Value;
+using expr::Object;
 
-Eql::Eql(Value* v) {
+Eql::Eql(Object* v) {
   object = v;
 }
 
@@ -26,7 +26,7 @@ string Eql::to_string() const {
   return "{Eql " + object->to_string() + "}";
 }
 
-Value *Eql::check_type(Value* obj) {
+Object *Eql::check_type(Object* obj) {
   if (obj == object) {
     return expr::t::get();
   } else {
@@ -38,7 +38,7 @@ void EqlConstructor::mark_node() {
   marked = true;
 }
 
-Type* EqlConstructor::constructor(list<Value*> lst) {
+Type* EqlConstructor::constructor(list<Object*> lst) {
   if (lst.size() == 0) {
     string err = "Eql constructor needs value to be provided";
     throw err;

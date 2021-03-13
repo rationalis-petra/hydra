@@ -17,7 +17,7 @@ string Char::to_string() const {
   return "Char";
 }
 
-expr::Value *Char::check_type(expr::Value* obj) {
+expr::Object *Char::check_type(expr::Object* obj) {
   if ((dynamic_cast<expr::Char*>(obj)) == nullptr) {
     return expr::nil::get();
   } else {

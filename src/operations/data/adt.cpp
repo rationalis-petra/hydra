@@ -10,19 +10,19 @@ using std::string;
 using namespace expr;
 
 
-Value *op_tuple(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
-  Value::collect_garbage();
+Object *op_tuple(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  Object::collect_garbage();
 
   Tuple *out = new Tuple();
-  for (Value *o : arg_list)
+  for (Object *o : arg_list)
     out->values.push_back(o);
   return out;
 }
 
 
-Value *op_tuple_elt(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_tuple_elt(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   Tuple *tup = dynamic_cast<Tuple*>(arg_list.front());
   Integer *idx = dynamic_cast<Integer*>(arg_list.back());
@@ -30,8 +30,8 @@ Value *op_tuple_elt(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s
   return tup->values[idx->value];
 }
 
-Value *op_union(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_union(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   Union *out = new Union;
   out->tag = dynamic_cast<Symbol*>(arg_list.front());

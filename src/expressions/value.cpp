@@ -7,15 +7,15 @@ using std::list;
 
 using namespace expr;
 
-list<Value*> Value::node_list;
-list<LexicalScope*> Value::context_list;
-hydra_roots Value::roots; 
-Runtime Value::r; 
+list<Object*> Object::node_list;
+list<LexicalScope*> Object::context_list;
+hydra_roots Object::roots; 
+Runtime Object::r; 
 
-unsigned long Value::counter = 0;
-//runtime *Value::r;
+unsigned long Object::counter = 0;
+//runtime *Object::r;
 
-Value::Value() {
+Object::Object() {
   node_list.push_front(this);
   marked = false;
   counter++;
@@ -23,18 +23,18 @@ Value::Value() {
   // check for the number of 
 }
 
-Value::~Value() {}
+Object::~Object() {}
 
-bool Value::null() const {
+bool Object::null() const {
   return false;
 }
 
 // the default behaviour is to self-evaluate
-Value* Value::eval(LocalRuntime& r, LexicalScope& s) {
+Object* Object::eval(LocalRuntime& r, LexicalScope& s) {
   return this;
 }
 
-ostream &expr::operator<<(ostream &os, const Value *obj) {
+ostream &expr::operator<<(ostream &os, const Object *obj) {
   os << obj->to_string();
   return os;
 }

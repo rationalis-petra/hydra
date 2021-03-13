@@ -18,7 +18,7 @@ string IOStream::to_string() const {
   return "IOStream";
 }
 
-expr::Value *IOStream::check_type(expr::Value* obj) {
+expr::Object *IOStream::check_type(expr::Object* obj) {
   if ((dynamic_cast<expr::IOstream*>(obj)) == nullptr) {
     return expr::nil::get();
   } else {
@@ -36,7 +36,7 @@ string Istream::to_string() const {
   return "IStream";
 }
 
-expr::Value *Istream::check_type(expr::Value* obj) {
+expr::Object *Istream::check_type(expr::Object* obj) {
   if ((dynamic_cast<expr::Istream*>(obj)) == nullptr &&
       (dynamic_cast<expr::IOstream*>(obj)) == nullptr) {
     return expr::nil::get();
@@ -55,7 +55,7 @@ string Ostream::to_string() const {
   return "OStream";
 }
 
-expr::Value *Ostream::check_type(expr::Value* obj) {
+expr::Object *Ostream::check_type(expr::Object* obj) {
   if ((dynamic_cast<expr::Ostream*>(obj)) == nullptr &&
       (dynamic_cast<expr::IOstream*>(obj)) == nullptr) {
     return expr::nil::get();

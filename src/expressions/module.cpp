@@ -30,7 +30,7 @@ string Module::to_string() const {
 }
 
 Symbol *Module::intern(string str) {
-  Value* out = get(str);
+  Object* out = get(str);
   if (out->null()) {
       Symbol *sym = new Symbol(str);
       symbols[str] = sym;
@@ -42,7 +42,7 @@ Symbol *Module::intern(string str) {
 
 Symbol *Module::intern(list<string> path) {
   string str = path.front();
-  Value* out = get(str);
+  Object* out = get(str);
   path.pop_front();
 
   if (out->null()) {
@@ -65,7 +65,7 @@ Symbol *Module::intern(list<string> path) {
   }
 }
 
-Value *Module::get(string str) {
+Object *Module::get(string str) {
   map<string, Symbol*>::iterator loc = symbols.find(str);
   if (loc == symbols.end()) {
     return nil::get();
@@ -74,7 +74,7 @@ Value *Module::get(string str) {
   }
 }
 
-Value *Module::get(list<string> path) {
+Object *Module::get(list<string> path) {
   map<string, Symbol*>::iterator loc = symbols.find(path.front());
   if (loc == symbols.end()) {
     return nil::get();

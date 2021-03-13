@@ -6,7 +6,7 @@
 
 using std::string;
 
-using expr::Value;
+using expr::Object;
 using type::Symbol;
 
 void Symbol::mark_node() {
@@ -17,7 +17,7 @@ string Symbol::to_string() const {
   return "Symbol";
 }
 
-Value *Symbol::check_type(Value* obj) {
+Object *Symbol::check_type(Object* obj) {
   if (dynamic_cast<expr::Symbol*>(obj)) {
     return expr::t::get();
   } else {

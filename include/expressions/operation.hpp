@@ -18,7 +18,7 @@ struct Symbol;
 struct Vector;
 struct HString;
 
-struct Operator : public Value {
+struct Operator : public Object {
   // FUNCTIONS
   Operator();
 
@@ -26,9 +26,9 @@ struct Operator : public Value {
   std::string to_string() const;
   bool is_fn;
 
-  virtual Value *call(Value *arg_list, LocalRuntime &r,
+  virtual Object *call(Object *arg_list, LocalRuntime &r,
                              LexicalScope &s) = 0;
-  std::list<Value *> get_arg_list(Value *arg_list, LocalRuntime &r,
+  std::list<Object *> get_arg_list(Object *arg_list, LocalRuntime &r,
                                          LexicalScope &s);
   // STATE
   type::Fn* type;
@@ -40,7 +40,7 @@ struct UserOperator : public Operator {
 
   ~UserOperator();
   std::string to_string() const;
-  Value *call(Value *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(Object *arg_list, LocalRuntime &r, LexicalScope &s);
 
   Symbol *rest; // for accepting variable arguments
   Symbol *self; // name of function within function's scope
@@ -48,11 +48,11 @@ struct UserOperator : public Operator {
   std::map<Symbol *, Symbol*> keys;
 
   std::list<Symbol *> arg_names;
-  Value *expr;
+  Object *expr;
 
   // captured scope for closures
   LexicalScope *scope;
-  UserOperator(Value *op_def, bool eval_args, LocalRuntime &r, LexicalScope &s);
+  UserOperator(Object *op_def, bool eval_args, LocalRuntime &r, LexicalScope &s);
 };
 
 struct CombinedFn : public Operator {
@@ -61,7 +61,7 @@ struct CombinedFn : public Operator {
 
   void add (Operator* op);
   std::string to_string() const;
-  Value *call(Value *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(Object *arg_list, LocalRuntime &r, LexicalScope &s);
 
   //STATE
   std::list<Operator*> functions;
@@ -70,14 +70,14 @@ struct CombinedFn : public Operator {
 struct InbuiltOperator : public Operator {
   // FUNCTIONS
   InbuiltOperator(std::string str,
-                  Value* (*call)(Operator *op, Value *arg_list, LocalRuntime &r,
+                  Object* (*call)(Operator *op, Object *arg_list, LocalRuntime &r,
                               LexicalScope &s),
                   type::Fn *t, bool is_fn);
 
-  Value *call(Value *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(Object *arg_list, LocalRuntime &r, LexicalScope &s);
 
   // STATE
-  Value *(*fnc)(Operator *op, Value *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *(*fnc)(Operator *op, Object *arg_list, LocalRuntime &r, LexicalScope &s);
 };
 
 } // namespace expr

@@ -8,7 +8,7 @@
 using std::string;
 using std::list;
 
-using expr::Value;
+using expr::Object;
 using type::Mac;
 using type::Type;
 
@@ -49,7 +49,7 @@ std::string Mac::to_string() const {
   return str;
 }
 
-Value *Mac::check_type(Value *obj) {
+Object *Mac::check_type(Object *obj) {
   // TODO: fix me!!
   if (dynamic_cast<expr::Operator*>(obj)) {
     return expr::t::get();
@@ -57,7 +57,7 @@ Value *Mac::check_type(Value *obj) {
   return expr::nil::get();
 }
 
-Value *Mac::check_args(list<Value*> alist) {
+Object *Mac::check_args(list<Object*> alist) {
   for (auto type : arg_list) {
     if (alist.empty()) {
       string err = "Too few arguments to function";
@@ -80,7 +80,7 @@ Value *Mac::check_args(list<Value*> alist) {
   }
 
   if (rest_type) {
-    for (Value* obj : alist) {
+    for (Object* obj : alist) {
       if (rest_type->check_type(obj)->null()) {
         return expr::nil::get();
       }
@@ -96,7 +96,7 @@ Value *Mac::check_args(list<Value*> alist) {
 }
 
 
-Type *Mac::constructor(list<Value*> lst) {
+Type *Mac::constructor(list<Object*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {

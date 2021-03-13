@@ -22,10 +22,10 @@ struct Fn : public Type {
   static Fn* with_all(std::vector<Type*> args, Type* rest, Type* ret);
 
   std::string to_string() const;
-  expr::Value* check_type(expr::Value* obj);
-  expr::Value* check_args(std::list<expr::Value*> alist);
+  expr::Object* check_type(expr::Object* obj);
+  expr::Object* check_args(std::list<expr::Object*> alist);
 
-  Type* constructor(std::list<expr::Value*> lst);
+  Type* constructor(std::list<expr::Object*> lst);
 
   Type* return_type;
   Type* rest_type;
@@ -39,9 +39,9 @@ struct Mac : public Fn {
   virtual void mark_node();
 
   std::string to_string() const;
-  expr::Value* check_type(expr::Value* obj);
-  expr::Value* check_args(std::list<expr::Value*> alist);
-  Type* constructor(std::list<expr::Value*> lst);
+  expr::Object* check_type(expr::Object* obj);
+  expr::Object* check_args(std::list<expr::Object*> alist);
+  Type* constructor(std::list<expr::Object*> lst);
 };
 
 struct GenFn : public Type {
@@ -49,8 +49,8 @@ struct GenFn : public Type {
 
   GenFn();
   std::string to_string() const;
-  expr::Value* check_type(expr::Value* obj);
-  Type* constructor(std::list<expr::Value*> lst);
+  expr::Object* check_type(expr::Object* obj);
+  Type* constructor(std::list<expr::Object*> lst);
 
   Type* return_type;
   Type* rest_type;

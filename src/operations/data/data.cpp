@@ -9,7 +9,7 @@ using std::string;
 using namespace expr;
 using type::hydra_cast;
 
-Value *make_list(list<Value *> objects) {
+Object *make_list(list<Object *> objects) {
   if (objects.size() == 1) {
     if (dynamic_cast<Cons *>(objects.front()) ||
         (objects.front() == nil::get())) {
@@ -19,20 +19,20 @@ Value *make_list(list<Value *> objects) {
       throw err;
     }
   } else {
-    Value *o = objects.front();
+    Object *o = objects.front();
     objects.pop_front();
     return new Cons(o, make_list(objects));
   }
 }
 
-Value *op_cons(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_cons(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   return make_list(arg_list);
 }
 
-Value *op_cdr(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_cdr(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     throw "invalid number of args to cdr";
   }
@@ -46,8 +46,8 @@ Value *op_cdr(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-Value *op_car(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_car(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     throw "invalid number of args to car";
   }

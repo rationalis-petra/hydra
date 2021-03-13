@@ -20,8 +20,8 @@ using std::ostream;
 
 using namespace expr;
 
-Value *op_print(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_print(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   if (HString *str = dynamic_cast<HString *>(arg_list.front())) {
     cout << str->value;
@@ -29,7 +29,7 @@ Value *op_print(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
     cout << arg_list.front()->to_string();
   }
 
-  Value::roots.remove(arg_list.front());
+  Object::roots.remove(arg_list.front());
   return arg_list.front();
 }
 
@@ -38,11 +38,11 @@ Operator *op::print = new InbuiltOperator(
     "the standard output stream",
     op_print, type::Fn::with_args({new type::Any}), true);
 
-Value *op_open_file(Operator *op, Value *alist, LocalRuntime &r,
+Object *op_open_file(Operator *op, Object *alist, LocalRuntime &r,
                     LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
-  Value *filename = arg_list.front();
-  Value* out;
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  Object *filename = arg_list.front();
+  Object* out;
 
   Symbol *method;
   if (arg_list.size() == 2) {
@@ -71,8 +71,8 @@ Value *op_open_file(Operator *op, Value *alist, LocalRuntime &r,
     string err = "Inavalid argument to open-file: " + filename->to_string();
     throw err;
   }
-  for (Value* v : arg_list) {
-    Value::roots.remove(v);
+  for (Object* v : arg_list) {
+    Object::roots.remove(v);
   }
   return out;
 }
@@ -84,8 +84,8 @@ Operator *op::open_file = new InbuiltOperator(
     type::Fn::with_args_optional({new type::TString}, {new type::Symbol}),
     true);
 
-Value *op_next(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_next(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   istream *stream;
   if (Istream *s = dynamic_cast<Istream *>(arg_list.front())) {
@@ -100,8 +100,8 @@ Value *op_next(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   char ch;
   stream->get(ch);
 
-  for (Value* v : arg_list) {
-    Value::roots.remove(v);
+  for (Object* v : arg_list) {
+    Object::roots.remove(v);
   }  
 
   return new Char(ch);
@@ -114,8 +114,8 @@ Operator *op::next = new InbuiltOperator(
     type::Fn::with_all({new type::Istream}, nullptr, new type::Istream),
     true);
 
-Value *op_peek(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_peek(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   istream *stream;
   if (Istream *s = dynamic_cast<Istream *>(arg_list.front())) {
@@ -126,8 +126,8 @@ Value *op_peek(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
     string err = "Non-istream argument provided to peek";
     throw err;
   }
-  for (Value* v : arg_list) {
-    Value::roots.remove(v);
+  for (Object* v : arg_list) {
+    Object::roots.remove(v);
   }
 
   char ch = stream->peek();
@@ -140,8 +140,8 @@ Operator *op::peek = new InbuiltOperator(
     op_peek, type::Fn::with_all({new type::Istream}, nullptr, new type::Char),
     true);
 
-Value *op_put(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_put(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   Ostream *stream = dynamic_cast<Ostream *>(arg_list.front());
   Char *c = dynamic_cast<Char *>(arg_list.back());
@@ -157,8 +157,8 @@ Operator *op::put = new InbuiltOperator(
     op_put, type::Fn::with_all({new type::Ostream}, nullptr, new type::Char),
     true);
 
-Value *op_endp(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_endp(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments provided to endp";
     throw err;
@@ -182,8 +182,8 @@ Operator *op::endp = new InbuiltOperator(
     "end of the file, and nil otherwise",
     op_endp, type::Fn::with_args({new type::Istream}), true);
 
-Value *op_close(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_close(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments provided to close";
     throw err;

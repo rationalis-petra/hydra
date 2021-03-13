@@ -13,9 +13,9 @@ using std::to_string;
 
 using namespace expr;
 
-Value *op_foreign_lib(Operator* op, Value *body, LocalRuntime &r,
+Object *op_foreign_lib(Operator* op, Object *body, LocalRuntime &r,
                                    LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(body, r, s);
+  list<Object *> arg_list = op->get_arg_list(body, r, s);
   if (arg_list.size() != 1) {
     string err =
         "Incorrect number of arguments provided to function load-foreign-lib";
@@ -48,8 +48,8 @@ Operator *op::foreign_lib =
                         type::Fn::with_args({new type::TString}),
                         true);
 
-Value *op_foreign_sym(Operator* op, Value *body, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(body, r, s);
+Object *op_foreign_sym(Operator* op, Object *body, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(body, r, s);
   if (arg_list.size() != 2) {
     string err =
         "Incorrect number of arguments provided to function get-foreign-symbol";
@@ -85,8 +85,8 @@ Operator* op::foreign_sym =
                       true);
 
 // define-foreign-function
-Value *op_internalize(Operator* op2, Value *body, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op2->get_arg_list(body, r, s);
+Object *op_internalize(Operator* op2, Object *body, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op2->get_arg_list(body, r, s);
   if (arg_list.size() != 2) {
     string err =
         "Expected 2 arguments when internalizing foreign symbol, got + " +
@@ -110,7 +110,7 @@ Value *op_internalize(Operator* op2, Value *body, LocalRuntime &r, LexicalScope 
   ForeignOperator *op = new ForeignOperator();
 
   op->fn_address = (void (*)(void))sym->address;
-  Value *arglst = dynamic_cast<Cons *>(type->cdr)->car;
+  Object *arglst = dynamic_cast<Cons *>(type->cdr)->car;
   while (!arglst->null()) {
     // type-check here
     Cons *cell = dynamic_cast<Cons *>(arglst);
@@ -155,7 +155,7 @@ Value *op_internalize(Operator* op2, Value *body, LocalRuntime &r, LexicalScope 
     i++;
   }
 
-  Value *return_type =
+  Object *return_type =
       dynamic_cast<Cons *>(dynamic_cast<Cons *>(type->cdr)->cdr)
           ->car;
   Symbol *return_sym = dynamic_cast<Symbol *>(return_type);
@@ -200,8 +200,8 @@ Operator *op::internalize =
                         type::Fn::with_args({new type::Any, new type::Any}),
                         true);
 
-Value *ForeignOperator::call(Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = get_arg_list(alist, r, s);
+Object *ForeignOperator::call(Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = get_arg_list(alist, r, s);
   if (arg_list.size() != arg_types.size()) {
     string err =
         "Error in foreign function call: arg list is not of expected size";
@@ -211,10 +211,10 @@ Value *ForeignOperator::call(Value *alist, LocalRuntime &r, LexicalScope &s) {
   void *mynull = nullptr;
   void **arg_values = new void *[arg_list.size()];
 
-  list<Value *>::iterator vals = arg_list.begin();
+  list<Object *>::iterator vals = arg_list.begin();
   list<foreign_type>::iterator types = arg_types.begin();
   for (unsigned i = 0; i < arg_list.size(); i++) {
-    Value *val = *vals;
+    Object *val = *vals;
     foreign_type type = *types;
 
     switch (type) {

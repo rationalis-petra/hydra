@@ -24,7 +24,7 @@ Symbol::Symbol(string _name) {
   mut = true;
 }
 
-Value* Symbol::eval(LocalRuntime& r, LexicalScope& s) {
+Object* Symbol::eval(LocalRuntime& r, LexicalScope& s) {
   // fist, check the lexical scope
 
   auto loc = s.map.find(this);

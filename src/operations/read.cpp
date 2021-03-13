@@ -13,9 +13,9 @@ using std::stringstream;
 
 using namespace expr;
 
-Value *read(Value *raw, LocalRuntime &r);
+Object *read(Object *raw, LocalRuntime &r);
 
-Value *to_value(string token, LocalRuntime &r) {
+Object *to_value(string token, LocalRuntime &r) {
   // boolean literals
   if (token == "nil")
     return nil::get();
@@ -62,7 +62,7 @@ Value *to_value(string token, LocalRuntime &r) {
     if (path.empty()) {
       return r.r.root;
     }
-    Value *obj = r.r.root->intern(path);
+    Object *obj = r.r.root->intern(path);
     return obj;
     // ':' at beginning is implicit ketword package
   } else if (path.front() == "") {
@@ -73,24 +73,24 @@ Value *to_value(string token, LocalRuntime &r) {
     return sym;
     // keyword
   } else {
-    Value *obj = r.active_module->intern(path);
+    Object *obj = r.active_module->intern(path);
     return obj;
   }
 }
 
-Value *to_cons(list<Value *> list) {
+Object *to_cons(list<Object *> list) {
   if (list.empty()) {
     return nil::get();
   } else {
-    Value *car = list.front();
+    Object *car = list.front();
     list.pop_front();
     return new Cons(car, to_cons(list));
   }
 }
 
-Value *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
+Object *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
   // continue to add tokens to list until we hit a ')'
-  list<Value *> list;
+  list<Object *> list;
 
   while (!is->stream->eof()) {
     c = is->stream->peek();
@@ -113,9 +113,9 @@ Value *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
   throw "read error: [ with no matching ]!";
 }
 
-Value *mac_lparen(Istream *is, char c, LocalRuntime &r) {
+Object *mac_lparen(Istream *is, char c, LocalRuntime &r) {
   // continue to add tokens to list until we hit a ')'
-  list<Value *> list;
+  list<Object *> list;
 
   while (!is->stream->eof()) {
     c = is->stream->peek();
@@ -139,7 +139,7 @@ Value *mac_lparen(Istream *is, char c, LocalRuntime &r) {
   throw "( or [with no matching ) or ]!";
 }
 
-Value *mac_token(Istream *is, char c, LocalRuntime &r) {
+Object *mac_token(Istream *is, char c, LocalRuntime &r) {
   string token = string("");
   bool cond = false;
   while (!is->stream->eof()) {
@@ -180,7 +180,7 @@ Value *mac_token(Istream *is, char c, LocalRuntime &r) {
   return to_value(token, r);
 }
 
-Value *mac_string(Istream *is, char c, LocalRuntime &r) {
+Object *mac_string(Istream *is, char c, LocalRuntime &r) {
   is->stream->read(&c, 1);
   HString *str = new HString;
   while (!is->stream->eof()) {
@@ -200,7 +200,7 @@ Value *mac_string(Istream *is, char c, LocalRuntime &r) {
   throw err;
 }
 
-Value *read(Value *raw, LocalRuntime &r) {
+Object *read(Object *raw, LocalRuntime &r) {
   // strings work too!
   Istream *is;
   IOstream *ios = nullptr;
@@ -265,13 +265,13 @@ Value *read(Value *raw, LocalRuntime &r) {
   return nil::get();
 }
 
-Value *op_read(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_read(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments provided to read";
     throw err;
   }
-  Value *obj = read(arg_list.front(), r);
+  Object *obj = read(arg_list.front(), r);
   return obj;
 }
 
@@ -281,9 +281,9 @@ Operator *op::read = new InbuiltOperator(
     //type (Union Input-stream String)
     op_read, type::Fn::with_args({new type::Any}), true);
 
-Value *op_set_mac_char(Operator *op, Value *alist, LocalRuntime &r,
+Object *op_set_mac_char(Operator *op, Object *alist, LocalRuntime &r,
                        LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err =
         "Incorrect number of arguments provided to set-macro-character";

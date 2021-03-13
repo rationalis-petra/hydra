@@ -7,7 +7,7 @@
 using std::string;
 using std::list;
 
-using expr::Value;
+using expr::Object;
 using type::Fn;
 using type::Type;
 
@@ -52,14 +52,14 @@ std::string Fn::to_string() const {
   return str;
 }
 
-Value *Fn::check_type(Value *obj) {
+Object *Fn::check_type(Object *obj) {
   if (dynamic_cast<expr::Operator*>(obj)) {
     return expr::t::get();
   }
   return expr::nil::get();
 }
 
-Value *Fn::check_args(list<Value*> alist) {
+Object *Fn::check_args(list<Object*> alist) {
   for (auto type : arg_list) {
     if (alist.empty()) {
       string err = "Too few arguments to function";
@@ -82,7 +82,7 @@ Value *Fn::check_args(list<Value*> alist) {
   }
 
   if (rest_type) {
-    for (Value* obj : alist) {
+    for (Object* obj : alist) {
       if (rest_type->check_type(obj)->null()) {
         return expr::nil::get();
       }
@@ -98,7 +98,7 @@ Value *Fn::check_args(list<Value*> alist) {
 }
 
 
-Type *Fn::constructor(list<Value*> lst) {
+Type *Fn::constructor(list<Object*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {

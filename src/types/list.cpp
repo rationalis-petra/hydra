@@ -17,7 +17,7 @@ string List::to_string() const {
   return "{List " + elt_type->to_string() + "}";
 }
 
-expr::Value *List::check_type(expr::Value* obj) {
+expr::Object *List::check_type(expr::Object* obj) {
   if ((dynamic_cast<expr::Cons*>(obj)) || obj->null()) {
     return expr::t::get();
   } else {
@@ -25,7 +25,7 @@ expr::Value *List::check_type(expr::Value* obj) {
   }
 }
 
-Type *List::constructor(list<expr::Value*> lst) {
+Type *List::constructor(list<expr::Object*> lst) {
   List* ret = new List();
 
   if (lst.size() == 0) {

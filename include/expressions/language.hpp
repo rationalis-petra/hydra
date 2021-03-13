@@ -13,7 +13,7 @@ struct Symbol;
 struct Vector;
 
 // modules are like packages or namepsaces in other languages
-struct Module : public Value {
+struct Module : public Object {
   virtual void mark_node();
 
   Module();
@@ -24,40 +24,40 @@ struct Module : public Value {
 
   std::string name;
 
-  Value *get(std::string str);
-  Value *get(std::list<std::string> str);
+  Object *get(std::string str);
+  Object *get(std::list<std::string> str);
   Symbol *intern(std::string str);
   Symbol *intern(std::list<std::string> str);
 };
 
-struct Symbol : public Value {
+struct Symbol : public Object {
   virtual void mark_node();
 
   // mutability
   bool mut;
-  Value *value;
+  Object *value;
   std::string name;
 
   // std::list<hydra_module*> modules;
 
   Symbol(std::string name);
   std::string to_string() const;
-  Value *eval(LocalRuntime &r, LexicalScope &s);
+  Object *eval(LocalRuntime &r, LexicalScope &s);
 };
 
-struct Pattern : public Value {
+struct Pattern : public Object {
   virtual void mark_node();
   std::string to_string() const;
 
-  Value* match(Value* o);
-  Value *eval(LocalRuntime &r, LexicalScope &s);
+  Object* match(Object* o);
+  Object *eval(LocalRuntime &r, LexicalScope &s);
 };
 
-struct Ref : public Value {
+struct Ref : public Object {
   std::string to_string() const;
   virtual void mark_node();
 
-  Value *ptr;
+  Object *ptr;
 };
 
 }

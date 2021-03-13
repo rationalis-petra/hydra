@@ -17,7 +17,7 @@ void Module::mark_node() {
   marked = true;
 }
 
-expr::Value *Module::check_type(expr::Value* obj) {
+expr::Object *Module::check_type(expr::Object* obj) {
   if (dynamic_cast<expr::Module*>(obj)) {
     return expr::t::get();
   } else {
