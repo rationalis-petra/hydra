@@ -19,7 +19,7 @@ Value *op_vec(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 
 Operator *op::mk_vec = new expr::InbuiltOperator(
     "Will return an array whose elements are the arg-list", op_vec,
-    type::Fn::with_rest(new type::Nil), true);
+    type::Fn::with_rest(new type::Any), true);
 
 Value *op_vec_cat(Operator *op, Value *alist, LocalRuntime &r,
                   LexicalScope &s) {
@@ -64,7 +64,7 @@ Operator *op::vec_elt = new InbuiltOperator(
     "Takes an array and an index, and returns the element at that index",
     op_vec_elt,
     type::Fn::with_all({new type::Vector, new type::Integer}, nullptr,
-                       new type::Nil),
+                       new type::Any),
     true);
 Value *op_vec_len(Operator *op, Value *alist, LocalRuntime &r,
                   LexicalScope &s) {

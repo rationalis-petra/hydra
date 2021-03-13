@@ -66,8 +66,8 @@ Operator* op::mk_cons =
                         "argument in the car,\n the second in the cdr."
                         "Will fail if the second is not cons or nil",
                         op_cons,
-                        type::Fn::with_all({new type::Nil, new type::Nil},
-                                           new type::Nil, new type::Cons),
+                        type::Fn::with_all({new type::Any, new type::Any},
+                                           new type::Any, new type::Cons),
                         true);
 
 Operator *op::cdr =

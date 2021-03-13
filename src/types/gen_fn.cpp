@@ -31,7 +31,7 @@ void GenFn::mark_node() {
 
 GenFn::GenFn() {
   rest_type = nullptr;
-  return_type = new Nil;
+  return_type = new Any;
 }
 
 std::string GenFn::to_string() const {

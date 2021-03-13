@@ -142,35 +142,35 @@ void make_modules() {
 
   CombinedFn *gn_elt = new CombinedFn;
   gn_elt->is_fn = true;
-  gn_elt->type->rest_type = new type::Nil;
+  gn_elt->type->rest_type = new type::Any;
   gn_elt->add(op::vec_elt);
   gn_elt->add(op::str_elt);
   gn_elt->add(op::tuple_elt);
 
   CombinedFn *gn_len = new CombinedFn;
   gn_len->is_fn = true;
-  gn_len->type->rest_type = new type::Nil;
+  gn_len->type->rest_type = new type::Any;
   gn_len->add(op::vec_len);
   // gn_elt->add(op::str_elt);
 
   CombinedFn *gn_concat = new CombinedFn;
   gn_concat->is_fn = true;
-  gn_concat->type->rest_type = new type::Nil;
+  gn_concat->type->rest_type = new type::Any;
   gn_concat->add(op::str_cat);
   gn_concat->add(op::vec_cat);
 
   CombinedFn *gn_gr = new CombinedFn;
   gn_gr->is_fn = true;
-  gn_gr->type->arg_list.push_back(new type::Nil);
-  gn_gr->type->arg_list.push_back(new type::Nil);
+  gn_gr->type->arg_list.push_back(new type::Any);
+  gn_gr->type->arg_list.push_back(new type::Any);
 
   gn_gr->add(op::int_gr);
   gn_gr->add(op::str_gr);
 
   CombinedFn *gn_get = new CombinedFn;
   gn_get->is_fn = true;
-  gn_get->type->arg_list.push_back(new type::Nil);
-  gn_get->type->arg_list.push_back(new type::Nil);
+  gn_get->type->arg_list.push_back(new type::Any);
+  gn_get->type->arg_list.push_back(new type::Any);
   gn_get->add(op::obj_get);
   gn_get->add(op::get);
 
@@ -261,6 +261,7 @@ void make_modules() {
     make_pair("Type", new type::MetaType),
     make_pair("String", new type::TString),
     make_pair("Module", new type::Module),
+    make_pair("Any", new type::Any),
     make_pair("Nil", new type::Nil),
     make_pair("Symbol", new type::Symbol),
     make_pair("List", new type::List),

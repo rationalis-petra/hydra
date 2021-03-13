@@ -21,7 +21,7 @@ Value *op_typep(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 Operator *op::typep = new InbuiltOperator(
     "Returns t if the first argument is the type defined by the\n"
     "second, otherwise returns nil",
-    op_typep, type::Fn::with_args({new type::MetaType, new type::Nil}), true);
+    op_typep, type::Fn::with_args({new type::MetaType, new type::Any}), true);
 
 Value *op_mk_type(Operator *op, Value *alist, LocalRuntime &r,
                   LexicalScope &s) {
@@ -35,7 +35,7 @@ Value *op_mk_type(Operator *op, Value *alist, LocalRuntime &r,
 
 Operator *op::mk_type = new InbuiltOperator(
     "Calls the constructor for a particular type", op_mk_type,
-    type::Fn::with_all({new type::MetaConstructor}, new type::Nil,
+    type::Fn::with_all({new type::MetaConstructor}, new type::Any,
                        new type::MetaType),
     true);
 

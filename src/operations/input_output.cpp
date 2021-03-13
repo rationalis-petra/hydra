@@ -37,7 +37,7 @@ Value *op_print(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 Operator *op::print = new InbuiltOperator(
     "Prints a string representation of the provided argument to\n"
     "the standard output stream",
-    op_print, type::Fn::with_args({new type::Nil}), true);
+    op_print, type::Fn::with_args({new type::Any}), true);
 
 Value *op_open_file(Operator *op, Value *alist, LocalRuntime &r,
                     LexicalScope &s) {

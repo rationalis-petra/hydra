@@ -1,0 +1,21 @@
+
+#include <string>
+
+#include "expressions.hpp"
+#include "types.hpp"
+
+using std::string;
+
+using namespace type;
+
+void Any::mark_node() {
+  marked = true;
+}
+
+string Any::to_string() const {
+  return "Any";
+}
+
+expr::Value *Any::check_type(expr::Value* obj) {
+  return expr::t::get();
+}

@@ -114,7 +114,7 @@ UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
         t_type = hydra_cast<type::Type>(hydra_cast<Cons>(symdef->cdr)->car->eval(r, s));
       } else {
         name = hydra_cast<Symbol>(*it);
-        t_type = new type::Nil;
+        t_type = new type::Any;
       }
       // :self keyword
       if (name == hydra_cast<Module>(r.r.root->intern("keyword")->value)
@@ -139,7 +139,7 @@ UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
           }
           else {
             rest = hydra_cast<Symbol>(*it);
-            type->rest_type = new type::Nil;
+            type->rest_type = new type::Any;
           }
         } else {
           string err = "No rest argument name provided!";

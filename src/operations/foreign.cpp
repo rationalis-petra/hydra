@@ -81,7 +81,7 @@ Operator* op::foreign_sym =
                       "will find the\n foreign symbol whose name"
                       "matches this string in the library",
                       op_foreign_sym,
-                      type::Fn::with_args({new type::TString, new type::Nil}),
+                      type::Fn::with_args({new type::TString, new type::Any}),
                       true);
 
 // define-foreign-function
@@ -197,7 +197,7 @@ Operator *op::internalize =
                         "and returns a hydra\n value that can be used"
                         "to access the symbol",
                         op_internalize,
-                        type::Fn::with_args({new type::Nil, new type::Nil}),
+                        type::Fn::with_args({new type::Any, new type::Any}),
                         true);
 
 Value *ForeignOperator::call(Value *alist, LocalRuntime &r, LexicalScope &s) {

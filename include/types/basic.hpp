@@ -20,6 +20,12 @@ struct Nil : public Type {
   virtual expr::Value *check_type(expr::Value *obj);
 };
 
+struct Any : public Type {
+  virtual void mark_node();
+  std::string to_string() const;
+  virtual expr::Value *check_type(expr::Value *obj);
+};
+
 struct Integer : public Type {
   virtual void mark_node();
   std::string to_string() const;

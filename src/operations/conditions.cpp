@@ -46,7 +46,7 @@ Value* op_handler_catch(Operator* op, Value* alist, LocalRuntime &r, LexicalScop
 
 Operator* op::handler_catch =
   new InbuiltOperator("Catches a thrown exepction",
-                      op_handler_catch, type::Fn::with_all({new type::Nil}, new type::Cons, new type::Nil),
+                      op_handler_catch, type::Fn::with_all({new type::Any}, new type::Cons, new type::Any),
                       false);
 
 Value* op_handler_bind(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
@@ -72,7 +72,7 @@ Value* op_handler_bind(Operator* op, Value* alist, LocalRuntime &r, LexicalScope
 Operator* op::handler_bind =
   new InbuiltOperator("Catches a thrown exepction",
                       op_handler_bind,
-                      type::Fn::with_all({new type::Nil}, new type::Cons, new type::Nil),false);
+                      type::Fn::with_all({new type::Any}, new type::Cons, new type::Any),false);
 
 // RESTARTS
 
@@ -112,7 +112,7 @@ Value* op_add_restart(Operator* op2, Value* alist, LocalRuntime &r, LexicalScope
 Operator* op::add_restart =
   new InbuiltOperator("signals an object as an exception",
                       op_add_restart,
-                      type::Fn::with_args({new type::Nil, new type::Nil, new type::Nil}),
+                      type::Fn::with_args({new type::Any, new type::Any, new type::Any}),
                       false);
 
 Value* gen_list(std::list<hydra_restart*> lst) {
@@ -159,5 +159,5 @@ Value* op_signal_condition(Operator* op, Value* alist, LocalRuntime &r, LexicalS
 Operator* op::signal_condition =
   new InbuiltOperator("signals an object as an exception",
                       op_signal_condition,
-                      type::Fn::with_args({new type::Nil}),
+                      type::Fn::with_args({new type::Any}),
                       true);

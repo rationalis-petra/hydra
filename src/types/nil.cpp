@@ -4,7 +4,6 @@
 #include "types.hpp"
 
 using std::string;
-using std::list;
 
 using namespace type;
 
@@ -17,5 +16,5 @@ string Nil::to_string() const {
 }
 
 expr::Value *Nil::check_type(expr::Value* obj) {
-  return expr::t::get();
+  return  obj->null() ? (Value*) expr::t::get() : (Value*) expr::nil::get();
 }

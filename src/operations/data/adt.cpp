@@ -39,7 +39,7 @@ Value *op_union(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 
 Operator *op::mk_tuple =
     new InbuiltOperator("Will return a tuple whose elements are the arg-list",
-                        op_tuple, type::Fn::with_rest(new type::Nil), true);
+                        op_tuple, type::Fn::with_rest(new type::Any), true);
 
 Operator *op::tuple_elt =
   new InbuiltOperator("Will return the nth element of a tuple",
@@ -47,4 +47,4 @@ Operator *op::tuple_elt =
 
 Operator *op::mk_union = new InbuiltOperator(
     "Will return a tagged value", op_union,
-    type::Fn::with_args({new type::Nil, new type::Symbol}), true);
+    type::Fn::with_args({new type::Any, new type::Symbol}), true);

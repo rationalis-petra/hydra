@@ -29,7 +29,7 @@ Type *List::constructor(list<expr::Value*> lst) {
   List* ret = new List();
 
   if (lst.size() == 0) {
-    ret->elt_type = new Nil;
+    ret->elt_type = new Any;
     return ret;
   } else if (lst.size() == 1) {
     if (Type* tp = dynamic_cast<Type*>(lst.front())) {

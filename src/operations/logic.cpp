@@ -60,7 +60,7 @@ Value *op_eq(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
 Operator* op::eq =
   new InbuiltOperator("Returns t if two values are equal, and nil otherwise",
                       op_eq,
-                      type::Fn::with_args({new type::Nil, new type::Nil}),
+                      type::Fn::with_args({new type::Any, new type::Any}),
                       true);
 
 Value *op_or(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
@@ -81,7 +81,7 @@ Value *op_or(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
 Operator* op::do_or =
   new InbuiltOperator("Returns the first non-nil argument, or nil if all arguments are nil",
                       op_or,
-                      type::Fn::with_rest(new type::Nil),
+                      type::Fn::with_rest(new type::Any),
                       false);
 
 Value *op_and(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
@@ -109,7 +109,7 @@ Value *op_and(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
 Operator* op::do_and = 
   new InbuiltOperator("Returns the first nil argument, or the last argument if all are non-nil",
                       op_and,
-                      type::Fn::with_rest(new type::Nil),
+                      type::Fn::with_rest(new type::Any),
                       false);
 
 
@@ -129,5 +129,5 @@ Value *op_not(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
 Operator* op::do_not =
   new InbuiltOperator("Returns t if argument is nil, and nil otherwise",
                       op_not,
-                      type::Fn::with_args({new type::Nil}),
+                      type::Fn::with_args({new type::Any}),
                       true);

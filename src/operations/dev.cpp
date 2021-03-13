@@ -40,7 +40,7 @@ Value* op_describe(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s)
 Operator* op::describe =
   new InbuiltOperator("describes the provided argument",
                       op_describe,
-                      type::Fn::with_args({new type::Nil}),
+                      type::Fn::with_args({new type::Any}),
                       true);
 
 // currently returns a string of time, not a time object... fix this!!!
@@ -59,5 +59,5 @@ Value* op_time(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
 Operator* op::time =
   new InbuiltOperator("evaluates the argument(s), and returns a time object",
                       op_time,
-                      type::Fn::with_args({new type::Nil}),
+                      type::Fn::with_args({new type::Any}),
                       true);

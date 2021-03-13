@@ -282,7 +282,7 @@ Operator *op::read = new InbuiltOperator(
     "Takes a string or input stream, and returns a hydra expression.\n"
     "Programmable via set-macro-character",
     //type (Union Input-stream String)
-    op_read, type::Fn::with_args({new type::Nil}), true);
+    op_read, type::Fn::with_args({new type::Any}), true);
 
 Value *op_set_mac_char(Operator *op, Value *alist, LocalRuntime &r,
                        LexicalScope &s) {

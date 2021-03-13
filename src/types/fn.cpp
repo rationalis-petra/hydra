@@ -33,7 +33,7 @@ void Fn::mark_node() {
 
 Fn::Fn() {
   rest_type = nullptr;
-  return_type = new type::Nil;
+  return_type = new type::Any;
 }
 
 std::string Fn::to_string() const {

@@ -35,7 +35,7 @@ Operator *op::do_if =
                       "If it is nil, then evaluate the second expression & return\n"
                       "Otherwise, evaluate the first expression.",
                       op_if,
-                      type::Fn::with_args({new type::Nil, new type::Nil, new type::Nil}),
+                      type::Fn::with_args({new type::Any, new type::Any, new type::Any}),
                       false);
 
 Value *op_while(Operator* op, Value *alist, LocalRuntime &r,
@@ -65,7 +65,7 @@ Operator* op::do_while =
   new InbuiltOperator("Evaluate the first expression. If it is nil, return\n"
                       "Otherwise, evaluate rest of the expression(s), and repeat",
                       op_while,
-                      type::Fn::with_rest(new type::Nil),
+                      type::Fn::with_rest(new type::Any),
                       false);
 
 Value *op_bind(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
@@ -95,7 +95,7 @@ Value *op_bind(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 Operator* op::bind =
   new InbuiltOperator("Sets the value symbol (first argument) to the second argument",
                       op_bind,
-                      type::Fn::with_args({new type::Symbol, new type::Nil}),
+                      type::Fn::with_args({new type::Symbol, new type::Any}),
                       true);
 
 Value *op_unbind(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
@@ -149,7 +149,7 @@ Value *op_quote(Operator* op, Value *alist, LocalRuntime &r,
 Operator* op::quote =
   new InbuiltOperator("Prevents evaluation of the argument it is provided",
                       op_quote,
-                      type::Fn::with_args({new type::Nil}),
+                      type::Fn::with_args({new type::Any}),
                       false);
 
 Value *op_eval(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
@@ -168,7 +168,7 @@ Value *op_eval(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 Operator* op::eval =
   new InbuiltOperator("Evaluates it's argument as if it was a hydra program",
                       op_eval,
-                      type::Fn::with_args({new type::Nil}),
+                      type::Fn::with_args({new type::Any}),
                       true);
 
 Value *op_progn(Operator* op, Value *alist, LocalRuntime &r,
@@ -187,14 +187,14 @@ Operator* op::progn =
   new InbuiltOperator("Evaluates its arguments in sequential order, returning the value\n"
                       "of the last one",
                       op_progn,
-                      type::Fn::with_rest(new type::Nil),
+                      type::Fn::with_rest(new type::Any),
                       false);
 
 
 Value *op_gen(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   list<Value*> arg_list = op->get_arg_list(alist, r, s);
   CombinedFn* out = new CombinedFn;
-  out->type->rest_type = new type::Nil;
+  out->type->rest_type = new type::Any;
   arg_list.pop_front();
   if (!arg_list.empty()) {
     if (HString* str = dynamic_cast<HString*>(arg_list.front())) {
@@ -207,7 +207,7 @@ Value *op_gen(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 Operator* op::genfn =
   new InbuiltOperator("Generates a new generic function object",
                       op_gen,
-                      type::Fn::with_all({new type::List}, new type::Nil, new type::GenFn),
+                      type::Fn::with_all({new type::List}, new type::Any, new type::GenFn),
                       false);
 
 Value *op_fn(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
@@ -217,7 +217,7 @@ Value *op_fn(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 Operator* op::fn =
   new InbuiltOperator("Generates a new function object",
                       op_fn,
-                      type::Fn::with_rest(new type::Nil),
+                      type::Fn::with_rest(new type::Any),
                       false);
 
 Value *op_mac(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
@@ -228,7 +228,7 @@ Value *op_mac(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 Operator* op::mac =
   new InbuiltOperator("Generates a new macro object",
                       op_mac,
-                      type::Fn::with_all({new type::Cons}, new type::Nil, new type::Mac),
+                      type::Fn::with_all({new type::Cons}, new type::Any, new type::Mac),
                       false);
 
 Value *op_addfn(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
@@ -275,7 +275,7 @@ Value *op_ref(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 Operator* op::ref  =
   new InbuiltOperator("Returns a reference to the provided value",
                       op_ref,
-                      type::Fn::with_args({new type::Nil}),
+                      type::Fn::with_args({new type::Any}),
                       true);
 
 // op_var::op_var() {
