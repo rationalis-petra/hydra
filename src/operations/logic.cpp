@@ -9,15 +9,15 @@ using std::string;
 using namespace expr;
 
 
-Value *op_eq(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_eq(Operator* op, Object* alist, LocalRuntime& r, LexicalScope &s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     string err = "Invalid number of arguments to macro =: expects 2";
     throw err;
   }
-  Value* arg1 = arg_list.front();
+  Object* arg1 = arg_list.front();
   arg_list.pop_front();
-  Value* arg2 = arg_list.front();
+  Object* arg2 = arg_list.front();
   if (Integer* num1 = dynamic_cast<Integer*>(arg1)) {
     if (Integer* num2 = dynamic_cast<Integer*>(arg2)) {
       if (num1->value == num2->value)
@@ -63,15 +63,15 @@ Operator* op::eq =
                       type::Fn::with_args({new type::Any, new type::Any}),
                       true);
 
-Value *op_or(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_or(Operator* op, Object* alist, LocalRuntime& r, LexicalScope &s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     string err = "Invalid number of arguments to macro or";
     throw err;
   }
 
-  for (Value* arg : arg_list) {
-    Value* cond = arg->eval(r, s);
+  for (Object* arg : arg_list) {
+    Object* cond = arg->eval(r, s);
     if (!cond->null())
       return cond;
   }
@@ -84,16 +84,16 @@ Operator* op::do_or =
                       type::Fn::with_rest(new type::Any),
                       false);
 
-Value *op_and(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_and(Operator* op, Object* alist, LocalRuntime& r, LexicalScope &s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     string err = "Invalid number of arguments to macro and";
     throw err;
   }
 
-  Value* out = nullptr;
-  for (Value* arg : arg_list) {
-    Value* cond = arg->eval(r, s);
+  Object* out = nullptr;
+  for (Object* arg : arg_list) {
+    Object* cond = arg->eval(r, s);
     if (cond->null()) {
       return nil::get();
     }
@@ -113,8 +113,8 @@ Operator* op::do_and =
                       false);
 
 
-Value *op_not(Operator* op, Value* alist, LocalRuntime& r, LexicalScope &s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_not(Operator* op, Object* alist, LocalRuntime& r, LexicalScope &s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments to macro not";
     throw err;

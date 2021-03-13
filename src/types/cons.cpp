@@ -17,7 +17,7 @@ string Cons::to_string() const {
   return "Cons";
 }
 
-expr::Value *Cons::check_type(expr::Value* obj) {
+expr::Object *Cons::check_type(expr::Object* obj) {
   if ((dynamic_cast<expr::Cons*>(obj)) == nullptr) {
     return expr::nil::get();
   } else {
@@ -25,7 +25,7 @@ expr::Value *Cons::check_type(expr::Value* obj) {
   }
 }
 
-Type *Cons::constructor(list<Value*> lst) {
+Type *Cons::constructor(list<Object*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {

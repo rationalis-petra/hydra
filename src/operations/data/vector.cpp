@@ -8,11 +8,11 @@ using std::string;
 
 using namespace expr;
 
-Value *op_vec(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_vec(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   Vector *out = new Vector;
-  for (Value *o : arg_list)
+  for (Object *o : arg_list)
     out->array.push_back(o);
   return out;
 }
@@ -21,14 +21,14 @@ Operator *op::mk_vec = new expr::InbuiltOperator(
     "Will return an array whose elements are the arg-list", op_vec,
     type::Fn::with_rest(new type::Any), true);
 
-Value *op_vec_cat(Operator *op, Value *alist, LocalRuntime &r,
+Object *op_vec_cat(Operator *op, Object *alist, LocalRuntime &r,
                   LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   Vector *vec = new Vector;
-  for (Value *obj : arg_list) {
+  for (Object *obj : arg_list) {
     Vector *a = dynamic_cast<Vector *>(obj);
     if (a) {
-      for (Value *o : a->array) {
+      for (Object *o : a->array) {
         vec->array.push_back(o);
       }
     }
@@ -40,9 +40,9 @@ Operator *op::vec_cat = new InbuiltOperator(
     "Concatenates two vectors", op_vec_cat,
     type::Fn::with_all({}, new type::Vector, new type::Vector), true);
 
-Value *op_vec_elt(Operator *op, Value *alist, LocalRuntime &r,
+Object *op_vec_elt(Operator *op, Object *alist, LocalRuntime &r,
                   LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 2) {
     string err = "invalid number of args to elt";
     throw err;
@@ -66,9 +66,9 @@ Operator *op::vec_elt = new InbuiltOperator(
     type::Fn::with_all({new type::Vector, new type::Integer}, nullptr,
                        new type::Any),
     true);
-Value *op_vec_len(Operator *op, Value *alist, LocalRuntime &r,
+Object *op_vec_len(Operator *op, Object *alist, LocalRuntime &r,
                   LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   Vector *arr = dynamic_cast<Vector *>(arg_list.front());
 

@@ -3,7 +3,7 @@
 using std::string;
 using namespace expr;
 
-void Object::mark_node() {
+void UserObject::mark_node() {
   marked = true;
   for (auto kvp : object_vals) {
     kvp.first->mark_node();
@@ -11,7 +11,7 @@ void Object::mark_node() {
   }
 }
 
-string Object::to_string() const {
+string UserObject::to_string() const {
   string out = "{";
   for (auto x : object_vals) {
     out += "[";

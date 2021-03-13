@@ -8,75 +8,75 @@
 namespace type {
 
 
-struct Object : public Type {
+struct UserObject : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  virtual expr::Value *check_type(expr::Value *obj);
+  virtual expr::Object *check_type(expr::Object *obj);
 };
 
 struct Nil : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  virtual expr::Value *check_type(expr::Value *obj);
+  virtual expr::Object *check_type(expr::Object *obj);
 };
 
 struct Any : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  virtual expr::Value *check_type(expr::Value *obj);
+  virtual expr::Object *check_type(expr::Object *obj);
 };
 
 struct Integer : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Value *check_type(expr::Value *obj);
+  expr::Object *check_type(expr::Object *obj);
 };
 
 struct TString : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Value *check_type(expr::Value *obj);
+  expr::Object *check_type(expr::Object *obj);
 };
 
 struct Module : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Value *check_type(expr::Value *obj);
+  expr::Object *check_type(expr::Object *obj);
 };
 
 struct Char : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Value *check_type(expr::Value *obj);
+  expr::Object *check_type(expr::Object *obj);
 };
 
 struct IOStream : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Value *check_type(expr::Value *obj);
+  expr::Object *check_type(expr::Object *obj);
 };
 struct Istream : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Value *check_type(expr::Value *obj);
+  expr::Object *check_type(expr::Object *obj);
 };
 
 struct Ostream : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Value *check_type(expr::Value *obj);
+  expr::Object *check_type(expr::Object *obj);
 };
 
 struct MetaType : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Value *check_type(expr::Value *obj);
+  expr::Object *check_type(expr::Object *obj);
 };
 
 struct MetaConstructor : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Value *check_type(expr::Value *obj);
+  expr::Object *check_type(expr::Object *obj);
 };
 
 } // namespace type

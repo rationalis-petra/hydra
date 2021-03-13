@@ -13,7 +13,7 @@
 
 namespace type {
 
-  template <typename T> T *hydra_cast(expr::Value *inp) {
+  template <typename T> T *hydra_cast(expr::Object *inp) {
   T *obj = dynamic_cast<T *>(inp);
   if (obj == nullptr) {
     std::string err = std::string("Failed typecast, expected ") + typeid(T).name() +

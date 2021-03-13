@@ -12,8 +12,8 @@ using type::hydra_cast;
 
 using namespace expr;
 
-// Value *op_thread(Operator *op, Value *alist, Runtime &r) {
-//   list<Value *> arg_list = op->get_arg_list(alist, r);
+// Object *op_thread(Operator *op, Object *alist, Runtime &r) {
+//   list<Object *> arg_list = op->get_arg_list(alist, r);
 
 //   if (arg_list.size() < 1) {
 //     string err = "error in thread: expected at least one argument";

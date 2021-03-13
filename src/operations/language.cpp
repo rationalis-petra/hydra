@@ -11,8 +11,8 @@ using type::hydra_cast;
 
 using namespace expr;
 
-Value *op_if(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_if(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   // aseert that list length is 3
   int len = arg_list.size();
   if (len != 3) {
@@ -20,21 +20,21 @@ Value *op_if(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
   }
   // we now assume that arg_list is a list of length 3
 
-  for (Value* v : arg_list)
-    Value::roots.remove(v);
+  for (Object* v : arg_list)
+    Object::roots.remove(v);
 
-  Value *condition = arg_list.front()->eval(r, s);
-  Value::roots.insert(condition);
+  Object *condition = arg_list.front()->eval(r, s);
+  Object::roots.insert(condition);
   arg_list.pop_front();
   // is nil?
   if (condition->null()) {
-    Value* out =  arg_list.back()->eval(r, s);
-    Value::roots.remove(condition);
+    Object* out =  arg_list.back()->eval(r, s);
+    Object::roots.remove(condition);
     return out;
   }
   // otherwise
-  Value* out = arg_list.front()->eval(r, s);
-  Value::roots.remove(condition);
+  Object* out = arg_list.front()->eval(r, s);
+  Object::roots.remove(condition);
   return out;
 }
 
@@ -46,22 +46,22 @@ Operator *op::do_if =
                       type::Fn::with_args({new type::Any, new type::Any, new type::Any}),
                       false);
 
-Value *op_while(Operator* op, Value *alist, LocalRuntime &r,
+Object *op_while(Operator* op, Object *alist, LocalRuntime &r,
                              LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   // assert that list length is >2
 
-  Value *condition = arg_list.front();
+  Object *condition = arg_list.front();
   arg_list.pop_front();
   // is nil?
-  Value* out = nil::get();
+  Object* out = nil::get();
   while (!condition->eval(r, s)->null()) {
-    for (Value *o : arg_list) {
+    for (Object *o : arg_list) {
       out = o->eval(r, s);
     }
   }
-  for (Value* v : arg_list) {
-    Value::roots.remove(v);
+  for (Object* v : arg_list) {
+    Object::roots.remove(v);
   }
   // otherwise
   return out;
@@ -74,11 +74,11 @@ Operator* op::do_while =
                       type::Fn::with_rest(new type::Any),
                       false);
 
-Value *op_bind(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_bind(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   if (Symbol *symbol = dynamic_cast<Symbol *>(arg_list.front())) {
-    Value *value = arg_list.back();
+    Object *value = arg_list.back();
 
     // if there is a lexical scope with the value
     if (s.map.find(symbol) != s.map.end()) {
@@ -104,8 +104,8 @@ Operator* op::bind =
                       type::Fn::with_args({new type::Symbol, new type::Any}),
                       true);
 
-Value *op_unbind(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_unbind(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
 
   Symbol *symbol = dynamic_cast<Symbol *>(arg_list.front());
 
@@ -129,8 +129,8 @@ Operator* op::unbind =
                       type::Fn::with_args({new type::Symbol}),
                       true);
 
-Value* op_definedp(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object* op_definedp(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   Symbol* sym = hydra_cast<Symbol>(arg_list.front());
   if (sym->value) {
     return t::get();
@@ -145,9 +145,9 @@ Operator* op::definedp =
                       type::Fn::with_args({new type::Symbol}),
                       true);
 
-Value *op_quote(Operator* op, Value *alist, LocalRuntime &r,
+Object *op_quote(Operator* op, Object *alist, LocalRuntime &r,
                              LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   return arg_list.front();
 }
 
@@ -158,15 +158,15 @@ Operator* op::quote =
                       type::Fn::with_args({new type::Any}),
                       false);
 
-Value *op_eval(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_eval(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments to eval";
     throw err;
   }
   // eval evaluates in a null lexical scope!
   LexicalScope new_scope;
-  Value* value = arg_list.front()->eval(r, new_scope);
+  Object* value = arg_list.front()->eval(r, new_scope);
   return value;
 }
 
@@ -177,11 +177,11 @@ Operator* op::eval =
                       type::Fn::with_args({new type::Any}),
                       true);
 
-Value *op_progn(Operator* op, Value *alist, LocalRuntime &r,
+Object *op_progn(Operator* op, Object *alist, LocalRuntime &r,
                              LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
-  Value *out = nullptr;
-  for (Value *arg : arg_list) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  Object *out = nullptr;
+  for (Object *arg : arg_list) {
     out = arg->eval(r, s);
   }
   if (!out)
@@ -197,8 +197,8 @@ Operator* op::progn =
                       false);
 
 
-Value *op_gen(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_gen(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
   CombinedFn* out = new CombinedFn;
   out->type->rest_type = new type::Any;
   arg_list.pop_front();
@@ -216,8 +216,8 @@ Operator* op::genfn =
                       type::Fn::with_all({new type::List}, new type::Any, new type::GenFn),
                       false);
 
-Value *op_fn(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  return (Value*) new UserOperator(alist, true, r, s);
+Object *op_fn(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  return (Object*) new UserOperator(alist, true, r, s);
 }
 
 Operator* op::fn =
@@ -226,8 +226,8 @@ Operator* op::fn =
                       type::Fn::with_rest(new type::Any),
                       false);
 
-Value *op_mac(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  return (Value*) new UserOperator(alist, false, r, s);
+Object *op_mac(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  return (Object*) new UserOperator(alist, false, r, s);
 }
 
 
@@ -237,17 +237,17 @@ Operator* op::mac =
                       type::Fn::with_all({new type::Cons}, new type::Any, new type::Mac),
                       false);
 
-Value *op_addfn(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_addfn(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
   CombinedFn* f = dynamic_cast<CombinedFn*>(arg_list.front());
   arg_list.pop_front();
 
-  for (Value* o : arg_list) {
+  for (Object* o : arg_list) {
     Operator* op = hydra_cast<Operator>(o);
     f->add(op);
   }
 
-  return (Value*) f;
+  return (Object*) f;
 }
 
 Operator* op::addfn =
@@ -256,8 +256,8 @@ Operator* op::addfn =
                       type::Fn::with_all({new type::GenFn}, new type::Fn, new type::GenFn),
                       true);
 
-Value *op_exit(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  for (Value* obj : Value::node_list) {
+Object *op_exit(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  for (Object* obj : Object::node_list) {
     delete obj;
   }
   exit(0);
@@ -270,8 +270,8 @@ Operator* op::exit =
                       true);
 
 
-Value *op_ref(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_ref(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
 
   Ref* ref = new Ref;
   ref->ptr = arg_list.front();
@@ -290,8 +290,8 @@ Operator* op::ref  =
 //   type->arg_list.push_front(new type_nil);
 // }
 
-// Value *op_var::call(Value *alist, LocalRuntime &r, LexicalScope &s) {
-//   list<Value*> arg_list = get_arg_list(alist, r, s);
+// Object *op_var::call(Object *alist, LocalRuntime &r, LexicalScope &s) {
+//   list<Object*> arg_list = get_arg_list(alist, r, s);
 
 //   hydra_var* var = new hydra_var;
 //   // TODO: add get-var function to objects?

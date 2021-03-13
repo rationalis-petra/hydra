@@ -9,13 +9,13 @@ using std::list;
 
 void mark() {
   // mark all objects accessible from the root and active module
-  Value::r.root->mark_node();
-  if (Value::r.local_runtimes.size() > 1) {
+  Object::r.root->mark_node();
+  if (Object::r.local_runtimes.size() > 1) {
     string err = "Error in collect_garbage: using multiple threads when this is not yet supported!!";
     throw err;
   }
 
-  for (LocalRuntime* loc : Value::r.local_runtimes) {
+  for (LocalRuntime* loc : Object::r.local_runtimes) {
     loc->active_module->mark_node();
     for (auto o : loc->restarts) {
       o->mark_node();
@@ -23,13 +23,13 @@ void mark() {
   }
 
   // also, mark everything accessible via a lexical context
-  for (LexicalScope* s : Value::context_list) {
+  for (LexicalScope* s : Object::context_list) {
     for (auto o : s->map) {
       o.first->mark_node();
       o.second->mark_node();
     }
   }
-  for (auto o : Value::roots.data) {
+  for (auto o : Object::roots.data) {
     o.first->mark_node();
   }
 
@@ -38,8 +38,8 @@ void mark() {
 }
 
 void sweep() {
-  list<Value*> new_list;
-  for (Value* obj : Value::node_list) {
+  list<Object*> new_list;
+  for (Object* obj : Object::node_list) {
     if (!obj->marked) {
       delete obj;
     }
@@ -48,10 +48,10 @@ void sweep() {
       new_list.push_front(obj);
     }
   }
-  Value::node_list = new_list;
+  Object::node_list = new_list;
 }
 
-void Value::collect_garbage() {
+void Object::collect_garbage() {
   if (counter > 10000) {
     counter = 0;
 

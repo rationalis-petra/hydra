@@ -12,8 +12,8 @@ using std::list;
 using std::string;
 
 
-Value* op_describe(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_describe(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
 
   if (UserOperator* uop = dynamic_cast<UserOperator*>(arg_list.front())) {
     string str = "generic function:\n" + uop->docstring->value +
@@ -44,9 +44,9 @@ Operator* op::describe =
                       true);
 
 // currently returns a string of time, not a time object... fix this!!!
-Value* op_time(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
-  Value* obj = arg_list.front();
+Object* op_time(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+  Object* obj = arg_list.front();
   steady_clock::time_point start = steady_clock::now();
   obj->eval(r, s);
   steady_clock::time_point end = steady_clock::now();

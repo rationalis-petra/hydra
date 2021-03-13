@@ -11,15 +11,15 @@ using type::hydra_cast;
 using namespace expr;
 
 // HANDLING CONDITIONS
-Value* op_handler_catch(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_handler_catch(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
   try {
     // add self to list of handlers
     // LocalRuntime.handlers.add (new catch_handler())
     r.handlers.push_front(new case_handler);
-    Value* out = arg_list.front()->eval(r, s);
-    for (Value* v : arg_list) {
-      Value::roots.remove(v);
+    Object* out = arg_list.front()->eval(r, s);
+    for (Object* v : arg_list) {
+      Object::roots.remove(v);
     }
     r.handlers.pop_front();
     return out;
@@ -32,20 +32,20 @@ Value* op_handler_catch(Operator* op, Value* alist, LocalRuntime &r, LexicalScop
 
     r.handlers.pop_front();
     arg_list.pop_front();
-    for (Value *o : arg_list) {
+    for (Object *o : arg_list) {
 
-      Value* fst = dynamic_cast<Cons*>(o)->car;
-      Value* ty = hydra_cast<Cons>(fst)->car;
+      Object* fst = dynamic_cast<Cons*>(o)->car;
+      Object* ty = hydra_cast<Cons>(fst)->car;
       type::Type *t = dynamic_cast<type::Type*>(ty->eval(r, s));
-      Value::roots.insert(t);
+      Object::roots.insert(t);
 
       if (!t->check_type(exc->obj)->null()) {
         delete exc;
-        Value* out =  dynamic_cast<Cons *>(dynamic_cast<Cons *>(o)->cdr)
+        Object* out =  dynamic_cast<Cons *>(dynamic_cast<Cons *>(o)->cdr)
             ->car->eval(r, s);
-        Value::roots.remove(t);
-        for (Value *v : arg_list) {
-          Value::roots.remove(v);
+        Object::roots.remove(t);
+        for (Object *v : arg_list) {
+          Object::roots.remove(v);
         }
         return out;
       }
@@ -59,23 +59,23 @@ Operator* op::handler_catch =
                       op_handler_catch, type::Fn::with_all({new type::Any}, new type::Cons, new type::Any),
                       false);
 
-Value* op_handler_bind(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_handler_bind(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
   // add self to the stack of handlers
   // LocalRuntime.handlers.add(new bind_handler(arg_list))
-  Value *code = arg_list.front();
+  Object *code = arg_list.front();
   arg_list.pop_front();
   r.handlers.push_front(new bind_handler(arg_list, r, s));
 
 
   try {
     // EXCEPTION THROWN HERRE
-    Value *out = code->eval(r, s);
+    Object *out = code->eval(r, s);
 
 
     r.handlers.pop_front();
-    for (Value *v : arg_list) {
-      Value::roots.remove(v);
+    for (Object *v : arg_list) {
+      Object::roots.remove(v);
     }
     return out;
   } catch (hydra_exception* e) {
@@ -83,8 +83,8 @@ Value* op_handler_bind(Operator* op, Value* alist, LocalRuntime &r, LexicalScope
     if (e->type == RESTART_CALL) {
       r.handlers.pop_front();
     }
-    for (Value *v : arg_list) {
-      Value::roots.remove(v);
+    for (Object *v : arg_list) {
+      Object::roots.remove(v);
     }
     throw e;
   }
@@ -98,8 +98,8 @@ Operator* op::handler_bind =
 // RESTARTS
 
 // (with-restart <restart_name> <function> <code>)
-Value* op_add_restart(Operator* op2, Value* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Value *> arg_list = op2->get_arg_list(alist, r, s);
+Object* op_add_restart(Operator* op2, Object* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Object *> arg_list = op2->get_arg_list(alist, r, s);
 
   Symbol* sym = dynamic_cast<Symbol*> (arg_list.front()->eval(r, s));
   arg_list.pop_front();
@@ -110,7 +110,7 @@ Value* op_add_restart(Operator* op2, Value* alist, LocalRuntime &r, LexicalScope
   r.restarts.push_front(res);
 
   try {
-    Value* ret = arg_list.front()->eval(r, s);
+    Object* ret = arg_list.front()->eval(r, s);
 
     // NOTE: it seems that the restart wdoesn't get registered until we return??
     r.restarts.pop_front();
@@ -136,7 +136,7 @@ Operator* op::add_restart =
                       type::Fn::with_args({new type::Any, new type::Any, new type::Any}),
                       false);
 
-Value* gen_list(std::list<hydra_restart*> lst) {
+Object* gen_list(std::list<hydra_restart*> lst) {
   if (lst.empty()) {
     return nil::get();
   } else {
@@ -146,7 +146,7 @@ Value* gen_list(std::list<hydra_restart*> lst) {
   }
 }
 
-Value *op_get_restarts(Operator *op, Value *alist, LocalRuntime &r,
+Object *op_get_restarts(Operator *op, Object *alist, LocalRuntime &r,
                        LexicalScope &s) {
   return gen_list(r.restarts);
 }
@@ -158,8 +158,8 @@ Operator* op::get_restarts =
                       true);
 
 // SIGNALLING CONDITIONS
-Value* op_signal_condition(Operator* op, Value* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Value*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_signal_condition(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
+  list<Object*> arg_list = op->get_arg_list(alist, r, s);
   while (!r.handlers.empty()) {
     try {
       return r.handlers.front()->handle(arg_list.front());

@@ -52,7 +52,7 @@ string HString::to_string() const {
 
 void Vector::mark_node() {
   marked = true;
-  for (Value* o : array) {
+  for (Object* o : array) {
     o->mark_node();
   }
 }
@@ -74,7 +74,7 @@ string Vector::to_string() const {
 
 void Tuple::mark_node() {
   marked = true;
-  for (Value* o : values) {
+  for (Object* o : values) {
     o->mark_node();
   }
 }
@@ -127,7 +127,7 @@ Integer::Integer(int num) : value(num) {}
 void Char::mark_node() {
   marked = true;
 }
-Char::Char() : Value() {}
+Char::Char() : Object() {}
 Char::Char(int c) : value(c) {}
 string Char::to_string() const {
   return string("") + ((char) value);

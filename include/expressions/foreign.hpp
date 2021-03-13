@@ -14,7 +14,7 @@ namespace expr {
 
 enum foreign_type { Int32, Pointer, String, Void };
 
-struct ForeignLib : public Value {
+struct ForeignLib : public Object {
   virtual void mark_node();
 
   ForeignLib(lt_dlhandle lib);
@@ -23,7 +23,7 @@ struct ForeignLib : public Value {
   lt_dlhandle lib;
 };
 
-struct ForeignSymbol : public Value {
+struct ForeignSymbol : public Object {
   virtual void mark_node();
 
   ForeignSymbol(void *addr);
@@ -35,7 +35,7 @@ struct ForeignSymbol : public Value {
 struct ForeignOperator : public Operator {
   ForeignOperator();
 
-  Value* call(Value* args, LocalRuntime& r, LexicalScope &s);
+  Object* call(Object* args, LocalRuntime& r, LexicalScope &s);
 
   std::list<foreign_type> arg_types;
   foreign_type return_type;

@@ -5,8 +5,8 @@ using namespace expr;
 
 using std::map;
 
-void hydra_roots::remove(Value *obj) {
-  map<Value*, unsigned long>::iterator it;
+void hydra_roots::remove(Object *obj) {
+  map<Object*, unsigned long>::iterator it;
   if ((it = data.find(obj)) != data.end()) {
     data[obj] -= 1;
     if (data[obj] == 0) {
@@ -15,8 +15,8 @@ void hydra_roots::remove(Value *obj) {
   }
 }
 
-void hydra_roots::insert(Value *obj) {
-  map<Value*, unsigned long>::iterator it;
+void hydra_roots::insert(Object *obj) {
+  map<Object*, unsigned long>::iterator it;
   if ((it = data.find(obj)) != data.end()) {
     data[obj] += 1;
   } else {

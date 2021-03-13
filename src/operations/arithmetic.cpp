@@ -11,13 +11,13 @@ using namespace expr;
 using type::hydra_cast;
 
 
-Value *op_plus(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
+Object *op_plus(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
   // ASSUME: all values in arg_list are rooted
-  std::list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  std::list<Object *> arg_list = op->get_arg_list(alist, r, s);
   Integer *out = new Integer(0);
 
-  for (Value *o : arg_list) {
-    Value::roots.remove(o);
+  for (Object *o : arg_list) {
+    Object::roots.remove(o);
     Integer *num = hydra_cast<Integer>(o);
     out->value += num->value;
   }
@@ -36,8 +36,8 @@ expr::Operator *op::plus =
 
 
 
-Value *op_minus(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_minus(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '-' function";
   }
@@ -45,14 +45,14 @@ Value *op_minus(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
 
   Integer *out = new Integer(0);
   out->value = hydra_cast<Integer>(arg_list.front())->value;
-  Value::roots.remove(arg_list.front());
+  Object::roots.remove(arg_list.front());
 
   arg_list.pop_front();
 
-  for (Value *arg : arg_list) {
+  for (Object *arg : arg_list) {
     Integer *num = hydra_cast<Integer>(arg);
     out->value -= num->value;
-  Value::roots.remove(arg);
+  Object::roots.remove(arg);
   }
   return out;
 }
@@ -69,11 +69,11 @@ expr::Operator *op::minus =
 
 
 
-Value *op_multiply(Operator *op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_multiply(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   Integer *out = new Integer(1);
 
-  for (Value *arg : arg_list) {
+  for (Object *arg : arg_list) {
     if (Integer *num = dynamic_cast<Integer *>(arg))
       out->value *= num->value;
   }
@@ -95,9 +95,9 @@ expr::Operator *op::multiply =
 
 
 
-Value *op_divide(Operator* op, Value *alist, LocalRuntime &r,
+Object *op_divide(Operator* op, Object *alist, LocalRuntime &r,
                               LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '/' function";
   }
@@ -106,7 +106,7 @@ Value *op_divide(Operator* op, Value *alist, LocalRuntime &r,
   out->value = dynamic_cast<Integer *>(arg_list.front())->value;
   arg_list.pop_front();
 
-  for (Value *arg : arg_list) {
+  for (Object *arg : arg_list) {
     Integer *num = dynamic_cast<Integer *>(arg);
     out->value /= num->value;
   }
@@ -128,8 +128,8 @@ expr::Operator *op::divide = new InbuiltOperator(
 
 
 
-Value *op_int_gr(Operator* op, Value *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Value *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_int_gr(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+  list<Object *> arg_list = op->get_arg_list(alist, r, s);
   // we now ASSERT that arg_list is a list of length 2
   // does it contain integers?
 

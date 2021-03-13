@@ -25,7 +25,7 @@ string Tuple::to_string() const {
   return str;
 }
 
-expr::Value *Tuple::check_type(expr::Value* obj) {
+expr::Object *Tuple::check_type(expr::Object* obj) {
   if (expr::Tuple* tup = dynamic_cast<expr::Tuple*>(obj)) {
     if (types.size() == 0) {
       return expr::t::get();
@@ -44,9 +44,9 @@ expr::Value *Tuple::check_type(expr::Value* obj) {
   }
 }
 
-Type *Tuple::constructor(list<expr::Value*> lst) {
+Type *Tuple::constructor(list<expr::Object*> lst) {
   Tuple * tup = new Tuple;
-  for (expr::Value* obj : lst) {
+  for (expr::Object* obj : lst) {
     if (Type *t = dynamic_cast<Type*>(obj)) {
       tup->types.push_back(t);
     }

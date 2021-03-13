@@ -8,20 +8,20 @@
 
 namespace expr {
 struct condition_handler {
-  virtual Value* handle(Value* condition) = 0;
+  virtual Object* handle(Object* condition) = 0;
 };
 
 struct bind_handler : public condition_handler {
-  bind_handler(std::list<Value*>, LocalRuntime& r, LexicalScope &s);
+  bind_handler(std::list<Object*>, LocalRuntime& r, LexicalScope &s);
 
   LocalRuntime& r;
   LexicalScope& s;
-  std::list<Value*> handling_code;
-  Value* handle(Value* condition);
+  std::list<Object*> handling_code;
+  Object* handle(Object* condition);
 };
 
 struct case_handler : public condition_handler {
-  Value* handle(Value* condition);
+  Object* handle(Object* condition);
 };
 
 enum exception_type {
@@ -34,7 +34,7 @@ struct hydra_restart : public Operator {
   hydra_restart(Operator* o, Symbol* s);
   void mark_node();
 
-  Value *call(Value *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(Object *arg_list, LocalRuntime &r, LexicalScope &s);
   Operator* op;
   Symbol* sym;
 };
@@ -47,11 +47,11 @@ struct hydra_exception {
 
   union {
     struct {
-      Value* obj;
+      Object* obj;
     };
     struct {
       hydra_restart *res;
-      Value *args;
+      Object *args;
       LexicalScope *s;
     };
   };

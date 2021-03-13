@@ -9,13 +9,13 @@
 
 namespace expr {
 
-struct Object : public Value {
+struct UserObject : public Object {
   void mark_node();
   std::string to_string() const;
-  std::map<Symbol*, Value*> object_vals;
+  std::map<Symbol*, Object*> object_vals;
 
-  std::set<Object*> prototypes;
-  std::set<Object*> derivatives;
+  std::set<UserObject*> prototypes;
+  std::set<UserObject*> derivatives;
 };
 
 }

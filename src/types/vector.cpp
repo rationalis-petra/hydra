@@ -8,7 +8,7 @@ using std::list;
 
 using type::Vector;
 using type::Type;
-using expr::Value;
+using expr::Object;
 
 void Vector::mark_node() {
   marked = true;
@@ -18,7 +18,7 @@ string Vector::to_string() const {
   return "Vector";
 }
 
-Value *Vector::check_type(Value* obj) {
+Object *Vector::check_type(Object* obj) {
   if ((dynamic_cast<Vector*>(obj)) || obj->null()) {
     return expr::t::get();
   } else {
@@ -26,7 +26,7 @@ Value *Vector::check_type(Value* obj) {
   }
 }
 
-Type *Vector::constructor(list<Value*> lst) {
+Type *Vector::constructor(list<Object*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {

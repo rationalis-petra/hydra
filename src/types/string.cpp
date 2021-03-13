@@ -16,7 +16,7 @@ string TString::to_string() const {
   return "String";
 }
 
-expr::Value *TString::check_type(expr::Value* obj) {
+expr::Object *TString::check_type(expr::Object* obj) {
   if (dynamic_cast<expr::HString*>(obj)) {
     return expr::t::get();
   } else {

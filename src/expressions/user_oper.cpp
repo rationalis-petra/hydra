@@ -18,8 +18,8 @@ using std::function;
 
 // UTILITY FUNCTION: local to this file
 // Convert a cons-list into a c++ list
-list<Value *> make_list(Value *obj) {
-  list<Value *> lst;
+list<Object *> make_list(Object *obj) {
+  list<Object *> lst;
   while (!obj->null()) {
     Cons *cns = hydra_cast<Cons>(obj);
     lst.push_back(cns->car);
@@ -67,12 +67,12 @@ void UserOperator::mark_node() {
   }
 }
 
-UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
+UserOperator::UserOperator(Object *op_def, bool _is_fn, LocalRuntime &r,
                      LexicalScope &s) : Operator() {
   // EVAL is called when evaluating
   // therefore, we must add ourselves to the root list
   // ASSUME op_def already there
-  Value::roots.insert(this);
+  Object::roots.insert(this);
   is_fn = _is_fn;
   rest = nullptr;
   self = nullptr;
@@ -85,10 +85,10 @@ UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
   // (fn/mac <optional name> <arg_list> rest)
   if (Cons *cns = dynamic_cast<Cons *>(op_def)) {
 
-    Value *name_list;
+    Object *name_list;
 
     if (Symbol *sym = dynamic_cast<Symbol *>(cns->car)) {
-      Value *raw_type = sym->eval(r, s);
+      Object *raw_type = sym->eval(r, s);
       if (type::Type* ret_type = dynamic_cast<type::Type*>(raw_type)) {
         type->return_type = ret_type;
       } else {
@@ -107,7 +107,7 @@ UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
     }
 
 
-    list<Value *> lst = make_list(name_list);
+    list<Object *> lst = make_list(name_list);
     bool optional = false;
     bool key = false;
 
@@ -193,8 +193,8 @@ UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
         }
       }
     }
-    Value *expr_body = cns->cdr;
-    Value *cdr = expr_body;
+    Object *expr_body = cns->cdr;
+    Object *cdr = expr_body;
 
     if (Cons *docons = (dynamic_cast<Cons *>(expr_body))) {
       HString *dstring = dynamic_cast<HString *>(docons->car);
@@ -208,7 +208,7 @@ UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
             hydra_cast<Symbol>(language_module->get("core"))->value)
             ->get("progn"));
     progn->name = "progn";
-    Value *car = progn;
+    Object *car = progn;
     expr = new Cons(car, cdr);
   } else {
     string err = "Non-cons provided to fn/mac";
@@ -216,14 +216,14 @@ UserOperator::UserOperator(Value *op_def, bool _is_fn, LocalRuntime &r,
   }
 
   // see beginning of function
-  Value::roots.remove(this);
+  Object::roots.remove(this);
 }
 
-Value *UserOperator::call(Value *alist, LocalRuntime &r,
+Object *UserOperator::call(Object *alist, LocalRuntime &r,
                               LexicalScope &s) {
   // ASSUME that this and the alist are rooted
   // ASSUME all values in arg_list are rooted
-  list<Value *> arg_list = get_arg_list(alist, r, s);
+  list<Object *> arg_list = get_arg_list(alist, r, s);
 
 
   // too few arguments OR too many arguments
@@ -238,7 +238,7 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
   for (Symbol *s : arg_names) {
     scope->map[s] = arg_list.front();
     // unroot values as we add them to a scope
-    Value::roots.remove(arg_list.front());
+    Object::roots.remove(arg_list.front());
     arg_list.pop_front();
   }
   for (Symbol *s : optionals) {
@@ -246,7 +246,7 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
       scope->map[s] = nil::get();
     } else {
       scope->map[s] = arg_list.front();
-      Value::roots.remove(arg_list.front());
+      Object::roots.remove(arg_list.front());
       arg_list.pop_front();
     }
   }
@@ -267,7 +267,7 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
           throw err;
         } else {
           scope->map[keys[sym]] = arg_list.front();
-          Value::roots.remove(arg_list.front());
+          Object::roots.remove(arg_list.front());
           arg_list.pop_front();
         }
       } else {
@@ -275,7 +275,7 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
         throw err;
       }
       // we are done with sym, unroot it
-      Value::roots.remove(sym);
+      Object::roots.remove(sym);
     }
   }
 
@@ -286,15 +286,15 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
       scope->map[rest] = nil::get();
     } else {
       // we use a recursive lambda to construct the rlist
-      function<Value *()> gen_rest = [&](void) {
+      function<Object *()> gen_rest = [&](void) {
         if (arg_list.empty()) {
-          return (Value *)nil::get();
+          return (Object *)nil::get();
         } else {
-          Value *car = arg_list.front();
-          Value::roots.remove(arg_list.front());
+          Object *car = arg_list.front();
+          Object::roots.remove(arg_list.front());
           arg_list.pop_front();
-          Value *cdr = gen_rest();
-          return (Value *) new Cons(car, cdr);
+          Object *cdr = gen_rest();
+          return (Object *) new Cons(car, cdr);
         }
       };
       scope->map[rest] = gen_rest();
@@ -305,14 +305,14 @@ Value *UserOperator::call(Value *alist, LocalRuntime &r,
   }
 
 
-  Value *out;
+  Object *out;
   if (is_fn) {
     out = expr->eval(r, *scope);
   } else {
-    Value* intermediate = expr->eval(r, *scope);
-    Value::roots.insert(intermediate);
+    Object* intermediate = expr->eval(r, *scope);
+    Object::roots.insert(intermediate);
     out = intermediate->eval(r, s);
-    Value::roots.remove(intermediate);
+    Object::roots.remove(intermediate);
   }
 
   return out;

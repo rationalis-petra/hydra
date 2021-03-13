@@ -4,17 +4,17 @@
 
 namespace expr {
 
-struct Thread : public Value {
+struct Thread : public Object {
   void mark_node();
   std::string to_string() const;
 };
 
-struct Mutex : public Value {
+struct Mutex : public Object {
   void mark_node();
   std::string to_string() const;
 };
 
-struct Semaphore : public Value {
+struct Semaphore : public Object {
   void mark_node();
   std::string to_string() const;
 };

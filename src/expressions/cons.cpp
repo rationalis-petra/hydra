@@ -14,23 +14,23 @@ void Cons::mark_node() {
   cdr->mark_node();
 }
 
-Cons::Cons(Value *_car, Value *_cdr)
+Cons::Cons(Object *_car, Object *_cdr)
     : car(_car), cdr(_cdr) {
   roots.insert(this);
   collect_garbage();
   roots.remove(this);
 }
 
-Value *Cons::eval(LocalRuntime &r, LexicalScope &s) {
-  Value *oper = car->eval(r, s);
+Object *Cons::eval(LocalRuntime &r, LexicalScope &s) {
+  Object *oper = car->eval(r, s);
 
-  Value::roots.insert(oper);
+  Object::roots.insert(oper);
 
   Operator *op;
   if ((op = dynamic_cast<Operator *>(oper))) {
     try {
-      Value *out = op->call(cdr, r, s);
-      Value::roots.remove(oper);
+      Object *out = op->call(cdr, r, s);
+      Object::roots.remove(oper);
       return out;
     } catch (hydra_exception* e) {
       roots.remove(oper);
@@ -46,7 +46,7 @@ Value *Cons::eval(LocalRuntime &r, LexicalScope &s) {
 
 string Cons::to_string() const {
   string out = "(";
-  const Value *elt = this;
+  const Object *elt = this;
   while (!elt->null()) {
     if (const Cons *obj = dynamic_cast<const Cons *>(elt)) {
       out += obj->car->to_string();

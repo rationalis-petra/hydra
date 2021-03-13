@@ -3,16 +3,16 @@
 using namespace expr;
 
 // HANDLER BIND
-bind_handler::bind_handler(std::list<Value *> lst, LocalRuntime &run,
+bind_handler::bind_handler(std::list<Object *> lst, LocalRuntime &run,
                            LexicalScope &sc)
     : r(run), s(sc) {
   handling_code = lst;
 }
 
-Value *bind_handler::handle(Value *condition) {
-  for (Value *o : handling_code) {
-    Value *fst = dynamic_cast<Cons *>(o)->car;
-    Value *ty = type::hydra_cast<Cons>(fst)->car;
+Object *bind_handler::handle(Object *condition) {
+  for (Object *o : handling_code) {
+    Object *fst = dynamic_cast<Cons *>(o)->car;
+    Object *ty = type::hydra_cast<Cons>(fst)->car;
     type::Type *t = dynamic_cast<type::Type *>(ty->eval(r, s));
 
     if (!t->check_type(condition)->null()) {
@@ -24,7 +24,7 @@ Value *bind_handler::handle(Value *condition) {
   throw false;
 }
 
-Value *case_handler::handle(Value *condition) {
+Object *case_handler::handle(Object *condition) {
   hydra_exception *ex = new hydra_exception(CASE_THROW);
   ex->obj = condition;
   throw ex;
@@ -41,7 +41,7 @@ void hydra_restart::mark_node() {
   sym->mark_node();
 }
 
-Value *hydra_restart::call(Value *arg_list, LocalRuntime &r, LexicalScope &s) {
+Object *hydra_restart::call(Object *arg_list, LocalRuntime &r, LexicalScope &s) {
   // invokesn a restart
   hydra_exception *e = new hydra_exception(RESTART_CALL);
   e->res = this;

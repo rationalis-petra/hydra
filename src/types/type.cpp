@@ -16,7 +16,7 @@ string MetaType::to_string() const {
   return "Type";
 }
 
-expr::Value *MetaType::check_type(expr::Value* obj) {
+expr::Object *MetaType::check_type(expr::Object* obj) {
   if (dynamic_cast<Type*>(obj)) {
     return expr::t::get();
   } else {
@@ -33,7 +33,7 @@ string MetaConstructor::to_string() const {
   return "{Type Constructor}";
 }
 
-expr::Value *MetaConstructor::check_type(expr::Value* obj) {
+expr::Object *MetaConstructor::check_type(expr::Object* obj) {
   if (dynamic_cast<TypeConstructor*>(obj)) {
     return expr::t::get();
   } else {

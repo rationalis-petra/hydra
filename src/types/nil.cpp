@@ -15,6 +15,6 @@ string Nil::to_string() const {
   return "Nil";
 }
 
-expr::Value *Nil::check_type(expr::Value* obj) {
-  return  obj->null() ? (Value*) expr::t::get() : (Value*) expr::nil::get();
+expr::Object *Nil::check_type(expr::Object* obj) {
+  return  obj->null() ? (Object*) expr::t::get() : (Object*) expr::nil::get();
 }

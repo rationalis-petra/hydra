@@ -6,7 +6,7 @@
 #include "object.hpp"
 
 namespace expr {
-struct t : public Value {
+struct t : public Object {
   virtual void mark_node();
 
   std::string to_string() const;  
@@ -16,7 +16,7 @@ private:
   t();
 };
 
-struct nil : public Value {
+struct nil : public Object {
   virtual void mark_node();
 
   std::string to_string() const;
@@ -27,20 +27,20 @@ private:
   nil();
 };
 
-struct Cons : public Value {
+struct Cons : public Object {
   virtual void mark_node();
 
   std::string to_string() const; 
-  Cons(Value* car, Value* cdr);
-  Value* eval(LocalRuntime& r, LexicalScope& s);
+  Cons(Object* car, Object* cdr);
+  Object* eval(LocalRuntime& r, LexicalScope& s);
 
-  Value* car;
-  Value* cdr;
+  Object* car;
+  Object* cdr;
 
   unsigned len();
 };
 
-struct Integer : public Value {
+struct Integer : public Object {
   virtual void mark_node();
 
   Integer(int num);
@@ -49,7 +49,7 @@ struct Integer : public Value {
   int value;
 };
 
-struct Istream : public Value {
+struct Istream : public Object {
   virtual void mark_node();
 
   std::string to_string() const;
@@ -57,7 +57,7 @@ struct Istream : public Value {
   ~Istream();
 };
 
-struct Ostream : public Value {
+struct Ostream : public Object {
   virtual void mark_node();
 
   std::string to_string() const;
@@ -65,7 +65,7 @@ struct Ostream : public Value {
   ~Ostream();
 };
 
-struct IOstream : public Value {
+struct IOstream : public Object {
   virtual void mark_node();
 
   std::string to_string() const;
@@ -73,15 +73,15 @@ struct IOstream : public Value {
   ~IOstream();
 };
 
-struct Vector : public Value {
+struct Vector : public Object {
   virtual void mark_node();
 
   std::string to_string() const;
-  std::vector<Value*> array;
+  std::vector<Object*> array;
 };
 
 
-struct HString : public Value {
+struct HString : public Object {
   virtual void mark_node();
 
   HString();
@@ -91,7 +91,7 @@ struct HString : public Value {
   std::string value;  
 };
 
-struct Char : public Value {
+struct Char : public Object {
   virtual void mark_node();
 
   Char();
@@ -100,21 +100,21 @@ struct Char : public Value {
   int value;
 };
 
-struct Tuple : public Value {
+struct Tuple : public Object {
   virtual void mark_node();
 
   std::string to_string() const;
-  std::vector<Value*> values;
+  std::vector<Object*> values;
 };
 
 struct Symbol;
 
-struct Union : public Value {
+struct Union : public Object {
   virtual void mark_node();
 
   std::string to_string() const;
   Symbol* tag;
-  Value* value;
+  Object* value;
 };
 
 }

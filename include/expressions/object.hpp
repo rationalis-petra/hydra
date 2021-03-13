@@ -10,30 +10,30 @@
 
 namespace expr {
 
-struct Value;
+struct Object;
 
 struct hydra_roots {
 public:
-  void remove(Value* obj);
-  void insert(Value* obj);
-  std::map<Value*, unsigned long> data;
+  void remove(Object* obj);
+  void insert(Object* obj);
+  std::map<Object*, unsigned long> data;
 };
 
-struct Value {
+struct Object {
   //std::string docstring;
 
   virtual bool null() const;
   virtual std::string to_string() const = 0;
-  virtual Value* eval(LocalRuntime& r, LexicalScope& s);
-  Value();
-  virtual ~Value();
+  virtual Object* eval(LocalRuntime& r, LexicalScope& s);
+  Object();
+  virtual ~Object();
 
 
   // mark & sweep garbage collection
   // local variables/functions
   bool marked;
   virtual void mark_node() = 0;
-  //virtual Value* copy() const = 0;
+  //virtual Object* copy() const = 0;
 
   // self-explanatory
   static void collect_garbage();
@@ -45,7 +45,7 @@ struct Value {
   // number of objects after most recent collection
   static unsigned long last;
   // The list of all hydra objects
-  static std::list<Value*> node_list; 
+  static std::list<Object*> node_list; 
   // The list of root hydra objects - these are objects
   // which should not be deleted for reasons 'outside'
   static hydra_roots roots; 
@@ -54,7 +54,7 @@ struct Value {
 };
 
 
-std::ostream &operator<<(std::ostream &os, const Value *obj);
+std::ostream &operator<<(std::ostream &os, const Object *obj);
 
 }
 

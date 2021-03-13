@@ -16,6 +16,6 @@ string Any::to_string() const {
   return "Any";
 }
 
-expr::Value *Any::check_type(expr::Value* obj) {
+expr::Object *Any::check_type(expr::Object* obj) {
   return expr::t::get();
 }

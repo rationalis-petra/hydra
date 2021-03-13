@@ -17,25 +17,25 @@ Module *expr::language_module;
 
 using type::hydra_cast;
 
-vector<pair<string, Value *>> inbuilts;
+vector<pair<string, Object *>> inbuilts;
 
-vector<pair<string, Value *>> dev;
-vector<pair<string, Value *>> core;
-vector<pair<string, Value *>> foreign;
-vector<pair<string, Value *>> io;
+vector<pair<string, Object *>> dev;
+vector<pair<string, Object *>> core;
+vector<pair<string, Object *>> foreign;
+vector<pair<string, Object *>> io;
 // net
 // concurrent / parallel
 
-Runtime& g = Value::r;
+Runtime& g = Object::r;
 LocalRuntime r(g);
 
-Value *read(Istream *istm);
+Object *read(Istream *istm);
 void make_modules();
 
 int main(int argc, char **argv) {
   make_modules();
 
-  // Value::r = &r;
+  // Object::r = &r;
 
   g.root = new Module("");
   Symbol *sym = g.root->intern("hydra");
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     sym->value = p.second;
   }
 
-  vector<pair<string, vector<pair<string, Value *>>>> moddefs = {
+  vector<pair<string, vector<pair<string, Object *>>>> moddefs = {
       make_pair("core", core), make_pair("io", io),
       make_pair("foreign", foreign), make_pair("dev", dev)};
 
@@ -74,8 +74,8 @@ int main(int argc, char **argv) {
   string in = lang;
   Istream *prog = new Istream();
   prog->stream = new stringstream(lang);
-  Value *ast;
-  Value *out;
+  Object *ast;
+  Object *out;
 
   // if argc > 1, assume they are file names
   int count = argc;
@@ -104,14 +104,14 @@ int main(int argc, char **argv) {
       cout << r.active_module->name << "> ";
       LexicalScope s;
       ast = read(stm);
-      Value::roots.insert(ast);
+      Object::roots.insert(ast);
       out = ast->eval(r, s);
       cout << "* " << out << endl;
-      Value::roots.remove(ast);
-      Value::collect_garbage();
+      Object::roots.remove(ast);
+      Object::collect_garbage();
     } catch (hydra_exception *e) {
       cout << "Top-level exception thrown!" << endl;
-      cout << "Value: " << e->obj << endl;
+      cout << "Object: " << e->obj << endl;
     } catch (string e) {
       cout << e << endl;
     } catch (const char *err) {
@@ -121,8 +121,8 @@ int main(int argc, char **argv) {
     getline(cin, in);
   }
 
-  cout << Value::node_list.size() << endl;
-  for (Value *obj : Value::node_list) {
+  cout << Object::node_list.size() << endl;
+  for (Object *obj : Object::node_list) {
     cout << obj << endl;
     delete obj;
   }
@@ -289,15 +289,15 @@ void make_modules() {
         make_pair("close-file", op::close)};
 }
 
-Value *read(Istream *istm) {
+Object *read(Istream *istm) {
   // blank scope
   LexicalScope scope;
   Symbol *cores = language_module->intern("core");
   Module *corem = hydra_cast<Module>(cores->eval(r, scope));
 
   Symbol* s = corem->intern("read");
-  Value *v = s->eval(r, scope);
+  Object *v = s->eval(r, scope);
   Operator *op = hydra_cast<Operator>(v);
-  Value* arg = new Cons(istm, nil::get());
+  Object* arg = new Cons(istm, nil::get());
   return op->call(arg, r, scope);
 }

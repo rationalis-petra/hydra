@@ -7,7 +7,7 @@
 
 namespace expr {
 
-struct Value;
+struct Object;
 struct Module;
 struct Operator;
 struct Symbol;
@@ -34,7 +34,7 @@ struct LocalRuntime {
 
 // the lexical scope contians a mapping of symbols to their local values
 struct LexicalScope {
-  std::map<Symbol*, Value*> map;
+  std::map<Symbol*, Object*> map;
   LexicalScope();
   ~LexicalScope();
 };
