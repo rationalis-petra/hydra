@@ -12,7 +12,7 @@ Object* op_obj_get(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
   Symbol* sym = dynamic_cast<Symbol*>(arg_list.back());
 
   try {
-    return obj->object_vals.at(sym);
+    return obj->slots.at(sym);
   } catch (std::out_of_range& e) {
     string err = "Attempt to get non-existent slot in object: " + sym->to_string();
     throw err;
@@ -31,7 +31,11 @@ Object* op_mk_object(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
     Tuple* tup = dynamic_cast<Tuple*>(kvp);
     Symbol* slot = dynamic_cast<Symbol*>(tup->values[0]);
     Object* value = dynamic_cast<Object*>(tup->values[1]);
-    obj->object_vals[slot] = value;
+    Object* is_parent = dynamic_cast<Object*>(tup->values[1]);
+    obj->slots[slot] = value;
+    if (!is_parent->null()) {
+      obj->parents.insert(slot);
+    }
   }
 
   return obj;
@@ -39,7 +43,7 @@ Object* op_mk_object(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
 
 Operator* op::mk_obj =
   new InbuiltOperator("Create a new object",
-                      op_mk_object, type::Fn::with_all({}, new type::Tuple({new type::Symbol, new type::Any}), new type::Any), true);
+                      op_mk_object, type::Fn::with_all({}, new type::Tuple({new type::Symbol, new type::Any, new type::Any}), new type::Any), true);
 
 Object* op_obj_set(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
   
@@ -49,7 +53,7 @@ Object* op_obj_set(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
   Symbol* sym = dynamic_cast<Symbol*>(arg_list.front());
   Object* newval = arg_list.back();
 
-  obj->object_vals[sym] = newval;
+  obj->slots[sym] = newval;
   return newval;
 }
 
@@ -58,19 +62,19 @@ Operator* op::obj_set =
                       op_obj_set,
                       type::Fn::with_args({new type::Any, new type::Symbol, new type::Any}),
                       true);
-Object* op_derive(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+
+Object* op_clone(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
   
   UserObject* obj = new UserObject;
-  UserObject* prototype = dynamic_cast<UserObject*>(arg_list.front());
+  UserObject* clonee = dynamic_cast<UserObject*>(arg_list.front());
 
-  obj->prototypes.insert(prototype);
-  obj->object_vals = prototype->object_vals;
+  obj->slots = clonee->slots;
 
   return obj;
 }
 
-Operator* op::derive =
+Operator* op::clone =
   new InbuiltOperator("Derives an object from the provided object",
-                      op_derive, type::Fn::with_rest(new type::Any), true);
+                      op_clone, type::Fn::with_rest(new type::Any), true);
 
 

@@ -210,7 +210,7 @@ void make_modules() {
 
     make_pair("set", gn_set),
     make_pair("get", gn_get),
-    make_pair("derive", op::derive),
+    make_pair("clone", op::clone),
 
     // streams
     make_pair("peek", op::peek),

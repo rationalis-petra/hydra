@@ -5,7 +5,7 @@ using namespace expr;
 
 void UserObject::mark_node() {
   marked = true;
-  for (auto kvp : object_vals) {
+  for (auto kvp : slots) {
     kvp.first->mark_node();
     kvp.second->mark_node();
   }
@@ -13,7 +13,7 @@ void UserObject::mark_node() {
 
 string UserObject::to_string() const {
   string out = "{";
-  for (auto x : object_vals) {
+  for (auto x : slots) {
     out += "[";
     out += x.first->to_string();
     out += " ";

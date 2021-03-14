@@ -12,8 +12,6 @@ namespace expr {
 struct UserObject : public Object {
   void mark_node();
   std::string to_string() const;
-  std::map<Symbol*, Object*> object_vals;
-
 };
 
 }

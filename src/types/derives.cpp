@@ -29,7 +29,11 @@ expr::Object *derive_check(set<expr::Object*> ptypes, expr::Object* obj) {
     if (proto == obj) {
       return expr::t::get();
     }
-    if (!derive_check(proto->prototypes, obj)->null()) {
+    std::set<expr::Object*> ptypes2;
+    for (auto s : proto->parents) {
+      ptypes2.insert(proto->slots[s]);
+    }
+    if (!derive_check(ptypes2, obj)->null()) {
       return expr::t::get();
     }
   }
@@ -45,7 +49,10 @@ expr::Object *Derives::check_type(expr::Object* obj) {
     if (oobj == object) {
       return expr::t::get(); 
     }
-    set<expr::Object*> ptypes = oobj->prototypes;
+    std::set<expr::Object*> ptypes;
+    for (auto s : obj->parents) {
+      ptypes.insert(obj->slots[s]);
+    }
     return derive_check(ptypes, object);
   }
 }
@@ -65,8 +72,6 @@ expr::Object *Derives::subtype(Type* ty) {
   }
   return expr::nil::get();
 }
-
-
 
 
 

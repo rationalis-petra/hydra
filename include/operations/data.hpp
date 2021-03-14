@@ -33,7 +33,7 @@ namespace op {
   extern expr::Operator* mk_obj;
   extern expr::Operator* obj_get;
   extern expr::Operator* obj_set;
-  extern expr::Operator* derive;
+  extern expr::Operator* clone;
 
 // Symbol operations: making mutable/unmutable
   extern expr::Operator* lock;
