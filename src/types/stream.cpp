@@ -26,6 +26,13 @@ expr::Object *IOStream::check_type(expr::Object* obj) {
   }
 }
 
+expr::Object *IOStream::subtype(Type *ty) {
+  if (dynamic_cast<IOStream *>(ty)) {
+    return expr::t::get();
+  } else {
+    return expr::nil::get();
+  }
+}
 
 // INPUT STREAM
 void Istream::mark_node() {
@@ -45,6 +52,13 @@ expr::Object *Istream::check_type(expr::Object* obj) {
   }
 }
 
+expr::Object *Istream::subtype(Type *ty) {
+  if (dynamic_cast<IOStream *>(ty) || dynamic_cast<Istream*>(ty)) {
+    return expr::t::get();
+  } else {
+    return expr::nil::get();
+  }
+}
 
 // OUTPUT STREAM
 void Ostream::mark_node() {
@@ -64,3 +78,10 @@ expr::Object *Ostream::check_type(expr::Object* obj) {
   }
 }
 
+expr::Object *Ostream::subtype(Type *ty) {
+  if (dynamic_cast<IOStream *>(ty) || dynamic_cast<Ostream*>(ty)) {
+    return expr::t::get();
+  } else {
+    return expr::nil::get();
+  }
+}

@@ -19,3 +19,7 @@ string Any::to_string() const {
 expr::Object *Any::check_type(expr::Object* obj) {
   return expr::t::get();
 }
+
+expr::Object *Any::subtype(Type *obj) {
+  return expr::t::get();
+}

@@ -50,3 +50,12 @@ Type* EqlConstructor::constructor(list<Object*> lst) {
 string EqlConstructor::to_string() const {
   return "Constructor for the Eql type";
 }
+
+expr::Object *Eql::subtype(Type * ty) {
+  if (Eql* eq = dynamic_cast<Eql*>(ty)) {
+    string err = "Eql constructor not yet finished";
+    throw err;
+  } else {
+    return expr::nil::get();
+  }
+}

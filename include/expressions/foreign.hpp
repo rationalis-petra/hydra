@@ -35,7 +35,7 @@ struct ForeignSymbol : public Object {
 struct ForeignOperator : public Operator {
   ForeignOperator();
 
-  Object* call(Object* args, LocalRuntime& r, LexicalScope &s);
+  Object* call(std::list<Object*> arg_list, LocalRuntime& r, LexicalScope &s);
 
   std::list<foreign_type> arg_types;
   foreign_type return_type;

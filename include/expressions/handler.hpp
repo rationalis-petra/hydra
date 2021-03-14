@@ -1,6 +1,8 @@
 #ifndef __HYDRA_EXPRESSIONS_HANDLER_HPP
 #define __HYDRA_EXPRESSIONS_HANDLER_HPP
 
+#include <list>
+
 #include "expressions/object.hpp"
 #include "expressions/language.hpp"
 #include "expressions/operation.hpp"
@@ -34,7 +36,7 @@ struct hydra_restart : public Operator {
   hydra_restart(Operator* o, Symbol* s);
   void mark_node();
 
-  Object *call(Object *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s);
   Operator* op;
   Symbol* sym;
 };
@@ -45,17 +47,14 @@ struct hydra_exception {
 
   exception_type type;
 
-  union {
-    struct {
-      Object* obj;
-    };
-    struct {
-      hydra_restart *res;
-      Object *args;
-      LexicalScope *s;
-    };
-  };
-};
+  // was a union, doesn't like it??
+  // FAKE UNION PT1
+  Object *obj;
 
+  // FAKE UNION PT2
+  hydra_restart *res;
+  std::list<Object *> args;
+  LexicalScope *s;
+};
 }
 #endif

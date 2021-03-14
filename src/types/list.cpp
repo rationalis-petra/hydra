@@ -44,3 +44,11 @@ Type *List::constructor(list<expr::Object*> lst) {
     throw err;
   }
 }
+
+expr::Object *List::subtype(Type* other) {
+  if (List* lst = dynamic_cast<List*>(other)) {
+    return elt_type->subtype(lst->elt_type);
+  } else {
+    return expr::nil::get();
+  }
+}

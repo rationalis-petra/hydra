@@ -26,10 +26,9 @@ struct Operator : public Object {
   std::string to_string() const;
   bool is_fn;
 
-  virtual Object *call(Object *arg_list, LocalRuntime &r,
-                             LexicalScope &s) = 0;
-  std::list<Object *> get_arg_list(Object *arg_list, LocalRuntime &r,
-                                         LexicalScope &s);
+  virtual Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) = 0;
+  std::list<Object *> get_arg_list(Object* arg_list, LocalRuntime &r, LexicalScope &s);
+
   // STATE
   type::Fn* type;
   HString *docstring;
@@ -40,7 +39,7 @@ struct UserOperator : public Operator {
 
   ~UserOperator();
   std::string to_string() const;
-  Object *call(Object *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s);
 
   Symbol *rest; // for accepting variable arguments
   Symbol *self; // name of function within function's scope
@@ -52,16 +51,16 @@ struct UserOperator : public Operator {
 
   // captured scope for closures
   LexicalScope *scope;
-  UserOperator(Object *op_def, bool eval_args, LocalRuntime &r, LexicalScope &s);
+  UserOperator(std::list<Object*> op_def, bool eval_args, LocalRuntime &r, LexicalScope &s);
 };
 
-struct CombinedFn : public Operator {
+struct GenericFn : public Operator {
   // FUNTCIONS
   virtual void mark_node();
 
   void add (Operator* op);
   std::string to_string() const;
-  Object *call(Object *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s);
 
   //STATE
   std::list<Operator*> functions;
@@ -70,14 +69,25 @@ struct CombinedFn : public Operator {
 struct InbuiltOperator : public Operator {
   // FUNCTIONS
   InbuiltOperator(std::string str,
-                  Object* (*call)(Operator *op, Object *arg_list, LocalRuntime &r,
+                  Object* (*call)(std::list<Object*> arg_list, LocalRuntime &r,
                               LexicalScope &s),
                   type::Fn *t, bool is_fn);
 
-  Object *call(Object *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s);
 
   // STATE
-  Object *(*fnc)(Operator *op, Object *arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *(*fnc)(std::list<Object*>arg_list, LocalRuntime &r, LexicalScope &s);
+};
+
+
+struct NextFnc : public Operator {
+  // FUNCTIONS
+  NextFnc(std::list<Operator*> funcs, std::list<Object*> arg_list, Symbol* nextsym);
+  Object *call(std::list<Object*> arg_list, LocalRuntime&r, LexicalScope& s);
+
+  Symbol* nextsym;
+  std::list<Operator*> funcs;
+  std::list<Object*> arg_list;
 };
 
 } // namespace expr

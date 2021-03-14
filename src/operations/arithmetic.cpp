@@ -11,9 +11,8 @@ using namespace expr;
 using type::hydra_cast;
 
 
-Object *op_plus(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
+Object *op_plus(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   // ASSUME: all values in arg_list are rooted
-  std::list<Object *> arg_list = op->get_arg_list(alist, r, s);
   Integer *out = new Integer(0);
 
   for (Object *o : arg_list) {
@@ -36,8 +35,8 @@ expr::Operator *op::plus =
 
 
 
-Object *op_minus(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_minus(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() < 2) {
     throw "Insufficient arguments provided to '-' function";
   }
@@ -69,8 +68,8 @@ expr::Operator *op::minus =
 
 
 
-Object *op_multiply(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_multiply(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   Integer *out = new Integer(1);
 
   for (Object *arg : arg_list) {
@@ -95,9 +94,9 @@ expr::Operator *op::multiply =
 
 
 
-Object *op_divide(Operator* op, Object *alist, LocalRuntime &r,
+Object *op_divide(list<Object*> arg_list, LocalRuntime &r,
                               LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  
   if (arg_list.size() < 1) {
     throw "Insufficient arguments provided to '/' function";
   }
@@ -128,8 +127,8 @@ expr::Operator *op::divide = new InbuiltOperator(
 
 
 
-Object *op_int_gr(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_int_gr(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   // we now ASSERT that arg_list is a list of length 2
   // does it contain integers?
 

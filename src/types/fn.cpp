@@ -136,4 +136,25 @@ Fn *Fn::with_args_optional(std::vector<Type *> args, std::vector<Type *> opts) {
   return tfn;
 }
 
-  
+expr::Object* Fn::subtype(Type* other) {
+  if (Fn* tfn = dynamic_cast<Fn*>(other)) {
+    if (arg_list.size() == tfn->arg_list.size()) {
+      auto our_ir = arg_list.begin();
+      auto their_ir = tfn->arg_list.begin();
+      // all of our arguments have to be subtypes of theirs
+      while (our_ir != arg_list.end()) {
+        if (!(*their_ir)->subtype(*our_ir)) {
+          return expr::nil::get(); 
+        }
+        their_ir++;
+        our_ir++;
+      }
+      // our return type must be a supertype of theirs
+      // i.e. their return type must be a subtype of ours
+      if (return_type->subtype(tfn->return_type)) {
+        return expr::t::get();
+      }
+    }
+  }
+  return expr::nil::get();
+}

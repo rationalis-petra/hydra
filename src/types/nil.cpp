@@ -18,3 +18,11 @@ string Nil::to_string() const {
 expr::Object *Nil::check_type(expr::Object* obj) {
   return  obj->null() ? (Object*) expr::t::get() : (Object*) expr::nil::get();
 }
+
+expr::Object *Nil::subtype(Type* ty) {
+  if (dynamic_cast<Nil*>(ty)) {
+    return expr::t::get();
+  } else {
+    return expr::nil::get();
+  }
+}

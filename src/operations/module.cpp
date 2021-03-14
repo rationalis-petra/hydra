@@ -9,9 +9,9 @@ using std::string;
 using namespace expr;
 using type::hydra_cast;
 
-Object *op_mk_symbol(Operator *op, Object *alist, LocalRuntime &r,
+Object *op_mk_symbol(list<Object*> arg_list, LocalRuntime &r,
                     LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments to make-symbol";
     throw err;
@@ -25,9 +25,9 @@ Operator *op::mk_symbol = new InbuiltOperator(
     op_mk_symbol,
     type::Fn::with_all({new type::TString}, nullptr, new type::Symbol), true);
 
-Object *op_mk_module(Operator *op, Object *alist, LocalRuntime &r,
+Object *op_mk_module(list<Object*> arg_list, LocalRuntime &r,
                     LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  
   if (arg_list.size() > 1) {
     string err = "invalid number of arguments to make-module";
     throw err;
@@ -43,9 +43,9 @@ Operator *op::mk_module = new InbuiltOperator(
     "Generates a new module whose name is the provided string", op_mk_module,
     type::Fn::with_all({new type::TString}, nullptr, new type::Module), true);
 
-Object *op_in_module(Operator *op, Object *alist, LocalRuntime &r,
+Object *op_in_module(list<Object*> arg_list, LocalRuntime &r,
                     LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments to in-module";
     throw err;
@@ -59,8 +59,8 @@ Operator *op::in_module = new InbuiltOperator(
     "Sets the current (active) module to the provided argument", op_in_module,
     type::Fn::with_all({new type::Module}, nullptr, new type::Module), true);
 
-Object *op_intern(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_intern(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to intern";
     throw err;
@@ -80,8 +80,8 @@ Operator *op::intern = new InbuiltOperator(
                        new type::Symbol),
     true);
 
-Object *op_insert(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_insert(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to insert";
     throw err;
@@ -112,8 +112,8 @@ Operator *op::insert = new InbuiltOperator(
                        new type::Symbol),
     true);
 
-Object *op_get(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_get(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to get";
     throw err;
@@ -130,9 +130,9 @@ Operator *op::get = new InbuiltOperator(
     op_get, type::Fn::with_all({new type::TString}, nullptr, new type::Symbol),
     true);
 
-Object *op_get_module(Operator *op, Object *alist, LocalRuntime &r,
+Object *op_get_module(list<Object*> arg_list, LocalRuntime &r,
                      LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  
   if (arg_list.size() != 0) {
     string err = "invalid number of arguments provided to current-module";
     throw err;
@@ -143,9 +143,9 @@ Object *op_get_module(Operator *op, Object *alist, LocalRuntime &r,
 Operator *op::get_module = new InbuiltOperator(
     "Returns the current (active) module", op_get_module, new type::Fn, true);
 
-Object *op_get_symbols(Operator *op, Object *alist, LocalRuntime &r,
+Object *op_get_symbols(list<Object*> arg_list, LocalRuntime &r,
                       LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  
   if (arg_list.size() != 1) {
     string err = "invalid number of arguments provided to get-symbols";
     throw err;
@@ -163,8 +163,8 @@ Operator *op::get_symbols = new InbuiltOperator(
     "Returns a list of symbols which are exported by a module", op_get_symbols,
     type::Fn::with_all({new type::Module}, nullptr, new type::List), true);
 
-Object *op_remove(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_remove(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to remove";
     throw err;
@@ -202,8 +202,8 @@ Operator *op::remove = new InbuiltOperator(
 //   return out;
 // }
 
-Object *op_export(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_export(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 2) {
     string err = "invalid number of arguments provided to current-module";
     throw err;

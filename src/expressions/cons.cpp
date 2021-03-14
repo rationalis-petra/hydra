@@ -1,6 +1,5 @@
 #include <string>
 #include <typeinfo>
-#include <iostream>
 
 #include "expressions.hpp"
 
@@ -29,7 +28,8 @@ Object *Cons::eval(LocalRuntime &r, LexicalScope &s) {
   Operator *op;
   if ((op = dynamic_cast<Operator *>(oper))) {
     try {
-      Object *out = op->call(cdr, r, s);
+      std::list<Object*> arg_list = op->get_arg_list(cdr, r, s);
+      Object *out = op->call(arg_list, r, s);
       Object::roots.remove(oper);
       return out;
     } catch (hydra_exception* e) {

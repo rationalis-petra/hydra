@@ -12,8 +12,8 @@ using std::list;
 using std::string;
 
 
-Object* op_describe(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_describe(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  
 
   if (UserOperator* uop = dynamic_cast<UserOperator*>(arg_list.front())) {
     string str = "generic function:\n" + uop->docstring->value +
@@ -22,7 +22,7 @@ Object* op_describe(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& 
       //str += "\n expression:\n";
       //str += "(fn " + uop->expr->to_string() + ")";
     return new HString(str);
-  } else if (CombinedFn* generic = dynamic_cast<CombinedFn*>(arg_list.front())) {
+  } else if (GenericFn* generic = dynamic_cast<GenericFn*>(arg_list.front())) {
     string str = "generic function:\n" + generic->docstring->value +
                  "\nlambda-list: " +
       "\ntype: " + generic->type->to_string();
@@ -44,8 +44,8 @@ Operator* op::describe =
                       true);
 
 // currently returns a string of time, not a time object... fix this!!!
-Object* op_time(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_time(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  
   Object* obj = arg_list.front();
   steady_clock::time_point start = steady_clock::now();
   obj->eval(r, s);

@@ -51,7 +51,7 @@ std::string GenFn::to_string() const {
 }
 
 expr::Object *GenFn::check_type(expr::Object *obj) {
-  if (dynamic_cast<expr::CombinedFn*>(obj)) {
+  if (dynamic_cast<expr::GenericFn*>(obj)) {
     return expr::t::get();
   }
   return expr::nil::get();
@@ -65,4 +65,9 @@ Type *GenFn::constructor(list<expr::Object*> lst) {
     string err = "type_gen_fn::constructor not implemented";
     throw err;
   }
+}
+
+expr::Object* GenFn::subtype(Type* other) {
+  string err = "Interpreter Error: subtype not implemented for gen_fn";
+  throw err;
 }

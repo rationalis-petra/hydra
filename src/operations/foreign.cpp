@@ -13,9 +13,8 @@ using std::to_string;
 
 using namespace expr;
 
-Object *op_foreign_lib(Operator* op, Object *body, LocalRuntime &r,
+Object *op_foreign_lib(list<Object*> arg_list, LocalRuntime &r,
                                    LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(body, r, s);
   if (arg_list.size() != 1) {
     string err =
         "Incorrect number of arguments provided to function load-foreign-lib";
@@ -48,8 +47,7 @@ Operator *op::foreign_lib =
                         type::Fn::with_args({new type::TString}),
                         true);
 
-Object *op_foreign_sym(Operator* op, Object *body, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(body, r, s);
+Object *op_foreign_sym(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   if (arg_list.size() != 2) {
     string err =
         "Incorrect number of arguments provided to function get-foreign-symbol";
@@ -85,8 +83,7 @@ Operator* op::foreign_sym =
                       true);
 
 // define-foreign-function
-Object *op_internalize(Operator* op2, Object *body, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op2->get_arg_list(body, r, s);
+Object *op_internalize(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   if (arg_list.size() != 2) {
     string err =
         "Expected 2 arguments when internalizing foreign symbol, got + " +
@@ -200,8 +197,7 @@ Operator *op::internalize =
                         type::Fn::with_args({new type::Any, new type::Any}),
                         true);
 
-Object *ForeignOperator::call(Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = get_arg_list(alist, r, s);
+Object *ForeignOperator::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   if (arg_list.size() != arg_types.size()) {
     string err =
         "Error in foreign function call: arg list is not of expected size";

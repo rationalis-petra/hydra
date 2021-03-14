@@ -25,14 +25,12 @@ Object *make_list(list<Object *> objects) {
   }
 }
 
-Object *op_cons(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
-
-  return make_list(arg_list);
+Object *op_cons(list<Object*> alist, LocalRuntime &r, LexicalScope &s) {
+  return make_list(alist);
 }
 
-Object *op_cdr(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_cdr(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 1) {
     throw "invalid number of args to cdr";
   }
@@ -46,8 +44,8 @@ Object *op_cdr(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-Object *op_car(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_car(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 1) {
     throw "invalid number of args to car";
   }

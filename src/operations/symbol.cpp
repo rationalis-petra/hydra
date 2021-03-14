@@ -9,8 +9,8 @@ using std::string;
 using namespace expr;
 using type::hydra_cast;
 
-Object *op_lock(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_lock(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments to lock: " +
                  std::to_string(arg_list.size()) + " expected 1";
@@ -25,8 +25,8 @@ Operator *op::lock = new InbuiltOperator(
     op_lock, type::Fn::with_all({new type::Symbol}, nullptr, new type::Symbol),
     true);
 
-Object *op_unlock(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_unlock(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments to unlock: " +
                  std::to_string(arg_list.size()) + " expected 1";

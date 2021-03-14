@@ -11,8 +11,8 @@ using type::hydra_cast;
 using namespace expr;
 
 // HANDLING CONDITIONS
-Object* op_handler_catch(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_handler_catch(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  
   try {
     // add self to list of handlers
     // LocalRuntime.handlers.add (new catch_handler())
@@ -59,8 +59,8 @@ Operator* op::handler_catch =
                       op_handler_catch, type::Fn::with_all({new type::Any}, new type::Cons, new type::Any),
                       false);
 
-Object* op_handler_bind(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_handler_bind(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  
   // add self to the stack of handlers
   // LocalRuntime.handlers.add(new bind_handler(arg_list))
   Object *code = arg_list.front();
@@ -98,9 +98,7 @@ Operator* op::handler_bind =
 // RESTARTS
 
 // (with-restart <restart_name> <function> <code>)
-Object* op_add_restart(Operator* op2, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object *> arg_list = op2->get_arg_list(alist, r, s);
-
+Object* op_add_restart(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
   Symbol* sym = dynamic_cast<Symbol*> (arg_list.front()->eval(r, s));
   arg_list.pop_front();
   Operator* op = dynamic_cast<Operator*>(arg_list.front()->eval(r, s));
@@ -146,7 +144,7 @@ Object* gen_list(std::list<hydra_restart*> lst) {
   }
 }
 
-Object *op_get_restarts(Operator *op, Object *alist, LocalRuntime &r,
+Object *op_get_restarts(list<Object*> arg_list, LocalRuntime &r,
                        LexicalScope &s) {
   return gen_list(r.restarts);
 }
@@ -158,8 +156,8 @@ Operator* op::get_restarts =
                       true);
 
 // SIGNALLING CONDITIONS
-Object* op_signal_condition(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_signal_condition(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  
   while (!r.handlers.empty()) {
     try {
       return r.handlers.front()->handle(arg_list.front());

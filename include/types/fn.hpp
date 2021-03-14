@@ -14,6 +14,7 @@ struct Fn : public Type {
   virtual void mark_node();
 
   Fn();
+  virtual expr::Object *subtype(Type *obj);
 
   // factory methods
   static Fn* with_rest(Type* tp);
@@ -37,6 +38,7 @@ struct Fn : public Type {
 
 struct Mac : public Fn {
   virtual void mark_node();
+  virtual expr::Object *subtype(Type *obj);
 
   std::string to_string() const;
   expr::Object* check_type(expr::Object* obj);
@@ -46,6 +48,7 @@ struct Mac : public Fn {
 
 struct GenFn : public Type {
   virtual void mark_node();
+  virtual expr::Object *subtype(Type *obj);
 
   GenFn();
   std::string to_string() const;

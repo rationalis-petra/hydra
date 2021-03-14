@@ -24,3 +24,10 @@ expr::Object *Module::check_type(expr::Object* obj) {
     return expr::nil::get();
   }
 }
+expr::Object *Module::subtype(Type* ty) {
+  if (dynamic_cast<Module*>(ty)) {
+    return expr::t::get();
+  } else {
+    return expr::nil::get();
+  }
+}

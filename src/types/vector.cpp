@@ -34,3 +34,11 @@ Type *Vector::constructor(list<Object*> lst) {
     throw err;
   }
 }
+
+expr::Object *Vector::subtype(Type* other) {
+  if (Vector* vc = dynamic_cast<Vector*>(other)) {
+    return type_elt->subtype(vc->type_elt);
+  } else {
+    return expr::nil::get();
+  }
+}

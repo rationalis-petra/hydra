@@ -53,3 +53,20 @@ Type *Tuple::constructor(list<expr::Object*> lst) {
   }
   return tup;
 }
+
+expr::Object *Tuple::subtype(Type * ty) {
+  if (Tuple* other = dynamic_cast<Tuple*>(ty)) {
+    if (other->types.size() != types.size()) {
+      return expr::nil::get();
+    } else {
+      for (int i = 0; i < types.size(); i++) {
+        if (!types[i]->subtype(other->types[i])) {
+          return expr::nil::get();
+        }
+      }
+      return expr::t::get();
+    }
+  } else {
+    return expr::nil::get();
+  }
+}

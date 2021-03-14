@@ -23,8 +23,9 @@
 
 namespace expr {
 
-
-extern Module* language_module;
+extern expr::Module *language_module;
+extern expr::Module *keyword_module;
+extern expr::Module *core_module;
 
 }
 #endif // __HYDRA_EXPRESSIONS_HPP

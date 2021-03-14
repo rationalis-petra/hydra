@@ -33,3 +33,12 @@ Type *Cons::constructor(list<Object*> lst) {
     throw err;
   }
 }
+
+expr::Object *Cons::subtype(Type *obj) {
+  if (Cons *tcons = dynamic_cast<Cons*>(obj)) {
+    // if (type_car->subtype(tcons->type_car) &&
+    //     type_cdr->subtype(tcons->type_cdr))
+    return expr::t::get();
+  }
+  return expr::nil::get();
+}

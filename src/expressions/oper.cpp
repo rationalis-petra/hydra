@@ -4,6 +4,7 @@
 #include <string>
 #include <typeinfo>
 
+#include "utils.hpp"
 #include "expressions.hpp"
 #include "operations.hpp"
 
@@ -11,7 +12,6 @@ using std::list;
 using std::string;
 
 using namespace expr;
-
 string Operator::to_string() const { return "<inbuilt operation>"; }
 
 Operator::Operator() {
@@ -32,21 +32,19 @@ list<Object *> Operator::get_arg_list(Object *arg_list, LocalRuntime &r,
   // ASSUME that arg_list is rooted
   Object *original_list = arg_list;
 
+  list<Object*> alist = cons_to_list(arg_list);
   list<Object *> out_list;
-  while (!arg_list->null()) {
-    Cons *list_elt = dynamic_cast<Cons *>(arg_list);
-    Object *arg = list_elt->car;
-    if (is_fn) {
+  if (is_fn) {
+    for (Object* arg : alist) {
       out_list.push_back(arg->eval(r, s));
-    } else {
-      out_list.push_back(arg);
+      Object::roots.insert(out_list.back());
     }
-
-    // we just added a value to the arg_list: we need to root it
-    // This means that a value will be 'double-rooted' for macros,
-    // but better safe than sorry!
-    Object::roots.insert(out_list.back());
-    arg_list = list_elt->cdr;
+  } else {
+    out_list = alist;
+    // TODO: make me able to remove this!!
+    for (Object* arg : alist) {
+      Object::roots.insert(arg);
+    }
   }
   if (type->check_args(out_list)->null()) {
     string err =
@@ -57,11 +55,11 @@ list<Object *> Operator::get_arg_list(Object *arg_list, LocalRuntime &r,
   return out_list;
 }
 
-// COMBINED FUNCTION
+// GENERIC FUNCTION
 
-string CombinedFn::to_string() const { return "<generic function>"; }
+string GenericFn::to_string() const { return "<generic function>"; }
 
-void CombinedFn::mark_node() {
+void GenericFn::mark_node() {
   if (marked)
     return;
 
@@ -73,8 +71,8 @@ void CombinedFn::mark_node() {
   }
 }
 
-void CombinedFn::add(Operator *fn) {
-  if (CombinedFn *f = dynamic_cast<CombinedFn *>(fn)) {
+void GenericFn::add(Operator *fn) {
+  if (GenericFn *f = dynamic_cast<GenericFn *>(fn)) {
     for (Operator *o : f->functions) {
       add(o);
     }
@@ -86,29 +84,43 @@ void CombinedFn::add(Operator *fn) {
   }
 }
 
-Object *CombinedFn::call(Object *alist, LocalRuntime &r, LexicalScope &s) {
+Object *GenericFn::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   // ASSUME that the function itself is marked
 
-  // All values in the arg_list are rooted by the get_arg_list function
-  list<Object *> arg_list = get_arg_list(alist, r, s);
-
+  // first find a list of applicable functions
+  std::list<Operator*> applicables;
   for (Operator *fn : functions) {
     if (!fn->type->check_args(arg_list)->null()) {
-      Object* out =  fn->call(alist, r, s);
+      applicables.push_back(fn);
 
       // we need to unroot values in the arg_list
-      for (Object* v : arg_list) {
-        Object::roots.remove(v);
-      }
-      return out;
     }
   }
-  string err = "No matching function in combined function";
-  throw err;
+
+  // Now, we have a list of applicable functions, we need to support them
+  // using the subtype relation
+  applicables.sort([](Operator *op1, Operator *op2) {
+    return (op1->type->subtype(op2->type))->null();
+  });
+  // now we have a sorted list, we just need to execute the methods, one-by-one
+  // only executing the next method if the previous one executed
+  // in addition, we need to introduce the 'call-next' function into
+  // the lexical scope
+  if (applicables.empty()) {
+    string err = "no applicable method found in generic function";
+    throw err;
+  } else {
+    Symbol *call_next = core_module->intern("call-next");
+    Operator *op = applicables.front();
+    applicables.pop_front();
+    NextFnc *nextfnc = new NextFnc(applicables, arg_list, call_next);
+    s.map[call_next] = nextfnc;
+    return op->call(arg_list, r, s);
+  }
 }
 
 InbuiltOperator::InbuiltOperator(string _docstring,
-                                 Object *(*_fnc)(Operator *, Object *,
+                                 Object *(*_fnc)(std::list<Object *> arg_list,
                                                 LocalRuntime &r,
                                                 LexicalScope &s),
                                  type::Fn *t, bool isfn) {
@@ -118,9 +130,25 @@ InbuiltOperator::InbuiltOperator(string _docstring,
   is_fn = isfn;
 }
 
-Object *InbuiltOperator::call(Object *arg_list, LocalRuntime &r,
+Object *InbuiltOperator::call(std::list<Object *> arg_list, LocalRuntime &r,
                              LexicalScope &s) {
   // ASSUME arg_list is rooted
   // WE delegate rooting to inbuilt functions
-  return fnc(this, arg_list, r, s);
+  return fnc(arg_list, r, s);
+}
+
+NextFnc::NextFnc(list<Operator*> _fncs, list<Object*> _arg_list, Symbol* _nextsym) {
+  funcs = _fncs;
+  arg_list = _arg_list;
+  nextsym = _nextsym;
+}
+
+Object* NextFnc::call(std::list<Object*> arglist, LocalRuntime& r, LexicalScope& s) {
+  for (Object* obj : arglist) {
+    roots.remove(obj);
+  }
+  Operator* op = funcs.front();
+  funcs.pop_front();
+  s.map[nextsym] = this;
+  return op->call(arg_list, r, s);
 }

@@ -105,3 +105,7 @@ Type *Mac::constructor(list<Object*> lst) {
   }
 }
 
+expr::Object* Mac::subtype(Type *obj) {
+  string err = "subtyoe for Mac not implemetned!";
+  throw err;
+}

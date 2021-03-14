@@ -9,8 +9,8 @@ using std::string;
 using namespace expr;
 
 
-Object *op_str_elt(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_str_elt(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 2) {
     string err = "invalid number of args to elt";
     throw err;
@@ -35,8 +35,8 @@ Operator *op::str_elt = new InbuiltOperator(
                        new type::Char),
     true);
 
-Object *op_str_cat(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_str_cat(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   string str;
   for (Object* obj : arg_list) {
     HString* s = dynamic_cast<HString*>(obj);
@@ -51,8 +51,8 @@ Operator *op::str_cat =
                         type::Fn::with_all({}, new type::TString, new type::TString),
                         true);
 
-Object *op_str_gr(Operator* op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_str_gr(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   HString *s1 = dynamic_cast<HString *>(arg_list.front());
   HString *s2 = dynamic_cast<HString *>(arg_list.back());
   if (s1->value > s2->value) {

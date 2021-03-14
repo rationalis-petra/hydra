@@ -9,8 +9,8 @@ using std::string;
 using namespace expr;
 
 
-Object *op_eq(Operator* op, Object* alist, LocalRuntime& r, LexicalScope &s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_eq(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s) {
+  
   if (arg_list.size() < 2) {
     string err = "Invalid number of arguments to macro =: expects 2";
     throw err;
@@ -63,8 +63,8 @@ Operator* op::eq =
                       type::Fn::with_args({new type::Any, new type::Any}),
                       true);
 
-Object *op_or(Operator* op, Object* alist, LocalRuntime& r, LexicalScope &s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_or(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s) {
+  
   if (arg_list.size() < 2) {
     string err = "Invalid number of arguments to macro or";
     throw err;
@@ -84,8 +84,8 @@ Operator* op::do_or =
                       type::Fn::with_rest(new type::Any),
                       false);
 
-Object *op_and(Operator* op, Object* alist, LocalRuntime& r, LexicalScope &s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_and(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s) {
+  
   if (arg_list.size() < 2) {
     string err = "Invalid number of arguments to macro and";
     throw err;
@@ -113,8 +113,8 @@ Operator* op::do_and =
                       false);
 
 
-Object *op_not(Operator* op, Object* alist, LocalRuntime& r, LexicalScope &s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object *op_not(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s) {
+  
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments to macro not";
     throw err;

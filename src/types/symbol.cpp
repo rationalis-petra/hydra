@@ -25,3 +25,11 @@ Object *Symbol::check_type(Object* obj) {
   }
 }
 
+
+expr::Object *Symbol::subtype(Type * ty) {
+  if (dynamic_cast<Symbol*>(ty)) {
+    return expr::t::get();
+  } else {
+    return expr::nil::get();
+  }
+}

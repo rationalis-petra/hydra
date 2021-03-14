@@ -24,3 +24,9 @@ expr::Object *Integer::check_type(expr::Object* obj) {
   }
 }
 
+expr::Object *Integer::subtype(Type* other) {
+  if (dynamic_cast<Integer*>(other)) {
+    return expr::t::get(); 
+  }
+  return expr::nil::get();
+}

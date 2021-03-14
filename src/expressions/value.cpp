@@ -20,7 +20,7 @@ Object::Object() {
   marked = false;
   counter++;
 
-  // check for the number of 
+  // collect garbage??
 }
 
 Object::~Object() {}

@@ -227,7 +227,8 @@ Object *read(Object *raw, LocalRuntime &r) {
 
       // generate a blank 'dummy' scope
       LexicalScope s;
-      return r.r.readtable[c]->call(cns2, r, s);
+      list<Object*> arg_list = r.r.readtable[c]->get_arg_list(cns2, r, s);
+      return r.r.readtable[c]->call(arg_list, r, s);
     }
     switch (c) {
       // whitespace characters
@@ -265,8 +266,8 @@ Object *read(Object *raw, LocalRuntime &r) {
   return nil::get();
 }
 
-Object *op_read(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_read(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments provided to read";
     throw err;
@@ -281,9 +282,9 @@ Operator *op::read = new InbuiltOperator(
     //type (Union Input-stream String)
     op_read, type::Fn::with_args({new type::Any}), true);
 
-Object *op_set_mac_char(Operator *op, Object *alist, LocalRuntime &r,
+Object *op_set_mac_char(list<Object*> arg_list, LocalRuntime &r,
                        LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  
   if (arg_list.size() != 2) {
     string err =
         "Incorrect number of arguments provided to set-macro-character";

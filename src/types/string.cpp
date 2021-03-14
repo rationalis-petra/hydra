@@ -24,3 +24,10 @@ expr::Object *TString::check_type(expr::Object* obj) {
   }
 }
 
+expr::Object *TString::subtype(Type * ty) {
+  if (dynamic_cast<TString*>(ty)) {
+    return expr::t::get();
+  } else {
+    return expr::nil::get();
+  }
+}

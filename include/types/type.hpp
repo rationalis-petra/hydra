@@ -14,6 +14,7 @@ namespace type {
 struct Type : public virtual expr::Object {
 public:
   virtual expr::Object *check_type(expr::Object *obj) = 0;
+  virtual expr::Object *subtype(Type *ty) = 0;
 };
 
 struct TypeConstructor : public virtual expr::Object {
@@ -25,6 +26,7 @@ struct Symbol : public Type {
   virtual void mark_node();
   std::string to_string() const;
   expr::Object* check_type(expr::Object* obj);
+  virtual expr::Object *subtype(Type *ty);
 };
 
 // TODO: TUPLE, UNION!!!
@@ -33,6 +35,7 @@ struct Cons : public Type, public TypeConstructor {
   virtual void mark_node();
   std::string to_string() const;
   expr::Object* check_type(expr::Object* obj);
+  virtual expr::Object *subtype(Type *ty);
   Type* constructor(std::list<expr::Object*> lst);
 
   Type* type_car;
@@ -43,6 +46,7 @@ struct Vector : public Type, public TypeConstructor {
   virtual void mark_node();
   std::string to_string() const;
   expr::Object* check_type(expr::Object* obj);
+  virtual expr::Object *subtype(Type *ty);
   Type* constructor(std::list<expr::Object*> lst);
 
   Type* type_elt;
@@ -52,6 +56,7 @@ struct List : public Type, public TypeConstructor {
   virtual void mark_node();
   std::string to_string() const;
   expr::Object* check_type(expr::Object* obj);
+  virtual expr::Object *subtype(Type *ty);
   Type* constructor(std::list<expr::Object*> lst);
 
   Type* elt_type;
@@ -63,6 +68,7 @@ struct Tuple : public Type, public TypeConstructor {
   virtual void mark_node();
   std::string to_string() const;
   expr::Object* check_type(expr::Object* obj);
+  virtual expr::Object *subtype(Type *ty);
   Type* constructor(std::list<expr::Object*> lst);
 
   std::vector<Type*> types;
@@ -74,6 +80,7 @@ struct Union : public Type, public TypeConstructor {
   expr::Object* check_type(expr::Object* obj);
   Type* constructor(std::list<expr::Object*> lst);
 
+  virtual expr::Object *subtype(Type *ty);
   std::list<Type*> types;
 };
 
@@ -88,6 +95,7 @@ struct Derives : public Type {
   void mark_node();
   expr::UserObject* object;
   std::string to_string() const;
+  virtual expr::Object *subtype(Type *ty);
   virtual expr::Object *check_type(expr::Object *obj);
 };
 
@@ -103,6 +111,7 @@ struct Eql : public Type {
   void mark_node();
   expr::Object* object;
   std::string to_string() const;
+  virtual expr::Object *subtype(Type *ty);
   virtual expr::Object *check_type(expr::Object *obj);
 };
 

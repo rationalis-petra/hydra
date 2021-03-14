@@ -6,27 +6,16 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
 
 using namespace expr;
 
 using type::hydra_cast;
 
 using std::list;
-using std::map;
 using std::string;
 using std::function;
 
-// UTILITY FUNCTION: local to this file
-// Convert a cons-list into a c++ list
-list<Object *> make_list(Object *obj) {
-  list<Object *> lst;
-  while (!obj->null()) {
-    Cons *cns = hydra_cast<Cons>(obj);
-    lst.push_back(cns->car);
-    obj = cns->cdr;
-  }
-  return lst;
-}
 
 string UserOperator::to_string() const {
   string name = is_fn ? "function" : "macro";
@@ -67,8 +56,9 @@ void UserOperator::mark_node() {
   }
 }
 
-UserOperator::UserOperator(Object *op_def, bool _is_fn, LocalRuntime &r,
-                     LexicalScope &s) : Operator() {
+UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
+                           LocalRuntime &r, LexicalScope &s)
+    : Operator() {
   // EVAL is called when evaluating
   // therefore, we must add ourselves to the root list
   // ASSUME op_def already there
@@ -82,148 +72,136 @@ UserOperator::UserOperator(Object *op_def, bool _is_fn, LocalRuntime &r,
   // if we have a symbol, try evaluating it to see if it's a type
 
   // operations have the form:
-  // (fn/mac <optional name> <arg_list> rest)
-  if (Cons *cns = dynamic_cast<Cons *>(op_def)) {
+  // (fn/mac <optional type> <lambda_list> rest)
 
-    Object *name_list;
+  // lambd list looks like: (x y (z Integer) :rest p)
+  list<Object*> lambda_list;
 
-    if (Symbol *sym = dynamic_cast<Symbol *>(cns->car)) {
-      Object *raw_type = sym->eval(r, s);
-      if (type::Type* ret_type = dynamic_cast<type::Type*>(raw_type)) {
-        type->return_type = ret_type;
-      } else {
-        string err = "First argument to fn is neither type nor argument-list";
-        throw err;
-      }
-      if (Cons* cns2 = dynamic_cast<Cons *>(cns->cdr)) {
-        name_list = cns2->car;
-        cns = cns2;
-      } else {
-        string err = "Second argument to typed fn is not an argument-list";
-        throw err;
-      }
+  // STEP 1: determine if this function is given a return type!
+  if (Symbol *sym = dynamic_cast<Symbol *>(op_def.front())) {
+    // The first element is a symbol, so we evaluate to get a type!
+    Object *raw_type = sym->eval(r, s);
+    if (type::Type *ret_type = dynamic_cast<type::Type *>(raw_type)) {
+      type->return_type = ret_type;
     } else {
-      name_list = cns->car;
+      string err = "First argument to fn is neither type nor argument-list";
+      throw err;
     }
 
-
-    list<Object *> lst = make_list(name_list);
-    bool optional = false;
-    bool key = false;
-
-    for (auto it = lst.begin(); it != lst.end(); it++) {
-      Symbol* name;
-      type::Type* t_type;
-      if (Cons* symdef = dynamic_cast<Cons*>(*it)) {
-        name = hydra_cast<Symbol>(symdef->car);
-        // type
-        t_type = hydra_cast<type::Type>(hydra_cast<Cons>(symdef->cdr)->car->eval(r, s));
-      } else {
-        name = hydra_cast<Symbol>(*it);
-        t_type = new type::Any;
-      }
-      // :self keyword
-      if (name == hydra_cast<Module>(r.r.root->intern("keyword")->value)
-                      ->get("self")) {
-        if (++it != lst.end()) {
-          self = hydra_cast<Symbol>(*it);
-          //type->return_type = t_type;
-        } else {
-          string err = "No self argument name!";
-          throw err;
-        }
-      }
-
-      // :rest arguments
-      else if (name ==
-               hydra_cast<Module>(r.r.root->intern("keyword")->value)
-                   ->get("rest")) {
-        if (++it != lst.end()) {
-          if (Cons* cns = dynamic_cast<Cons*>(*it)) {
-            rest = hydra_cast<Symbol>(cns->car);
-            type->rest_type = hydra_cast<type::Type>(hydra_cast<Cons>(cns->cdr)->car->eval(r, s));
-          }
-          else {
-            rest = hydra_cast<Symbol>(*it);
-            type->rest_type = new type::Any;
-          }
-        } else {
-          string err = "No rest argument name provided!";
-          throw err;
-        }
-      }
-
-      // :optional arguments
-      else if (name ==
-               hydra_cast<Module>(r.r.root->intern("keyword")->value)
-                   ->get("optional")) {
-        if (key) {
-          string err = "Cannot follow :key with :optional in function list";
-          throw err;
-        } else {
-          optional = true;
-        }
-      }
-
-      else if (name ==
-               hydra_cast<Module>(r.r.root->intern("keyword")->value)
-                   ->get("key")) {
-        key = true;
-      }
-
-      // :key arguments
-      else {
-        if (key) {
-          Symbol *keyword =
-              hydra_cast<Module>(r.r.root->intern("keyword")->value)
-                  ->intern(name->name);
-          keys[keyword] = name;
-          keyword->value = keyword;
-          type->keyword_list.push_back(t_type);
-          type->keyword_names.push_back(name);
-
-        } else if (optional) {
-          optionals.push_back(name);
-          type->optional_list.push_back(t_type);
-
-        } else {
-          type->arg_list.push_back(t_type);
-          arg_names.push_back(name);
-
-        }
-      }
+    // NOW, we need to make sure that the /second/ argument is a lambda-list
+    op_def.pop_front();
+    if (Cons *cns = dynamic_cast<Cons *>(op_def.front())) {
+      lambda_list = cons_to_list(cns);
+    } else {
+      string err = "Second argument to typed fn is not an argument-list";
+      throw err;
     }
-    Object *expr_body = cns->cdr;
-    Object *cdr = expr_body;
-
-    if (Cons *docons = (dynamic_cast<Cons *>(expr_body))) {
-      HString *dstring = dynamic_cast<HString *>(docons->car);
-      if (dstring) {
-        docstring = dstring;
-      }
-    }
-
-    Symbol *progn = hydra_cast<Symbol>(
-        hydra_cast<Module>(
-            hydra_cast<Symbol>(language_module->get("core"))->value)
-            ->get("progn"));
-    progn->name = "progn";
-    Object *car = progn;
-    expr = new Cons(car, cdr);
   } else {
-    string err = "Non-cons provided to fn/mac";
-    throw err;
+    lambda_list = cons_to_list(op_def.front());
   }
+
+  bool optional = false;
+  bool key = false;
+
+  for (auto it = lambda_list.begin(); it != lambda_list.end(); it++) {
+    Symbol *name;
+    type::Type *t_type;
+    if (Cons *symdef = dynamic_cast<Cons *>(*it)) {
+      name = hydra_cast<Symbol>(symdef->car);
+      // type
+      t_type = hydra_cast<type::Type>(
+          hydra_cast<Cons>(symdef->cdr)->car->eval(r, s));
+    } else {
+      name = hydra_cast<Symbol>(*it);
+      t_type = new type::Any;
+    }
+    // :self keyword
+    if (name == get_keyword("self")) {
+      if (++it != lambda_list.end()) {
+        self = hydra_cast<Symbol>(*it);
+        // type->return_type = t_type;
+      } else {
+        string err = "No self argument name!";
+        throw err;
+      }
+    }
+
+    // :rest arguments
+    else if (name == get_keyword("rest")) {
+      if (++it != lambda_list.end()) {
+        if (Cons *cns = dynamic_cast<Cons *>(*it)) {
+          rest = hydra_cast<Symbol>(cns->car);
+          type->rest_type = hydra_cast<type::Type>(
+              hydra_cast<Cons>(cns->cdr)->car->eval(r, s));
+        } else {
+          rest = hydra_cast<Symbol>(*it);
+          type->rest_type = new type::Any;
+        }
+      } else {
+        string err = "No rest argument name provided!";
+        throw err;
+      }
+    }
+
+    // :optional arguments
+    else if (name == get_keyword("optional")) {
+      if (key) {
+        string err = "Cannot follow :key with :optional in function list";
+        throw err;
+      } else {
+        optional = true;
+      }
+    }
+
+    else if (name == get_keyword("key")) {
+      key = true;
+    }
+
+    // :key arguments
+    else {
+      if (key) {
+        Symbol *keyword = get_keyword(name->name);
+        keys[keyword] = name;
+        keyword->value = keyword;
+        type->keyword_list.push_back(t_type);
+        type->keyword_names.push_back(name);
+
+      } else if (optional) {
+        optionals.push_back(name);
+        type->optional_list.push_back(t_type);
+
+      } else {
+        type->arg_list.push_back(t_type);
+        arg_names.push_back(name);
+      }
+    }
+  }
+
+  
+  // Now, check for a docstring
+  op_def.pop_front();
+  if (HString *dstring = dynamic_cast<HString *>(op_def.front())) {
+    docstring = dstring;
+    op_def.pop_front();
+  }
+
+  Symbol *progn = hydra_cast<Symbol>(
+      hydra_cast<Module>(
+          hydra_cast<Symbol>(language_module->get("core"))->value)
+          ->get("progn"));
+  progn->name = "progn";
+  Object *car = progn;
+  Object* cdr = list_to_cons(op_def);
+  expr = new Cons(car, cdr);
 
   // see beginning of function
   Object::roots.remove(this);
 }
 
-Object *UserOperator::call(Object *alist, LocalRuntime &r,
+Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
                               LexicalScope &s) {
   // ASSUME that this and the alist are rooted
   // ASSUME all values in arg_list are rooted
-  list<Object *> arg_list = get_arg_list(alist, r, s);
 
 
   // too few arguments OR too many arguments

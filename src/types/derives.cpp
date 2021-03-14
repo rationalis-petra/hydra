@@ -54,6 +54,15 @@ void DerivesConstructor::mark_node() {
   marked = true;
 }
 
+expr::Object *Derives::subtype(Type* ty) {
+  if (Derives* drv = dynamic_cast<Derives*>(ty)) {
+    if (check_type(drv->object)) {
+      return expr::t::get();
+    }
+  }
+  return expr::nil::get();
+}
+
 Type *DerivesConstructor::constructor(list<expr::Object*> lst) {
   Derives *drv = new Derives;
 
@@ -71,3 +80,4 @@ Type *DerivesConstructor::constructor(list<expr::Object*> lst) {
 string DerivesConstructor::to_string() const {
   return "Type constructor for derives";
 }
+

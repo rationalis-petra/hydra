@@ -5,8 +5,8 @@ using std::string;
 
 using namespace expr;
 
-Object* op_obj_get(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_obj_get(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  
 
   UserObject* obj = dynamic_cast<UserObject*>(arg_list.front());
   Symbol* sym = dynamic_cast<Symbol*>(arg_list.back());
@@ -23,8 +23,8 @@ Operator* op::obj_get =
   new InbuiltOperator("Get a slot from an object", op_obj_get,
                       type::Fn::with_args({new type::Any, new type::Symbol}), true);
 
-Object* op_mk_object(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_mk_object(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  
   UserObject* obj = new UserObject;
 
   for (Object* kvp : arg_list) {
@@ -39,10 +39,10 @@ Object* op_mk_object(Operator* op, Object* alist, LocalRuntime &r, LexicalScope&
 
 Operator* op::mk_obj =
   new InbuiltOperator("Create a new object",
-                      op_mk_object, type::Fn::with_all({}, new type::Tuple({new type::Symbol, new type::Any}), new type::UserObject), true);
+                      op_mk_object, type::Fn::with_all({}, new type::Tuple({new type::Symbol, new type::Any}), new type::Any), true);
 
-Object* op_obj_set(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_obj_set(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  
 
   UserObject* obj = dynamic_cast<UserObject*>(arg_list.front());
   arg_list.pop_front();
@@ -56,10 +56,10 @@ Object* op_obj_set(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s
 Operator* op::obj_set =
   new InbuiltOperator("Set a particular slot in an object to a vlue",
                       op_obj_set,
-                      type::Fn::with_args({new type::UserObject, new type::Symbol, new type::Any}),
+                      type::Fn::with_args({new type::Any, new type::Symbol, new type::Any}),
                       true);
-Object* op_derive(Operator* op, Object* alist, LocalRuntime &r, LexicalScope& s) {
-  list<Object*> arg_list = op->get_arg_list(alist, r, s);
+Object* op_derive(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  
   UserObject* obj = new UserObject;
   UserObject* prototype = dynamic_cast<UserObject*>(arg_list.front());
 

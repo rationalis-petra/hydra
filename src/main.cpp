@@ -14,6 +14,8 @@ extern string lang;
 
 using namespace expr;
 Module *expr::language_module;
+Module *expr::keyword_module;
+Module *expr::core_module;
 
 using type::hydra_cast;
 
@@ -43,6 +45,7 @@ int main(int argc, char **argv) {
   r.active_module = language_module;
   sym = g.root->intern("keyword");
   sym->value = new Module("keyword");
+  keyword_module = (Module*) sym->value;
   // arithmetic
 
   Module *mod = language_module;
@@ -140,26 +143,26 @@ void make_modules() {
 
   dev = {make_pair("doc", op::describe), make_pair("time", op::time)};
 
-  CombinedFn *gn_elt = new CombinedFn;
+  GenericFn *gn_elt = new GenericFn;
   gn_elt->is_fn = true;
   gn_elt->type->rest_type = new type::Any;
   gn_elt->add(op::vec_elt);
   gn_elt->add(op::str_elt);
   gn_elt->add(op::tuple_elt);
 
-  CombinedFn *gn_len = new CombinedFn;
+  GenericFn *gn_len = new GenericFn;
   gn_len->is_fn = true;
   gn_len->type->rest_type = new type::Any;
   gn_len->add(op::vec_len);
   // gn_elt->add(op::str_elt);
 
-  CombinedFn *gn_concat = new CombinedFn;
+  GenericFn *gn_concat = new GenericFn;
   gn_concat->is_fn = true;
   gn_concat->type->rest_type = new type::Any;
   gn_concat->add(op::str_cat);
   gn_concat->add(op::vec_cat);
 
-  CombinedFn *gn_gr = new CombinedFn;
+  GenericFn *gn_gr = new GenericFn;
   gn_gr->is_fn = true;
   gn_gr->type->arg_list.push_back(new type::Any);
   gn_gr->type->arg_list.push_back(new type::Any);
@@ -167,7 +170,7 @@ void make_modules() {
   gn_gr->add(op::int_gr);
   gn_gr->add(op::str_gr);
 
-  CombinedFn *gn_get = new CombinedFn;
+  GenericFn *gn_get = new GenericFn;
   gn_get->is_fn = true;
   gn_get->type->arg_list.push_back(new type::Any);
   gn_get->type->arg_list.push_back(new type::Any);
@@ -294,10 +297,10 @@ Object *read(Istream *istm) {
   LexicalScope scope;
   Symbol *cores = language_module->intern("core");
   Module *corem = hydra_cast<Module>(cores->eval(r, scope));
+  core_module = corem;
 
   Symbol* s = corem->intern("read");
   Object *v = s->eval(r, scope);
   Operator *op = hydra_cast<Operator>(v);
-  Object* arg = new Cons(istm, nil::get());
-  return op->call(arg, r, scope);
+  return op->call({istm}, r, scope);
 }

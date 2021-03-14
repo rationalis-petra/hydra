@@ -10,8 +10,8 @@ using std::string;
 
 using namespace expr;
 
-Object *op_typep(Operator *op, Object *alist, LocalRuntime &r, LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+Object *op_typep(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
   Object *obj = arg_list.back();
   type::Type *type_rep = dynamic_cast<type::Type *>(arg_list.front());
 
@@ -23,9 +23,9 @@ Operator *op::typep = new InbuiltOperator(
     "second, otherwise returns nil",
     op_typep, type::Fn::with_args({new type::MetaType, new type::Any}), true);
 
-Object *op_mk_type(Operator *op, Object *alist, LocalRuntime &r,
+Object *op_mk_type(list<Object*> arg_list, LocalRuntime &r,
                   LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  
   type::TypeConstructor *type =
       dynamic_cast<type::TypeConstructor *>(arg_list.front());
   arg_list.pop_front();
@@ -39,9 +39,9 @@ Operator *op::mk_type = new InbuiltOperator(
                        new type::MetaType),
     true);
 
-Object *op_subtype(Operator *op, Object *alist, LocalRuntime &r,
+Object *op_subtype(list<Object*> arg_list, LocalRuntime &r,
                   LexicalScope &s) {
-  list<Object *> arg_list = op->get_arg_list(alist, r, s);
+  
 
   // TODO: implement
   return t::get();
