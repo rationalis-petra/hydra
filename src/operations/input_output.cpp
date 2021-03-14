@@ -20,8 +20,7 @@ using std::ostream;
 
 using namespace expr;
 
-Object *op_print(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
+Object *op_print(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   if (HString *str = dynamic_cast<HString *>(arg_list.front())) {
     cout << str->value;
@@ -38,11 +37,11 @@ Operator *op::print = new InbuiltOperator(
     "the standard output stream",
     op_print, type::Fn::with_args({new type::Any}), true);
 
-Object *op_open_file(list<Object*> arg_list, LocalRuntime &r,
-                    LexicalScope &s) {
-  
+Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
+                     LexicalScope &s) {
+
   Object *filename = arg_list.front();
-  Object* out;
+  Object *out;
 
   Symbol *method;
   if (arg_list.size() == 2) {
@@ -71,7 +70,7 @@ Object *op_open_file(list<Object*> arg_list, LocalRuntime &r,
     string err = "Inavalid argument to open-file: " + filename->to_string();
     throw err;
   }
-  for (Object* v : arg_list) {
+  for (Object *v : arg_list) {
     Object::roots.remove(v);
   }
   return out;
@@ -84,8 +83,7 @@ Operator *op::open_file = new InbuiltOperator(
     type::Fn::with_args_optional({new type::TString}, {new type::Symbol}),
     true);
 
-Object *op_next(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
+Object *op_next(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   istream *stream;
   if (Istream *s = dynamic_cast<Istream *>(arg_list.front())) {
@@ -100,9 +98,9 @@ Object *op_next(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   char ch;
   stream->get(ch);
 
-  for (Object* v : arg_list) {
+  for (Object *v : arg_list) {
     Object::roots.remove(v);
-  }  
+  }
 
   return new Char(ch);
 }
@@ -111,11 +109,9 @@ Operator *op::next = new InbuiltOperator(
     "Takes an input stream, advances it one character\n"
     "and returns the character at the 'current' position",
     op_next,
-    type::Fn::with_all({new type::Istream}, nullptr, new type::Istream),
-    true);
+    type::Fn::with_all({new type::Istream}, nullptr, new type::Istream), true);
 
-Object *op_peek(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
+Object *op_peek(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   istream *stream;
   if (Istream *s = dynamic_cast<Istream *>(arg_list.front())) {
@@ -126,7 +122,7 @@ Object *op_peek(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
     string err = "Non-istream argument provided to peek";
     throw err;
   }
-  for (Object* v : arg_list) {
+  for (Object *v : arg_list) {
     Object::roots.remove(v);
   }
 
@@ -140,8 +136,7 @@ Operator *op::peek = new InbuiltOperator(
     op_peek, type::Fn::with_all({new type::Istream}, nullptr, new type::Char),
     true);
 
-Object *op_put(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
+Object *op_put(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   Ostream *stream = dynamic_cast<Ostream *>(arg_list.front());
   Char *c = dynamic_cast<Char *>(arg_list.back());
@@ -157,23 +152,27 @@ Operator *op::put = new InbuiltOperator(
     op_put, type::Fn::with_all({new type::Ostream}, nullptr, new type::Char),
     true);
 
-Object *op_endp(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
+Object *op_endp(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+
   if (arg_list.size() != 1) {
     string err = "Invalid number of arguments provided to endp";
     throw err;
   }
 
+  istream *strm;
   if (Istream *stream = dynamic_cast<Istream *>(arg_list.front())) {
-    istream *file = static_cast<istream *>(stream->stream);
-    if (file->eof()) {
-      return t::get();
-    } else {
-      return nil::get();
-    }
+    strm = static_cast<istream *>(stream->stream);
+  } else if (IOstream *stream = dynamic_cast<IOstream *>(arg_list.front())) {
+    strm = static_cast<istream *>(stream->stream);
   } else {
     string err = "Non-istream argument provided to end";
     throw err;
+  }
+
+  if (strm->eof()) {
+    return t::get();
+  } else {
+    return nil::get();
   }
 }
 
@@ -182,23 +181,27 @@ Operator *op::endp = new InbuiltOperator(
     "end of the file, and nil otherwise",
     op_endp, type::Fn::with_args({new type::Istream}), true);
 
-Object *op_close(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
-  if (arg_list.size() != 1) {
-    string err = "Invalid number of arguments provided to close";
-    throw err;
-  }
+Object *op_close(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   if (Istream *stream = dynamic_cast<Istream *>(arg_list.front())) {
     ifstream *file = static_cast<ifstream *>(stream->stream);
     file->close();
     return nil::get();
+  } else if (Ostream *stream = dynamic_cast<Ostream *>(arg_list.front())) {
+    ofstream *file = static_cast<ofstream *>(stream->stream);
+    file->close();
+    return nil::get();
+  } else if (IOstream *stream = dynamic_cast<IOstream *>(arg_list.front())) {
+    fstream *file = static_cast<fstream *>(stream->stream);
+    file->close();
+    return nil::get();
   } else {
-    string err = "Non-istream argument provided to peek";
+    string err = "Non-stream argument provided to close";
     throw err;
   }
 }
 
+// TODO: stream type??
 Operator *op::close = new InbuiltOperator(
     "Takes an input stream representing a file, and closes it", op_close,
-    type::Fn::with_args({new type::IOStream}), true);
+    type::Fn::with_args({new type::Any}), true);

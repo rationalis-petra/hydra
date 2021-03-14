@@ -30,8 +30,9 @@ Type *Vector::constructor(list<Object*> lst) {
   if (lst.size() == 0) {
     return this;
   } else {
-    string err = "unimplemented...";
-    throw err;
+    Vector* vc = new Vector();
+    vc->type_elt = dynamic_cast<Type*>(lst.front());
+    return vc;
   }
 }
 

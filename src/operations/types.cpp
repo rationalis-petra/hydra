@@ -42,9 +42,10 @@ Operator *op::mk_type = new InbuiltOperator(
 Object *op_subtype(list<Object*> arg_list, LocalRuntime &r,
                   LexicalScope &s) {
   
+  type::Type* t1 = dynamic_cast<type::Type*>(arg_list.front());
+  type::Type* t2 = dynamic_cast<type::Type*>(arg_list.back());
 
-  // TODO: implement
-  return t::get();
+  return t1->subtype(t2);
 }
 
 Operator *op::subtype = new InbuiltOperator(

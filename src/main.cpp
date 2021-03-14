@@ -277,8 +277,8 @@ void make_modules() {
     make_pair("Gen", new type::GenFn),
 
     make_pair("type?", op::typep),
-    make_pair("type", op::mk_type)
-    // make_pair("subtype", op::subtype)
+    make_pair("type", op::mk_type),
+    make_pair("subtype", op::subtype)
   };
 
   foreign = {// ffi
