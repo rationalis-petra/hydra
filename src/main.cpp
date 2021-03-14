@@ -177,6 +177,14 @@ void make_modules() {
   gn_get->add(op::obj_get);
   gn_get->add(op::get);
 
+  GenericFn *gn_set = new GenericFn;
+  gn_set->is_fn = true;
+  gn_set->type->arg_list.push_back(new type::Any);
+  gn_set->type->arg_list.push_back(new type::Any);
+  gn_set->type->arg_list.push_back(new type::Any);
+  gn_set->add(op::obj_set);
+  gn_set->add(op::vec_set);
+
   core = {
 
     // arithmetic
@@ -200,7 +208,7 @@ void make_modules() {
     make_pair("ref", op::ref),
     //make_pair("var", op::var),
 
-    make_pair("set", op::obj_set),
+    make_pair("set", gn_set),
     make_pair("get", gn_get),
     make_pair("derive", op::derive),
 

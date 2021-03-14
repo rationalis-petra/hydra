@@ -22,6 +22,9 @@ public:
 struct Object {
   //std::string docstring;
 
+  std::set<Object*> prototypes;
+  std::set<Object*> derivatives;
+
   virtual bool null() const;
   virtual std::string to_string() const = 0;
   virtual Object* eval(LocalRuntime& r, LexicalScope& s);

@@ -10,8 +10,8 @@ using std::set;
 
 using namespace type;
 
-Derives::Derives() {
-  object = new expr::UserObject();
+Derives::Derives(Object* obj) {
+  object = obj;
 }
 
 void Derives::mark_node() {
@@ -24,7 +24,7 @@ string Derives::to_string() const {
 }
 
 
-expr::Object *derive_check(set<expr::UserObject*> ptypes, expr::UserObject* obj) {
+expr::Object *derive_check(set<expr::Object*> ptypes, expr::Object* obj) {
   for (auto* proto : ptypes) {
     if (proto == obj) {
       return expr::t::get();
@@ -37,7 +37,7 @@ expr::Object *derive_check(set<expr::UserObject*> ptypes, expr::UserObject* obj)
 }
 
 expr::Object *Derives::check_type(expr::Object* obj) {
-  expr::UserObject* oobj = dynamic_cast<expr::UserObject*>(obj);
+  expr::Object* oobj = dynamic_cast<expr::UserObject*>(obj);
   if (oobj == nullptr) {
     return expr::nil::get();
   } else {
@@ -45,7 +45,7 @@ expr::Object *Derives::check_type(expr::Object* obj) {
     if (oobj == object) {
       return expr::t::get(); 
     }
-    set<expr::UserObject*> ptypes = oobj->prototypes;
+    set<expr::Object*> ptypes = oobj->prototypes;
     return derive_check(ptypes, object);
   }
 }
@@ -63,7 +63,6 @@ expr::Object *Derives::subtype(Type* ty) {
       return expr::t::get();
     }
   }
-
   return expr::nil::get();
 }
 
@@ -72,17 +71,7 @@ expr::Object *Derives::subtype(Type* ty) {
 
 
 Type *DerivesConstructor::constructor(list<expr::Object*> lst) {
-  Derives *drv = new Derives;
-
-  for (expr::Object *obj : lst) {
-    if (auto proto = dynamic_cast<expr::UserObject *>(obj)) {
-      drv->object = proto;
-    } else {
-      string err = "non-obejct provided to type Derives constructor";
-      throw err;
-    }
-  }
-  return drv;
+  return new Derives(lst.front());
 }
 
 string DerivesConstructor::to_string() const {

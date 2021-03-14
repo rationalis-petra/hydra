@@ -4,6 +4,8 @@
 std::string lang = R"(
 (&:hydra:core:in-module &:hydra:core)
 
+(export (current-module) (quote call-next))
+
 "The comment character has not been defined yet"
 "Hence, I use strings as makeshift comments!"
 "We start by defining extremely useful functions: and macros"

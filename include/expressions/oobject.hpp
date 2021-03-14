@@ -14,8 +14,6 @@ struct UserObject : public Object {
   std::string to_string() const;
   std::map<Symbol*, Object*> object_vals;
 
-  std::set<UserObject*> prototypes;
-  std::set<UserObject*> derivatives;
 };
 
 }

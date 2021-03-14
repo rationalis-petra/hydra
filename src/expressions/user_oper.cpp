@@ -59,6 +59,7 @@ void UserOperator::mark_node() {
 UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
                            LocalRuntime &r, LexicalScope &s)
     : Operator() {
+
   // EVAL is called when evaluating
   // therefore, we must add ourselves to the root list
   // ASSUME op_def already there
@@ -203,7 +204,6 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
   // ASSUME that this and the alist are rooted
   // ASSUME all values in arg_list are rooted
 
-
   // too few arguments OR too many arguments
   if ((arg_list.size() < arg_names.size()) ||
       (((arg_list.size() > arg_names.size() + optionals.size() + (keys.size() * 2)) &&
@@ -281,7 +281,6 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
   if (self) {
     scope->map[self] = this;
   }
-
 
   Object *out;
   if (is_fn) {

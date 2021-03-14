@@ -25,8 +25,8 @@ Symbol::Symbol(string _name) {
 }
 
 Object* Symbol::eval(LocalRuntime& r, LexicalScope& s) {
-  // fist, check the lexical scope
 
+  // fist, check the lexical scope
   auto loc = s.map.find(this);
   if (loc != s.map.end()) {
     return loc->second; 

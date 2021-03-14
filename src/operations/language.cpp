@@ -132,6 +132,11 @@ Operator* op::unbind =
 Object* op_definedp(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   
   Symbol* sym = hydra_cast<Symbol>(arg_list.front());
+  auto loc = s.map.find(sym);
+  if (loc != s.map.end()) {
+    return t::get();
+  }
+
   if (sym->value) {
     return t::get();
   } else {

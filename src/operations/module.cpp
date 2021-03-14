@@ -61,10 +61,6 @@ Operator *op::in_module = new InbuiltOperator(
 
 Object *op_intern(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   
-  if (arg_list.size() != 2) {
-    string err = "invalid number of arguments provided to intern";
-    throw err;
-  }
   Module *mod = hydra_cast<Module>(arg_list.front());
   HString *str = hydra_cast<HString>(arg_list.back());
 
@@ -76,7 +72,7 @@ Operator *op::intern = new InbuiltOperator(
     "then return it, otherwise place a new symbol in the current\n"
     "package with that name and return it",
     op_intern,
-    type::Fn::with_all({new type::Module, new type::Symbol}, nullptr,
+    type::Fn::with_all({new type::Module, new type::TString}, nullptr,
                        new type::Symbol),
     true);
 

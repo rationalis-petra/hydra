@@ -13,6 +13,7 @@ namespace op {
 // Vector operations: creation, indexing, length & concatenation
   extern expr::Operator* mk_vec;
   extern expr::Operator* vec_elt;
+  extern expr::Operator* vec_set;
   extern expr::Operator* vec_len;
   extern expr::Operator* vec_cat;
 

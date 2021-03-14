@@ -91,9 +91,9 @@ struct DerivesConstructor : public TypeConstructor {
 };
 
 struct Derives : public Type {
-  Derives();
+  Derives(Object* obj);
   void mark_node();
-  expr::UserObject* object;
+  expr::Object* object;
   std::string to_string() const;
   virtual expr::Object *subtype(Type *ty);
   virtual expr::Object *check_type(expr::Object *obj);

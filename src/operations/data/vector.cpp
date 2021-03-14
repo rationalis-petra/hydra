@@ -40,6 +40,9 @@ Operator *op::vec_cat = new InbuiltOperator(
     "Concatenates two vectors", op_vec_cat,
     type::Fn::with_all({}, new type::Vector, new type::Vector), true);
 
+
+
+
 Object *op_vec_elt(list<Object*> arg_list, LocalRuntime &r,
                   LexicalScope &s) {
   
@@ -66,6 +69,11 @@ Operator *op::vec_elt = new InbuiltOperator(
     type::Fn::with_all({new type::Vector, new type::Integer}, nullptr,
                        new type::Any),
     true);
+
+
+
+
+
 Object *op_vec_len(list<Object*> arg_list, LocalRuntime &r,
                   LexicalScope &s) {
   
@@ -78,3 +86,34 @@ Object *op_vec_len(list<Object*> arg_list, LocalRuntime &r,
 Operator *op::vec_len = new InbuiltOperator(
     "Returns the length of a given vector", op_vec_len,
     type::Fn::with_all({new type::Vector}, nullptr, new type::Integer), true);
+
+
+
+
+
+
+
+
+
+Object *op_vec_set(list<Object*> arg_list, LocalRuntime &r,
+                  LexicalScope &s) {
+  
+  Vector *arr = dynamic_cast<Vector *>(arg_list.front());
+  Integer *idx = dynamic_cast<Integer *>(arg_list.back());
+  if (!arr) {
+    string err = "First element to elt should be array";
+    throw err;
+  }
+  if (!idx) {
+    string err = "Second element to elt should be index";
+    throw err;
+  }
+  return arr->array.at(idx->value);
+}
+
+Operator *op::vec_set = new InbuiltOperator(
+    "Takes an array, an index, and an element. Sets the value at index to element ",
+    op_vec_elt,
+    type::Fn::with_all({new type::Vector, new type::Integer, new type::Any}, nullptr,
+                       new type::Any),
+    true);

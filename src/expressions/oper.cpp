@@ -114,7 +114,10 @@ Object *GenericFn::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s
     Operator *op = applicables.front();
     applicables.pop_front();
     NextFnc *nextfnc = new NextFnc(applicables, arg_list, call_next);
-    s.map[call_next] = nextfnc;
+    if (UserOperator* uop = dynamic_cast<UserOperator*>(op)) {
+      // TODO come up with a better solution than permanelty changing call-next...
+      uop->scope->map[call_next] = nextfnc;
+    }
     return op->call(arg_list, r, s);
   }
 }
