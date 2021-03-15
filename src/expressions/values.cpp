@@ -50,7 +50,7 @@ string HString::to_string() const {
 
 /// Vector
 
-unsigned Vector::size() {
+int Vector::size() {
   return array.size();
 }
 
@@ -80,7 +80,7 @@ string Vector::to_string() const {
 
 /// TUPLE
 
-unsigned Tuple::size() {
+int Tuple::size() {
   return values.size();
 }
 

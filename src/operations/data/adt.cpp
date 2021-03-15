@@ -4,7 +4,6 @@
 #include "operations.hpp"
 
 using std::list;
-using std::vector;
 using std::string;
 
 using namespace expr;
@@ -12,7 +11,7 @@ using namespace expr;
 
 Object *op_tuple(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   
-  Object::collect_garbage();
+  Object::collect_garbage(r);
 
   Tuple *out = new Tuple();
   for (Object *o : arg_list)

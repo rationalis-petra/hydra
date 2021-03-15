@@ -20,11 +20,10 @@ public:
 };
 
 struct Object {
-  //std::string docstring;
+  //HString docstring;
 
   std::set<Symbol*> parents;
   std::map<Symbol*, Object*> slots;
-  //std::set<Object*> derivatives;
 
   virtual bool null() const;
   virtual std::string to_string() const = 0;
@@ -37,15 +36,15 @@ struct Object {
   // local variables/functions
   bool marked;
   virtual void mark_node() = 0;
-  //virtual Object* copy() const = 0;
+  //virtual Object* clone() const = 0;
 
   // self-explanatory
-  static void collect_garbage();
+  static void collect_garbage(LocalRuntime& r);
 
   // A global Runtime
   static Runtime r;
   // how many objects exist?
-  static unsigned long counter;
+  static std::atomic<unsigned long> counter;
   // number of objects after most recent collection
   static unsigned long last;
   // The list of all hydra objects

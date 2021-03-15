@@ -4,6 +4,7 @@
 using std::string;
 using std::ostream;
 using std::list;
+using std::atomic;
 
 using namespace expr;
 
@@ -12,7 +13,7 @@ list<LexicalScope*> Object::context_list;
 hydra_roots Object::roots; 
 Runtime Object::r; 
 
-unsigned long Object::counter = 0;
+atomic<unsigned long> Object::counter = 0;
 //runtime *Object::r;
 
 Object::Object() {

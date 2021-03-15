@@ -15,9 +15,6 @@ void Cons::mark_node() {
 
 Cons::Cons(Object *_car, Object *_cdr)
     : car(_car), cdr(_cdr) {
-  roots.insert(this);
-  collect_garbage();
-  roots.remove(this);
 }
 
 Object *Cons::eval(LocalRuntime &r, LexicalScope &s) {

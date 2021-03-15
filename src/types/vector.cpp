@@ -18,7 +18,6 @@ string Vector::to_string() const {
   return "type Vector";
 }
 
-#include <iostream>
 Object *Vector::check_type(Object* obj) {
   if (dynamic_cast<expr::Vector*>(obj)) {
     return expr::t::get();

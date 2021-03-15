@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
       out = ast->eval(r, s);
       cout << "* " << out << endl;
       Object::roots.remove(ast);
-      Object::collect_garbage();
+      Object::collect_garbage(r);
     } catch (hydra_exception *e) {
       cout << "Top-level exception thrown!" << endl;
       cout << "Object: " << e->obj << endl;

@@ -76,7 +76,7 @@ struct IOstream : public Object {
 struct Vector : public Object {
   // expose vector access
   Object* operator[](int i);
-  unsigned size();
+  int size();
 
 
   virtual void mark_node();
@@ -110,7 +110,7 @@ struct Tuple : public Object {
 
   // expose vector access
   Object* operator[](int i);
-  unsigned size();
+  int size();
 
   std::string to_string() const;
   std::vector<Object*> values;

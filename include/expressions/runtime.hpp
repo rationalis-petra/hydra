@@ -2,8 +2,12 @@
 #define __HYDRA_EXPRESSIONS_RUNTIME_HPP
 
 #include <list>
-#include <map>
+#include <unordered_map>
 #include <vector>
+#include <thread>
+#include <atomic>
+#include <set>
+#include <condition_variable>
 
 namespace expr {
 
@@ -19,8 +23,19 @@ struct LocalRuntime;
 
 struct Runtime {
   Module* root;
-  std::map<char, Operator*> readtable;
+  // the set of all active threads and associated lock
+  std::set<std::thread> thread_pool;
+
+  std::unordered_map<char, Operator*> readtable;
   std::vector<LocalRuntime*> local_runtimes;
+
+  // this is for the garbage collector. for more details,
+  // see src/memory/garbage.cpp
+  bool collecting;
+  std::condition_variable collect; 
+  std::mutex collect_mutex;
+  std::condition_variable finished; 
+  std::mutex finished_mutex;
 };
 
 // A runtime containing thread-local variables
@@ -30,11 +45,17 @@ struct LocalRuntime {
   std::list<condition_handler*> handlers;
   std::list<hydra_restart*> restarts;
   Module* active_module;
+
+
+  // a thread will set this to true when it is waiting for garbage to be 
+  // collected, and the garbage collector will set it to false when it is
+  // done, so the thread may continue. 
+  bool can_collect;
 };
 
 // the lexical scope contians a mapping of symbols to their local values
 struct LexicalScope {
-  std::map<Symbol*, Object*> map;
+  std::unordered_map<Symbol*, Object*> map;
   LexicalScope();
   ~LexicalScope();
 };
