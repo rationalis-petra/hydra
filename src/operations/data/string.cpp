@@ -65,3 +65,40 @@ Object *op_str_gr(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
 Operator *op::str_gr = new InbuiltOperator(
     "Returns true if the first argument is greater than the second", op_str_gr,
     type::Fn::with_args({new type::TString, new type::TString}), true);
+
+
+
+
+
+Object *op_str_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
+  HString* str1 = dynamic_cast<HString*>(arg_list.front());
+  HString* str2 = dynamic_cast<HString*>(arg_list.back());
+
+  // TODO: maybe compare slots???
+  if (str1->value == str2->value) {
+    return t::get();
+  }
+  return nil::get();
+}
+
+Operator *op::str_eq =
+    new InbuiltOperator("Equality test for Strings",
+                        op_str_eq, type::Fn::with_args({new type::TString, new type::TString}), true);
+
+Object *op_char_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
+  Char* c1 = dynamic_cast<Char*>(arg_list.front());
+  Char* c2 = dynamic_cast<Char*>(arg_list.back());
+
+  // TODO: maybe compare slots???
+  if (c1->value == c2->value) {
+    return t::get();
+  }
+  return nil::get();
+}
+
+Operator *op::char_eq =
+    new InbuiltOperator("Equality test for Characters",
+                        op_char_eq,
+                        type::Fn::with_args({new type::Char, new type::Char}), true);

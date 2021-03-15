@@ -23,9 +23,13 @@
 
 namespace expr {
 
+// Here, we provide pointers to important objects in the runtime
+extern expr::GenericFn *equal_operator;
+
 extern expr::Module *language_module;
 extern expr::Module *keyword_module;
 extern expr::Module *core_module;
 
-}
+} // namespace expr
+
 #endif // __HYDRA_EXPRESSIONS_HPP

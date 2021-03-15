@@ -16,6 +16,7 @@ using namespace expr;
 Module *expr::language_module;
 Module *expr::keyword_module;
 Module *expr::core_module;
+GenericFn *expr::equal_operator;
 
 using type::hydra_cast;
 
@@ -74,7 +75,7 @@ int main(int argc, char **argv) {
       hydra_cast<Module>(language_module->intern("io")->value)->intern("+cin+");
   sym->value = stm;
 
-  string in = lang;
+  string in = "";
   Istream *prog = new Istream();
   prog->stream = new stringstream(lang);
   Object *ast;
@@ -142,6 +143,19 @@ void make_modules() {
               make_pair("dev", new Module("dev"))};
 
   dev = {make_pair("doc", op::describe), make_pair("time", op::time)};
+
+  equal_operator = new GenericFn;
+  equal_operator->is_fn = true;
+  equal_operator->type->arg_list.push_back(new type::Any);
+  equal_operator->type->arg_list.push_back(new type::Any);
+
+  equal_operator->add(op::obj_eq);
+  equal_operator->add(op::int_eq);
+  equal_operator->add(op::char_eq);
+  equal_operator->add(op::tuple_eq);
+  equal_operator->add(op::cons_eq);
+  equal_operator->add(op::vec_eq);
+  equal_operator->add(op::str_eq);
 
   GenericFn *gn_elt = new GenericFn;
   gn_elt->is_fn = true;
@@ -221,7 +235,7 @@ void make_modules() {
     make_pair("read", op::read),
     make_pair("set-macro-character", op::set_mac_char),
     // logic
-    make_pair("=", op::eq),
+    make_pair("=", equal_operator),
     make_pair("or", op::do_or),
     make_pair("and", op::do_and),
     make_pair("not", op::do_not),
@@ -279,6 +293,7 @@ void make_modules() {
     make_pair("IOStream", new type::IOStream),
     make_pair("IStream", new type::Istream),
     make_pair("OStream", new type::Ostream),
+    make_pair("Cons", new type::Cons),
     // Mac
     // Op
     make_pair("Fn", new type::Fn),

@@ -25,6 +25,27 @@ Operator *op::mk_tuple =
                         op_tuple, type::Fn::with_rest(new type::Any), true);
 
 
+Object *op_tuple_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
+  Tuple* tup1 = dynamic_cast<Tuple*>(arg_list.front());
+  Tuple* tup2 = dynamic_cast<Tuple*>(arg_list.back());
+
+  if (tup1->values.size() != tup2->values.size()) {
+    return nil::get();
+  } else {
+    for (int i = 0; i < tup1->size(); i++) {
+      if (equal_operator->call({(*tup1)[i], (*tup2)[i]}, r, s)->null()) {
+        return nil::get();
+      }
+    }
+    return t::get();
+  }
+}
+
+Operator *op::tuple_eq =
+    new InbuiltOperator("Equality test for Tuples",
+                        op_tuple_eq, type::Fn::with_args({new type::Tuple, new type::Tuple}), true);
+
 
 
 Object *op_tuple_elt(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {

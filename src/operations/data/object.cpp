@@ -78,3 +78,20 @@ Operator* op::clone =
                       op_clone, type::Fn::with_rest(new type::Any), true);
 
 
+
+
+Object *op_obj_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
+  Object* obj1 = dynamic_cast<Object*>(arg_list.front());
+  Object* obj2 = dynamic_cast<Object*>(arg_list.back());
+
+  // TODO: maybe compare slots???
+  if (obj1 == obj2) {
+    return t::get();
+  }
+  return nil::get();
+}
+
+Operator *op::obj_eq =
+    new InbuiltOperator("Equality test for Objects",
+                        op_obj_eq, type::Fn::with_args({new type::Any, new type::Any}), true);

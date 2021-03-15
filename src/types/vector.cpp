@@ -15,11 +15,12 @@ void Vector::mark_node() {
 }
 
 string Vector::to_string() const {
-  return "Vector";
+  return "type Vector";
 }
 
+#include <iostream>
 Object *Vector::check_type(Object* obj) {
-  if ((dynamic_cast<Vector*>(obj)) || obj->null()) {
+  if (dynamic_cast<expr::Vector*>(obj)) {
     return expr::t::get();
   } else {
     return expr::nil::get();

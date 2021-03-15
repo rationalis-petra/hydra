@@ -117,3 +117,25 @@ Operator *op::vec_set = new InbuiltOperator(
     type::Fn::with_all({new type::Vector, new type::Integer, new type::Any}, nullptr,
                        new type::Any),
     true);
+
+
+
+Object *op_vec_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
+  Vector* vec1 = dynamic_cast<Vector*>(arg_list.front());
+  Vector* vec2 = dynamic_cast<Vector*>(arg_list.back());
+
+  if (vec1->size() == vec2->size()) {
+    for (int i = 0; i < vec1->size(); i++) {
+      if (equal_operator->call({(*vec1)[i], (*vec2)[i]}, r, s)->null()) {
+        return nil::get();
+      }
+    }
+    return t::get();
+  }
+  return nil::get();
+}
+
+Operator *op::vec_eq =
+    new InbuiltOperator("Equality test for Vectors",
+                        op_vec_eq, type::Fn::with_args({new type::Vector, new type::Vector}), true);

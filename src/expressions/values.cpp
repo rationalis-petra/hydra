@@ -48,7 +48,15 @@ string HString::to_string() const {
 
 
 
-/// ARRAY
+/// Vector
+
+unsigned Vector::size() {
+  return array.size();
+}
+
+Object* Vector::operator[](int i) {
+  return array[i];
+}
 
 void Vector::mark_node() {
   marked = true;
@@ -71,6 +79,14 @@ string Vector::to_string() const {
 
 
 /// TUPLE
+
+unsigned Tuple::size() {
+  return values.size();
+}
+
+Object* Tuple::operator[](int i) {
+  return values[i];
+}
 
 void Tuple::mark_node() {
   marked = true;

@@ -10,6 +10,7 @@ namespace op {
   extern expr::Operator *multiply;
   extern expr::Operator *divide;
   extern expr::Operator *int_gr;
+  extern expr::Operator *int_eq;
 
 } // namespace op
 

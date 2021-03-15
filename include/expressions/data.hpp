@@ -74,6 +74,11 @@ struct IOstream : public Object {
 };
 
 struct Vector : public Object {
+  // expose vector access
+  Object* operator[](int i);
+  unsigned size();
+
+
   virtual void mark_node();
 
   std::string to_string() const;
@@ -102,6 +107,10 @@ struct Char : public Object {
 
 struct Tuple : public Object {
   virtual void mark_node();
+
+  // expose vector access
+  Object* operator[](int i);
+  unsigned size();
 
   std::string to_string() const;
   std::vector<Object*> values;

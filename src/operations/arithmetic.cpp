@@ -133,13 +133,8 @@ Object *op_int_gr(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   // does it contain integers?
 
   Integer *a1 = dynamic_cast<Integer *>(arg_list.front());
-  arg_list.pop_front();
-  Integer *a2 = dynamic_cast<Integer *>(arg_list.front());
-  // so arg_list is a list containing integers!
-  int arg1 = a1->value;
-  int arg2 = a2->value;
-
-  if (arg1 >= arg2) {
+  Integer *a2 = dynamic_cast<Integer *>(arg_list.back());
+  if (a1->value >= a2->value) {
     return t::get();
   } else {
     return nil::get();
@@ -150,3 +145,24 @@ expr::Operator *op::int_gr =
     new InbuiltOperator("Returns t iff the first argument is greater "
                         "than the second, and nil otherwise",
                         op_int_gr, type::Fn::with_rest(new type::Integer), true);
+
+
+Object *op_int_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
+  // we now ASSERT that arg_list is a list of length 2
+  // does it contain integers?
+
+  Integer *a1 = dynamic_cast<Integer *>(arg_list.front());
+  Integer *a2 = dynamic_cast<Integer *>(arg_list.back());
+  // so arg_list is a list containing integers!
+  if (a1->value == a2->value) {
+    return t::get();
+  } else {
+    return nil::get();
+  }
+}
+
+expr::Operator *op::int_eq =
+  new InbuiltOperator("Equality for Integers",
+                      op_int_eq, type::Fn::with_args({new type::Integer, new type::Integer}),
+                      true);
