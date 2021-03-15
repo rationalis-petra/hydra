@@ -3,6 +3,7 @@ add_library(expressions OBJECT
                         runtime.cpp
                         lexical_scope.cpp
 
+                        concurrency.cpp
                         value.cpp
                         object.cpp
                         cons.cpp

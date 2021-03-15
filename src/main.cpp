@@ -26,6 +26,7 @@ vector<pair<string, Object *>> dev;
 vector<pair<string, Object *>> core;
 vector<pair<string, Object *>> foreign;
 vector<pair<string, Object *>> io;
+vector<pair<string, Object *>> concurrent;
 // net
 // concurrent / parallel
 
@@ -56,8 +57,11 @@ int main(int argc, char **argv) {
   }
 
   vector<pair<string, vector<pair<string, Object *>>>> moddefs = {
-      make_pair("core", core), make_pair("io", io),
-      make_pair("foreign", foreign), make_pair("dev", dev)};
+      make_pair("core", core),
+      make_pair("io", io),
+      make_pair("foreign", foreign),
+      make_pair("dev", dev),
+      make_pair("concurrent", concurrent)};
 
   for (auto m : moddefs) {
     mod = hydra_cast<Module>(
@@ -313,6 +317,9 @@ void make_modules() {
         make_pair("print", op::print),
         make_pair("open-file", op::open_file),
         make_pair("close-file", op::close)};
+
+  concurrent = {
+    make_pair("thread", op::thread)};
 }
 
 Object *read(Istream *istm) {

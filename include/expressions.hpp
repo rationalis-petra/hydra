@@ -9,6 +9,7 @@
 #include "ltdl.h"
 
 
+#include "expressions/concurrency.hpp"
 #include "expressions/runtime.hpp"
 #include "expressions/operation.hpp"
 #include "expressions/oobject.hpp"

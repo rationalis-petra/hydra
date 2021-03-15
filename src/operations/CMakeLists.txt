@@ -5,9 +5,10 @@ add_library(operations OBJECT
                        data/string.cpp
                        data/vector.cpp
                        data/adt.cpp
+
                        arithmetic.cpp
                        conditions.cpp
-                       #concurrency.cpp
+                       concurrency.cpp
                        dev.cpp
                        foreign.cpp
                        input_output.cpp

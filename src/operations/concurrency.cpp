@@ -6,27 +6,20 @@
 
 using std::list;
 using std::string;
-using std::thread;
-
-using type::hydra_cast;
 
 using namespace expr;
 
-// Object *op_thread(Operator *op, Object *alist, Runtime &r) {
-//   list<Object *> arg_list = op->get_arg_list(alist, r);
+Object *op_mk_thread(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
+  Operator* op = dynamic_cast<Operator*>(arg_list.front());
 
-//   if (arg_list.size() < 1) {
-//     string err = "error in thread: expected at least one argument";
-//     throw err;
-//   }
+  Thread *t = new Thread(op, r, s);
+  //t->thread = thread(opcall, op, cns->cdr, r);
+  return t;
+}
 
-//   Operator* op = hydra_cast<Operator>(arg_list.first());
-//   Cons* cns = hydra_cast<Cons>(alist);
-
-//   Thread* t = new Thread;
-//   t.thread = thread(opcall, op, cns->cdr, r);
-//   return t;
-// }
-
-// Operator* op::thread = new InbuiltOperator*("Creates a new thread and starts the provided function within that thread",
-//                                             op_thread, nullptr, true);
+Operator *op::thread =
+  new InbuiltOperator ("Takes function Fn () -> Any and creates a new thread"
+                       "\n where it calls that function",
+                       op_mk_thread,
+                       type::Fn::with_args({type::Fn::with_args({})}),
+                       true);
