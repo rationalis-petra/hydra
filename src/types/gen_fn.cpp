@@ -30,7 +30,7 @@ void GenFn::mark_node() {
 }
 
 GenFn::GenFn() {
-  rest_type = nullptr;
+  rest_type = new Any;
   return_type = new Any;
 }
 

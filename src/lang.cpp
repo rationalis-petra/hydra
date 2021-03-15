@@ -116,7 +116,7 @@ std::string lang = R"(
 (def cdar (x) (cdr (car x)))
 
 (export (current-module) 'len)
-(defimpl len ({list List} :self len)
+(defimpl len ((list List) :self len)
     (if list (+ 1 (len (cdr list))) 0))
 
 (export (current-module) 'zip)
@@ -137,21 +137,21 @@ std::string lang = R"(
        (cons head (apply zip tail))))))
 
 (export (current-module) 'reverse)
-(def reverse ({lst List} :optional acc)
+(def reverse ((lst List) :optional acc)
   (if lst
       (reverse (cdr lst)
                (cons (car lst) acc))
        acc))
 
 (export (current-module) 'concat)
-(defimpl concat (:rest {lists List})
+(defimpl concat (:rest (lists List))
   (when lists
     (if (car lists)
         (cons (car (car lists))
               (apply concat (cons (cdr (car lists)) (cdr lists))))
          (apply concat (cdr lists)))))
 
-(defimpl elt ({lst List} {idx Integer})
+(defimpl elt ((lst List) (idx Integer))
   (if (= 0 idx) 
       (car lst)
       (elt (cdr lst) (- idx 1))))
@@ -204,15 +204,15 @@ std::string lang = R"(
 
 ;;; ARITHMETIC
 (export (current-module) 'even?)
-(def even? ({x Integer})
+(def even? ((x Integer))
   (= x (* 2 (/ x 2))))
 
 (export (current-module) 'rem)
-(def rem ({val Integer} {quot Integer})
+(def rem ((val Integer) (quot Integer))
   (- val (* quot (/ val quot))))
 
 (export (current-module) 'div)
-(def div ({val Integer} {quot Integer})
+(def div ((val Integer) (quot Integer))
   ((/ val quot)))
 
 ;;; LANGUAGE
@@ -249,7 +249,7 @@ std::string lang = R"(
 
 ;;; FUNCTIONALS
 (export (current-module) 'apply)
-(def apply ({fnc Fn} {values List})
+(def apply ((fnc Fn) (values List))
   "Will call the function FNC with arg-list VALUES"
   (let ((quotify (fn (lst :self quotify)
         "Will quote all elements in a list"

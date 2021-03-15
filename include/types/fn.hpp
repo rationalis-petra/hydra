@@ -25,6 +25,7 @@ struct Fn : public Type {
   std::string to_string() const;
   expr::Object* check_type(expr::Object* obj);
   expr::Object* check_args(std::list<expr::Object*> alist);
+  virtual expr::Object *equal(Type* ty);
 
   Type* constructor(std::list<expr::Object*> lst);
 

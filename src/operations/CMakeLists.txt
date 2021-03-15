@@ -7,6 +7,7 @@ add_library(operations OBJECT
                        data/adt.cpp
 
                        arithmetic.cpp
+                       operator.cpp
                        conditions.cpp
                        concurrency.cpp
                        dev.cpp

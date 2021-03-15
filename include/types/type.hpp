@@ -15,6 +15,7 @@ struct Type : public virtual expr::Object {
 public:
   virtual expr::Object *check_type(expr::Object *obj) = 0;
   virtual expr::Object *subtype(Type *ty) = 0;
+  virtual expr::Object *equal(Type* ty);
 };
 
 struct TypeConstructor : public virtual expr::Object {

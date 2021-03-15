@@ -12,13 +12,17 @@ void UserObject::mark_node() {
 }
 
 string UserObject::to_string() const {
-  string out = "{";
+  string out = "\n{";
   for (auto x : slots) {
     out += "[";
     out += x.first->to_string();
     out += " ";
     out += x.second->to_string();
-    out += "]\n";
+
+    out += "]";
+    if (x != *(--slots.end())) {
+      out += "\n";
+    }
   }
   out += "}";
   return out;

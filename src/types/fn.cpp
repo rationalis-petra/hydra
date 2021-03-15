@@ -149,6 +149,7 @@ expr::Object* Fn::subtype(Type* other) {
         their_ir++;
         our_ir++;
       }
+
       // our return type must be a supertype of theirs
       // i.e. their return type must be a subtype of ours
       if (return_type->subtype(tfn->return_type)) {
@@ -157,4 +158,33 @@ expr::Object* Fn::subtype(Type* other) {
     }
   }
   return expr::nil::get();
+}
+
+expr::Object* Fn::equal(Type* other) {
+  Fn* fn2 = dynamic_cast<Fn*>(other);
+  if (rest_type && fn2->rest_type) {
+    if (fn2->rest_type->equal(rest_type)->null())
+      return expr::nil::get();
+  }
+  if (fn2->return_type->equal(return_type)->null())
+    return expr::nil::get();
+  if (arg_list.size() != fn2->arg_list.size()) 
+    return expr::nil::get();
+  if (optional_list.size() != fn2->optional_list.size()) 
+    return expr::nil::get();
+
+  auto it1 = arg_list.begin();
+  auto it2 = fn2->arg_list.begin();
+  while (it1 != arg_list.end()) {
+    if ((*it1)->equal(*it2)->null()) 
+      return expr::nil::get();
+  }
+  it1 = optional_list.begin();
+  it2 = fn2->optional_list.begin();
+  while (it1 != arg_list.end()) {
+    if ((*it1)->equal(*it2)->null()) 
+      return expr::nil::get();
+  }
+
+  return expr::t::get();
 }

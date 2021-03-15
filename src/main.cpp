@@ -160,6 +160,7 @@ void make_modules() {
   equal_operator->add(op::cons_eq);
   equal_operator->add(op::vec_eq);
   equal_operator->add(op::str_eq);
+  equal_operator->add(op::type_eq);
 
   GenericFn *gn_elt = new GenericFn;
   gn_elt->is_fn = true;

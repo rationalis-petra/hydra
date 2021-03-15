@@ -88,6 +88,31 @@ Object *to_cons(list<Object *> list) {
   }
 }
 
+Object *mac_lcurl(Istream *is, char c, LocalRuntime &r) {
+  // continue to add tokens to list until we hit a ')'
+  list<Object *> list;
+
+  while (!is->stream->eof()) {
+    c = is->stream->peek();
+    switch (c) {
+    case ' ':
+    case '\n':
+    case '\t':
+      is->stream->read(&c, 1);
+      break;
+    case '}': {
+      is->stream->read(&c, 1);
+      return new Cons(op::mk_obj, to_cons(list));
+      break;
+    } break;
+    default:
+      list.push_back(read(is, r));
+      break;
+    }
+  }
+  throw "read error: { with no matching }!";
+}
+
 Object *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
   // continue to add tokens to list until we hit a ')'
   list<Object *> list;
@@ -212,7 +237,7 @@ Object *read(Object *raw, LocalRuntime &r) {
     string err = "Non-stream type provided to read!";
     throw err;
   }
-  char c;
+  char c = '\0';
 
   if (ios) {
     is = new Istream;
@@ -237,12 +262,15 @@ Object *read(Object *raw, LocalRuntime &r) {
     case ' ':
       break;
 
-    case '{':
     case '(':
       return mac_lparen(is, c, r);
       break;
     case '[':
       return mac_lsquare(is, c, r);
+      break;
+    case '{':
+      return mac_lcurl(is, c, r);
+      break;
 
     case '}':
     case ']':

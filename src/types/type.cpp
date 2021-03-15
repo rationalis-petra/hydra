@@ -8,6 +8,14 @@ using std::string;
 
 using namespace type;
 
+expr::Object* Type::equal(Type* other) {
+  if (this == other) {
+    return expr::t::get();
+  } else {
+    return expr::nil::get();
+  }
+}
+
 void MetaType::mark_node() {
   marked = true;
 }

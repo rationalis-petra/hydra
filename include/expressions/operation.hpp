@@ -59,6 +59,7 @@ struct GenericFn : public Operator {
   virtual void mark_node();
 
   void add (Operator* op);
+  void add_safe (Operator* op, LocalRuntime& r, LexicalScope& s);
   std::string to_string() const;
   Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s);
 

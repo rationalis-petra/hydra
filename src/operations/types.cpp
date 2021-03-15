@@ -51,3 +51,16 @@ Object *op_subtype(list<Object*> arg_list, LocalRuntime &r,
 Operator *op::subtype = new InbuiltOperator(
     "Returns true if the first argument is a subtype of the second", op_subtype,
     type::Fn::with_args({new type::MetaType, new type::MetaType}), true);
+
+
+
+Object *op_type_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  type::Type* t1 = dynamic_cast<type::Type*>(arg_list.front());
+  type::Type* t2 = dynamic_cast<type::Type*>(arg_list.back());
+
+  return t1->equal(t2);
+}
+
+Operator *op::type_eq = new InbuiltOperator(
+    "Equality for types", op_type_eq,
+    type::Fn::with_args({new type::MetaType, new type::MetaType}), true);

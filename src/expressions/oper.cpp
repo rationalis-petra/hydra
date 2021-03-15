@@ -71,12 +71,34 @@ void GenericFn::mark_node() {
   }
 }
 
+
 void GenericFn::add(Operator *fn) {
   if (GenericFn *f = dynamic_cast<GenericFn *>(fn)) {
+    // is this the best??
     for (Operator *o : f->functions) {
       add(o);
     }
   } else if (fn->is_fn) {
+    functions.push_front(fn);
+  } else {
+    string err = "Attempted to add macro to add-fn!";
+    throw err;
+  }
+}
+
+void GenericFn::add_safe(Operator *fn, LocalRuntime& r, LexicalScope& s) {
+  if (GenericFn *f = dynamic_cast<GenericFn *>(fn)) {
+    // is this the best??
+    for (Operator *o : f->functions) {
+      add_safe(o, r, s);
+    }
+  } else if (fn->is_fn) {
+    auto it = functions.begin();
+    while (it != functions.end()) {
+      if (!equal_operator->call({fn->type,(*it)->type}, r, s)->null())
+        functions.erase(it);
+      it++;
+    }
     functions.push_front(fn);
   } else {
     string err = "Attempted to add macro to add-fn!";

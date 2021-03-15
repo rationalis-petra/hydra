@@ -12,13 +12,6 @@ using type::hydra_cast;
 using namespace expr;
 
 Object *op_if(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
-  // aseert that list length is 3
-  int len = arg_list.size();
-  if (len != 3) {
-    throw "arglist to if invalid size!";
-  }
-  // we now assume that arg_list is a list of length 3
 
   for (Object* v : arg_list)
     Object::roots.remove(v);
@@ -202,63 +195,8 @@ Operator* op::progn =
                       false);
 
 
-Object *op_gen(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
-  GenericFn* out = new GenericFn;
-  out->type->rest_type = new type::Any;
-  arg_list.pop_front();
-  if (!arg_list.empty()) {
-    if (HString* str = dynamic_cast<HString*>(arg_list.front())) {
-      out->docstring = str;
-    }
-  }
-  return out;
-}
-
-Operator* op::genfn =
-  new InbuiltOperator("Generates a new generic function object",
-                      op_gen,
-                      type::Fn::with_all({new type::List}, new type::Any, new type::GenFn),
-                      false);
-
-Object *op_fn(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  return (Object*) new UserOperator(arg_list, true, r, s);
-}
-
-Operator* op::fn =
-  new InbuiltOperator("Generates a new function object",
-                      op_fn,
-                      type::Fn::with_rest(new type::Any),
-                      false);
-
-Object *op_mac(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  return (Object*) new UserOperator(arg_list, false, r, s);
-}
 
 
-Operator* op::mac =
-  new InbuiltOperator("Generates a new macro object",
-                      op_mac,
-                      type::Fn::with_all({new type::Cons}, new type::Any, new type::Mac),
-                      false);
-
-Object *op_addfn(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  GenericFn* f = dynamic_cast<GenericFn*>(arg_list.front());
-  arg_list.pop_front();
-
-  for (Object* o : arg_list) {
-    Operator* op = hydra_cast<Operator>(o);
-    f->add(op);
-  }
-
-  return (Object*) f;
-}
-
-Operator* op::addfn =
-  new InbuiltOperator("Combines functions into an effective function",
-                      op_addfn,
-                      type::Fn::with_all({new type::GenFn}, new type::Fn, new type::GenFn),
-                      true);
 
 Object *op_exit(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   for (Object* obj : Object::node_list) {
@@ -287,18 +225,3 @@ Operator* op::ref  =
                       op_ref,
                       type::Fn::with_args({new type::Any}),
                       true);
-
-// op_var::op_var() {
-//   is_fn = true;
-//   docstring = new HString("Creates some mutable storage, and returns a handle to it");
-//   type->arg_list.push_front(new type_nil);
-// }
-
-// Object *op_var::call(Object *alist, LocalRuntime &r, LexicalScope &s) {
-//   list<Object*> arg_list = get_arg_list(alist, r, s);
-
-//   hydra_var* var = new hydra_var;
-//   // TODO: add get-var function to objects?
-//   var->val = arg_list.front();
-//   return var;
-// }
