@@ -8,6 +8,10 @@ using namespace expr;
 
 Parent* Cons::parent;
 
+Cons::Cons(Object *_car, Object *_cdr)
+    : car(_car), cdr(_cdr) {
+}
+
 void Cons::mark_node() {
   if (marked) return;
   Object::mark_node();
@@ -15,9 +19,6 @@ void Cons::mark_node() {
   cdr->mark_node();
 }
 
-Cons::Cons(Object *_car, Object *_cdr)
-    : car(_car), cdr(_cdr) {
-}
 
 Object *Cons::eval(LocalRuntime &r, LexicalScope &s) {
   Object *oper = car->eval(r, s);
@@ -59,4 +60,3 @@ string Cons::to_string() const {
   out += ")";
   return out;
 }
-

@@ -27,7 +27,9 @@ std::string lang = R"(
                   (list (quote add-fn) 
                         symbol
                         (cons (quote fn) (cons val body)))
-                  (cons (quote fn) (cons val body)))
+                  (cons (quote fn)
+                        (cons :self symbol val)
+                        body))
               val))))
 
 "The defn, i.e. define-function"
@@ -242,10 +244,36 @@ std::string lang = R"(
      arg-list)))
 
 (export (current-module) 'ref)
-(def ref (value)
-  (let ((sym (symbol "")))
-    (bind sym value)
-     sym))
+(export (current-module) 'get!)
+(export (current-module) 'set!)
+(def ref-object {})
+(def Ref (type Derives ref-object)) 
+
+(def ref (val)
+  (object
+    [:parent ref-object t]
+    [:value val t]))
+
+(def set! ((ref Ref) value)
+  (set ref :value value))
+
+(def get! ((ref Ref))
+  (get ref :value)) 
+
+(def to-string ((ref Ref))
+  (concat "<reference: " (to-string (get! ref)) ">"))
+
+(insert (current-module) '&:hydra:concurrent:thread)
+
+(def thread-fn (x)
+  (print x)
+  (println ": thread-running"))
+
+(def thread-test ()
+  (let ((x (ref 10)))
+    (while (>= (! x) 0)
+      (set! x (- x 1))
+      (thread thread-fn (! x)))))
 
 ;;; FUNCTIONALS
 (export (current-module) 'apply)

@@ -9,7 +9,6 @@ using std::list;
 using std::string;
 
 using namespace expr;
-using type::hydra_cast;
 
 Object *op_plus(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   // ASSUME: all values in arg_list are rooted
@@ -98,16 +97,16 @@ void op::mk_arithmetic() {
   op::plus = new InbuiltOperator(
       "Returns the sum of its arguemnts. When "
       "provided with no arguments, returns 0",
-      op_plus, type::Fn::with_rest(new type::Derives(Integer::parent)), true);
+      op_plus, type::Fn::with_rest(type::integer_type), true);
 
   op::minus = new InbuiltOperator(
       "Subtract the second and all subsequent"
       "arguments from the first",
       op_minus,
-      type::Fn::with_all({new type::Derives(Integer::parent),
-                          new type::Derives(Integer::parent)},
-                         new type::Derives(Integer::parent),
-                         new type::Derives(Integer::parent)),
+      type::Fn::with_all({type::integer_type,
+                          type::integer_type},
+                          type::integer_type,
+                          type::integer_type),
       true);
 
   op::multiply = new InbuiltOperator(
@@ -119,23 +118,23 @@ void op::mk_arithmetic() {
   op::divide = new InbuiltOperator(
       "Divides the first argument by the second and all subsequent arguments",
       op_divide,
-      type::Fn::with_all({new type::Derives(Integer::parent),
-                          new type::Derives(Integer::parent)},
-                         new type::Derives(Integer::parent),
-                         new type::Derives(Integer::parent)),
+      type::Fn::with_all({type::integer_type,
+                          type::integer_type},
+                          type::integer_type,
+                          type::integer_type),
       true);
 
   op::int_gr = new InbuiltOperator(
       "Returns t iff the first argument is greater "
       "than the second, and nil otherwise",
       op_int_gr,
-      type::Fn::with_args({new type::Derives(Integer::parent),
-                           new type::Derives(Integer::parent)}),
+      type::Fn::with_args({type::integer_type,
+                           type::integer_type}),
       true);
 
   op::int_eq = new InbuiltOperator(
       "Equality for Integers", op_int_eq,
-      type::Fn::with_args({new type::Derives(Integer::parent),
-                           new type::Derives(Integer::parent)}),
+      type::Fn::with_args({type::integer_type,
+                           type::integer_type}),
       true);
 }

@@ -1,5 +1,6 @@
 
 add_library(types OBJECT cons.cpp
+                         initialize.cpp
                          integer.cpp
                          any.cpp
                          mac.cpp

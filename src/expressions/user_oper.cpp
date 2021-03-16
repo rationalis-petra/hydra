@@ -18,11 +18,11 @@ using std::function;
 
 
 string UserOperator::to_string() const {
-  string name = is_fn ? "function" : "macro";
+  string type = is_fn ? "function" : "macro";
   if (self) {
-    return "<" + name + ": " + self->to_string() + ">";
+    return "<" + type + ": " + self->name + ">";
   } else {
-    return "<user-defined operation>";
+    return "<anonymous " + type + ">";
   }
 }
 

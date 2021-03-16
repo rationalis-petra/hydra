@@ -225,7 +225,25 @@ Object *op_set_invoker(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s)
 }
 
 Operator* op::set_invoker =
-  new InbuiltOperator("Exits the current running application",
+  new InbuiltOperator("Sets the invoker: an object which is used when this object\n"
+                      "is called, allowing it to act as a function.",
                       op_set_invoker,
                       type::Fn::with_args({new type::Any, new type::Fn}),
+                      true);
+
+Object *op_get_invoker(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  if (Operator* op = dynamic_cast<Operator*>(arg_list.back())) {
+    arg_list.front()->invoker = op;
+    return op;
+  } else {
+    // type 
+    string err = "type error in op-set-invoker";
+    throw err;
+  }
+}
+
+Operator* op::get_invoker =
+  new InbuiltOperator("Retrieves the invoker for this obejct.",
+                      op_get_invoker,
+                      type::Fn::with_all({new type::Any}, nullptr, new type::Fn),
                       true);

@@ -17,6 +17,7 @@ string Operator::to_string() const { return "<inbuilt operation>"; }
 Operator::Operator() {
   type = new type::Fn;
   docstring = new HString;
+  invoker = this;
 }
 
 void Operator::mark_node() {

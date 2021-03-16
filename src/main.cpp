@@ -19,8 +19,6 @@ Module *expr::core_module;
 GenericFn *expr::equal_operator;
 GenericFn *expr::gn_to_string;
 
-IntegerClass *Integer::parent;;
-
 using type::hydra_cast;
 
 vector<pair<string, Object *>> inbuilts;
@@ -40,7 +38,14 @@ Object *read(Istream *istm);
 void make_modules();
 
 int main(int argc, char **argv) {
-  Integer::parent = new IntegerClass;
+  Integer::parent = new Parent("integer parent");
+  HString::parent = new Parent("string parent");
+  Cons::parent = new Parent("cons parent");
+  Tuple::parent = new Parent("tuple parent");
+  Char::parent = new Parent("Char parent");
+  Union::parent = new Parent("Union parent");
+  type::initialize_types();
+
   op::mk_arithmetic();
   make_modules();
 
@@ -238,9 +243,9 @@ void make_modules() {
     make_pair("len", gn_len),
 
     make_pair("to-string", gn_to_string),
-    //make_pair("var", op::var),
 
     make_pair("set-invoker", op::set_invoker),
+    make_pair("get-invoker", op::get_invoker),
     make_pair("set", gn_set),
     make_pair("get", gn_get),
     make_pair("clone", op::clone),
@@ -301,14 +306,14 @@ void make_modules() {
     make_pair("Is", new type::IsConstructor),
     make_pair("Derives", new type::DerivesConstructor),
     //make_pair("Object", new type::Object),
+    make_pair("Any", new type::Any),
+    make_pair("Integer", type::integer_type),
+    make_pair("Nil", type::nil_type),
+    make_pair("String", type::string_type),
     make_pair("Tuple", new type::Tuple),
-    make_pair("Integer", new type::Integer),
     make_pair("Vector", new type::Vector),
     make_pair("Type", new type::MetaType),
-    make_pair("String", new type::TString),
     make_pair("Module", new type::Module),
-    make_pair("Any", new type::Any),
-    make_pair("Nil", new type::Nil),
     make_pair("Symbol", new type::Symbol),
     make_pair("List", new type::List),
     make_pair("IOStream", new type::IOStream),

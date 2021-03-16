@@ -7,6 +7,17 @@
 
 namespace type {
 
+  extern Type* integer_type;
+  extern Type* nil_type;
+  extern Type* character_type;
+  extern Type* module_type;
+  extern Type* string_type;
+  extern Type* istream_type;
+  extern Type* ostream_type;
+  extern Type* iostream_type;
+  extern Type* meta_type;
+
+  void initialize_types();
 
 struct UserObject : public Type {
   virtual void mark_node();
@@ -63,6 +74,7 @@ struct IOStream : public Type {
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };
+
 struct Istream : public Type {
   virtual void mark_node();
   std::string to_string() const;
