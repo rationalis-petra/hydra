@@ -236,6 +236,7 @@ void make_modules() {
     make_pair("to-string", gn_to_string),
     //make_pair("var", op::var),
 
+    make_pair("set-invoker", op::set_invoker),
     make_pair("set", gn_set),
     make_pair("get", gn_get),
     make_pair("clone", op::clone),

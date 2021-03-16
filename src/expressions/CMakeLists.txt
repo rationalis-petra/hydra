@@ -4,8 +4,8 @@ add_library(expressions OBJECT
                         lexical_scope.cpp
 
                         concurrency.cpp
-                        value.cpp
                         object.cpp
+                        user_object.cpp
                         cons.cpp
                         oper.cpp
                         handler.cpp

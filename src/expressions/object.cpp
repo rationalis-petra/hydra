@@ -1,30 +1,59 @@
+#include <iostream>
 #include "expressions.hpp"
 
 using std::string;
+using std::ostream;
+using std::list;
+using std::atomic;
+using std::set;
+
 using namespace expr;
 
-void UserObject::mark_node() {
-  marked = true;
-  for (auto kvp : slots) {
-    kvp.first->mark_node();
-    kvp.second->mark_node();
-  }
+list<Object*> Object::node_list;
+list<LexicalScope*> Object::context_list;
+hydra_roots Object::roots; 
+Runtime Object::r; 
+
+atomic<unsigned long> Object::counter = 0;
+//runtime *Object::r;
+
+Object::Object() {
+  node_list.push_front(this);
+  marked = false;
+  counter++;
+  invoker = nullptr;
+
+  // collect garbage??
 }
 
-string UserObject::to_string() const {
-  string out = "\n{";
-  for (auto x : slots) {
-    out += "[";
-    out += x.first->to_string();
-    out += " ";
-    out += x.second->to_string();
+Object::~Object() {}
 
-    out += "]";
-    if (x != *(--slots.end())) {
-      out += "\n";
+bool Object::null() const {
+  return false;
+}
+
+// the default behaviour is to self-evaluate
+Object* Object::eval(LocalRuntime& r, LexicalScope& s) {
+  return this;
+}
+
+ostream &expr::operator<<(ostream &os, const Object *obj) {
+  os << obj->to_string();
+  return os;
+}
+
+Object *Object::derive_check(set<expr::Object*> ptypes) {
+  for (auto* proto : ptypes) {
+    if (proto == this) {
+      return expr::t::get();
+    }
+    std::set<expr::Object*> ptypes2;
+    for (auto s : proto->parents) {
+      ptypes2.insert(proto->slots[s]);
+    }
+    if (!derive_check(ptypes2)->null()) {
+      return expr::t::get();
     }
   }
-  out += "}";
-  return out;
+  return expr::nil::get();
 }
-

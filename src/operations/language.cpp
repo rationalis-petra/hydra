@@ -212,16 +212,20 @@ Operator* op::exit =
                       true);
 
 
-Object *op_ref(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
 
-  Ref* ref = new Ref;
-  ref->ptr = arg_list.front();
-  return ref;
+Object *op_set_invoker(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  if (Operator* op = dynamic_cast<Operator*>(arg_list.back())) {
+    arg_list.front()->invoker = op;
+    return op;
+  } else {
+    // type 
+    string err = "type error in op-set-invoker";
+    throw err;
+  }
 }
 
-Operator* op::ref  =
-  new InbuiltOperator("Returns a reference to the provided value",
-                      op_ref,
-                      type::Fn::with_args({new type::Any}),
+Operator* op::set_invoker =
+  new InbuiltOperator("Exits the current running application",
+                      op_set_invoker,
+                      type::Fn::with_args({new type::Any, new type::Fn}),
                       true);

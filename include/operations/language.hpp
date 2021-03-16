@@ -16,8 +16,7 @@ namespace op {
   extern expr::Operator* progn;
   extern expr::Operator* definedp;
 
-  extern expr::Operator* var;
-  extern expr::Operator* ref;
+  extern expr::Operator* set_invoker;
 
   extern expr::Operator* quote;
   extern expr::Operator* read;

@@ -12,7 +12,7 @@
 #include "expressions/concurrency.hpp"
 #include "expressions/runtime.hpp"
 #include "expressions/operation.hpp"
-#include "expressions/oobject.hpp"
+#include "expressions/user_object.hpp"
 #include "expressions/language.hpp"
 #include "expressions/data.hpp"
 #include "expressions/foreign.hpp"

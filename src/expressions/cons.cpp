@@ -33,6 +33,16 @@ Object *Cons::eval(LocalRuntime &r, LexicalScope &s) {
       roots.remove(oper);
       throw e;
     }
+  } else if (oper->invoker) {
+    try {
+      std::list<Object*> arg_list = oper->invoker->get_arg_list(cdr, r, s);
+      Object *out = oper->invoker->call(arg_list, r, s);
+      Object::roots.remove(oper);
+      return out;
+    } catch (hydra_exception* e) {
+      roots.remove(oper);
+      throw e;
+    }
   } else {
     string excp = "Attempted to call " + oper->to_string() +
                   " which is not an operation!";

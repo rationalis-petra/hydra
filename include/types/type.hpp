@@ -6,7 +6,7 @@
 #include <string>
 
 #include "expressions/object.hpp"
-#include "expressions/oobject.hpp"
+#include "expressions/user_object.hpp"
 #include "expressions/operation.hpp"
 
 namespace type {

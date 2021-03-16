@@ -11,6 +11,7 @@
 namespace expr {
 
 struct Object;
+struct Operator;
 
 struct hydra_roots {
 public:
@@ -24,6 +25,7 @@ struct Object {
 
   std::set<Symbol*> parents;
   std::map<Symbol*, Object*> slots;
+  Operator* invoker;
 
   virtual bool null() const;
   virtual std::string to_string() const = 0;
