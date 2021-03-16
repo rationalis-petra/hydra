@@ -9,7 +9,7 @@ using std::string;
 using namespace type;
 
 void Any::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string Any::to_string() const {

@@ -10,7 +10,7 @@ using expr::Object;
 using type::Symbol;
 
 void Symbol::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string Symbol::to_string() const {

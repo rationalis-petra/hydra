@@ -13,7 +13,7 @@ Tuple::Tuple(std::vector<Type*> _types) : types(_types) {}
   
 
 void Tuple::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string Tuple::to_string() const {

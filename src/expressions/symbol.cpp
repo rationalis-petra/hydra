@@ -8,7 +8,7 @@ using std::string;
 
 void Symbol::mark_node() {
   if (marked) return;
-  marked = true;
+  Object::mark_node();
   if (value) {
     value->mark_node();
   }

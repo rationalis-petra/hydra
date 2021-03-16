@@ -9,7 +9,7 @@ using std::list;
 using namespace type;
 
 void Integer::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string Integer::to_string() const {

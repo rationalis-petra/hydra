@@ -10,7 +10,7 @@ using std::list;
 using namespace type;
 
 void List::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string List::to_string() const {

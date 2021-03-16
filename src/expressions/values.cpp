@@ -12,7 +12,7 @@ using namespace expr;
 
 // compound types: string, array
 void t::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 t* t::singleton = nullptr;
@@ -34,7 +34,7 @@ string t::to_string() const {
 //// STRING
 
 void HString::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 HString::HString() {}
@@ -59,7 +59,8 @@ Object* Vector::operator[](int i) {
 }
 
 void Vector::mark_node() {
-  marked = true;
+  if (marked) return;
+  Object::mark_node();
   for (Object* o : array) {
     o->mark_node();
   }
@@ -89,7 +90,8 @@ Object* Tuple::operator[](int i) {
 }
 
 void Tuple::mark_node() {
-  marked = true;
+  if (marked) return;
+  Object::mark_node();
   for (Object* o : values) {
     o->mark_node();
   }
@@ -110,7 +112,8 @@ string Tuple::to_string() const {
 /// UNION
 
 void Union::mark_node() {
-  marked = true;
+  if (marked) return;
+  Object::mark_node();
   tag->mark_node();
   value->mark_node();
 }

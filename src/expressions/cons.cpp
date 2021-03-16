@@ -8,7 +8,7 @@ using namespace expr;
 
 void Cons::mark_node() {
   if (marked) return;
-  marked = true;
+  Object::mark_node();
   car->mark_node();
   cdr->mark_node();
 }

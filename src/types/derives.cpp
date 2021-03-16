@@ -15,7 +15,8 @@ Derives::Derives(Object* obj) {
 }
 
 void Derives::mark_node() {
-  marked = true;
+  if (marked) return;
+  Object::mark_node();
   object->mark_node();
 }
 
@@ -33,7 +34,7 @@ expr::Object *Derives::check_type(expr::Object* obj) {
 }
 
 void DerivesConstructor::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 

@@ -9,7 +9,7 @@ using namespace expr;
 
 void Module::mark_node() {
   if (marked) return;
-  marked = true;
+  Object::mark_node();
   for (auto pair : symbols) {
     pair.second->mark_node();
   }

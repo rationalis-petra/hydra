@@ -20,9 +20,8 @@ Operator::Operator() {
 }
 
 void Operator::mark_node() {
-  if (marked)
-    return;
-  marked = true;
+  if (marked) return;
+  Object::mark_node();
   docstring->mark_node();
   type->mark_node();
 }

@@ -8,7 +8,7 @@ using std::string;
 using namespace type;
 
 void Nil::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string Nil::to_string() const {

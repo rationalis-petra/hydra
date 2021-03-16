@@ -17,7 +17,7 @@ expr::Object* Type::equal(Type* other) {
 }
 
 void MetaType::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string MetaType::to_string() const {
@@ -41,7 +41,7 @@ expr::Object *MetaType::subtype(Type * ty) {
 }
 
 void MetaConstructor::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string MetaConstructor::to_string() const {

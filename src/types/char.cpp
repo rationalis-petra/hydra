@@ -8,7 +8,7 @@ using type::Char;
 using type::Type;
 
 void Char::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string Char::to_string() const {

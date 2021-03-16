@@ -11,7 +11,7 @@ using type::Type;
 using expr::Object;
 
 void Vector::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string Vector::to_string() const {

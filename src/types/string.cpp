@@ -9,7 +9,7 @@ using std::string;
 using type::TString;
  
 void TString::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string TString::to_string() const {

@@ -11,7 +11,7 @@ using namespace expr;
 ForeignLib::ForeignLib(lt_dlhandle _lib) : lib(_lib){}
 
 void ForeignLib::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
     
 string ForeignLib::to_string() const {

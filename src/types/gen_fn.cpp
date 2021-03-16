@@ -11,7 +11,7 @@ using namespace type;
 
 void GenFn::mark_node() {
   if (marked) return;
-  marked = true;
+  Object::mark_node();
   for (Type* t : arg_list) {
     t->mark_node();
   }

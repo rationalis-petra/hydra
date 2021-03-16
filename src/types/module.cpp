@@ -14,7 +14,7 @@ string Module::to_string() const {
 }
 
 void Module::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 expr::Object *Module::check_type(expr::Object* obj) {

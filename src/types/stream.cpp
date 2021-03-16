@@ -11,7 +11,7 @@ using namespace type;
 
 // INPUT-OUTPUT STREAM
 void IOStream::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string IOStream::to_string() const {

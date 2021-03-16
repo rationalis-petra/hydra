@@ -4,14 +4,7 @@ using std::string;
 using namespace expr;
 
 void UserObject::mark_node() {
-  if (marked) return;
-  marked = true;
-  for (auto kvp : slots) {
-    kvp.first->mark_node();
-    kvp.second->mark_node();
-  }
-  if (invoker)
-    invoker->mark_node();
+  Object::mark_node();
 }
 
 string UserObject::to_string() const {

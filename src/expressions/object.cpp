@@ -26,6 +26,18 @@ Object::Object() {
   // collect garbage??
 }
 
+void Object::mark_node() {
+  if (marked) return;
+  marked = true;
+  if (invoker) {
+    invoker->mark_node();
+  }
+  for (auto kvp : slots) {
+    kvp.first->mark_node();
+    kvp.second->mark_node();
+  }
+}
+
 Object::~Object() {}
 
 bool Object::null() const {

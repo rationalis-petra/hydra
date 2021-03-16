@@ -36,7 +36,8 @@ Object *case_handler::handle(Object *condition) {
 hydra_restart::hydra_restart(Operator *o, Symbol *s) : op(o), sym(s) {}
 
 void hydra_restart::mark_node() {
-  marked = true;
+  if (marked) return;
+  Object::mark_node();
   op->mark_node();
   sym->mark_node();
 }

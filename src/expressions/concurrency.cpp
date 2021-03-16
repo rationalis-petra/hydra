@@ -18,7 +18,7 @@ Thread::Thread(Operator* op, LocalRuntime& r, LexicalScope& s) {
 }
 
 void Thread::mark_node() {
-  marked = true;
+  Object::mark_node();
 };
 
 string Thread::to_string() const {

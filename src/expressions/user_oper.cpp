@@ -28,7 +28,7 @@ string UserOperator::to_string() const {
 
 void UserOperator::mark_node() {
   if (marked) return;
-  marked = true;
+  Object::mark_node();
   docstring->mark_node();
   type->mark_node();
 

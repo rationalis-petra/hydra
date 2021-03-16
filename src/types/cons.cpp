@@ -10,7 +10,7 @@ using std::list;
 using namespace type;
 
 void Cons::mark_node() {
-  marked = true;
+  Object::mark_node();
 }
 
 string Cons::to_string() const {

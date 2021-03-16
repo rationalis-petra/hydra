@@ -38,7 +38,7 @@ struct Object {
   // mark & sweep garbage collection
   // local variables/functions
   bool marked;
-  virtual void mark_node() = 0;
+  virtual void mark_node();
   //virtual Object* clone() const = 0;
 
   // self-explanatory

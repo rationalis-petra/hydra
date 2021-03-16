@@ -15,7 +15,8 @@ Is::Is(Object* obj) {
 }
 
 void Is::mark_node() {
-  marked = true;
+  if (marked) return;
+  Object::mark_node();
   object->mark_node();
 }
 
