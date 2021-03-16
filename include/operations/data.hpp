@@ -26,6 +26,7 @@ namespace op {
   extern expr::Operator* tuple_eq;
 
 // Stirng operations: creation, indexing, length & concatenation
+  extern expr::Operator* to_str;
   extern expr::Operator* str_elt;
   extern expr::Operator* str_gr;
   extern expr::Operator* str_len;

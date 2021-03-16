@@ -17,6 +17,7 @@ Module *expr::language_module;
 Module *expr::keyword_module;
 Module *expr::core_module;
 GenericFn *expr::equal_operator;
+GenericFn *expr::gn_to_string;
 
 using type::hydra_cast;
 
@@ -114,7 +115,9 @@ int main(int argc, char **argv) {
       ast = read(stm);
       Object::roots.insert(ast);
       out = ast->eval(r, s);
-      cout << "* " << out << endl;
+      cout << "* ";
+      op::print->call({out}, r, s);
+      cout << endl;
       Object::roots.remove(ast);
       Object::collect_garbage(r);
     } catch (hydra_exception *e) {
@@ -204,6 +207,12 @@ void make_modules() {
   gn_set->add(op::obj_set);
   gn_set->add(op::vec_set);
 
+  gn_to_string = new GenericFn;
+  gn_to_string->is_fn = true;
+  gn_to_string->type->arg_list.push_back(new type::Any);
+  gn_to_string->type->return_type = new type::TString;
+  gn_to_string->add(op::to_str);
+
   core = {
 
     // arithmetic
@@ -224,7 +233,7 @@ void make_modules() {
     make_pair("concat", gn_concat),
     make_pair("len", gn_len),
 
-    make_pair("ref", op::ref),
+    make_pair("to-string", gn_to_string),
     //make_pair("var", op::var),
 
     make_pair("set", gn_set),

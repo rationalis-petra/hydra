@@ -21,11 +21,16 @@ using std::ostream;
 using namespace expr;
 
 Object *op_print(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-
   if (HString *str = dynamic_cast<HString *>(arg_list.front())) {
     cout << str->value;
   } else {
-    cout << arg_list.front()->to_string();
+    Object* obj = gn_to_string->call(arg_list, r, s);
+    if ((str = dynamic_cast<HString*>(obj))) {
+      cout << str->value;
+    } else {
+      string err = "non-string returend from to-string";
+      throw err;
+    }
   }
 
   Object::roots.remove(arg_list.front());

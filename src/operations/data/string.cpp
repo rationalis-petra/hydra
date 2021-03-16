@@ -102,3 +102,13 @@ Operator *op::char_eq =
     new InbuiltOperator("Equality test for Characters",
                         op_char_eq,
                         type::Fn::with_args({new type::Char, new type::Char}), true);
+
+Object *op_to_str(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+  
+  return new HString(arg_list.front()->to_string());
+}
+
+Operator *op::to_str =
+    new InbuiltOperator("Converts an object into a string",
+                        op_to_str,
+                        type::Fn::with_all({new type::Any}, nullptr, new type::TString), true);
