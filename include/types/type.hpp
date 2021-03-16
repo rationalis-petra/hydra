@@ -100,15 +100,15 @@ struct Derives : public Type {
   virtual expr::Object *check_type(expr::Object *obj);
 };
 
-struct EqlConstructor : public TypeConstructor{
+struct IsConstructor : public TypeConstructor{
   void mark_node();
   expr::Object* object;
   std::string to_string() const;
   Type* constructor(std::list<expr::Object*> lst);
 };
 
-struct Eql : public Type {
-  Eql(expr::Object* v);
+struct Is : public Type {
+  Is(expr::Object* v);
   void mark_node();
   expr::Object* object;
   std::string to_string() const;

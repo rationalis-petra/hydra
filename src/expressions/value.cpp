@@ -5,6 +5,7 @@ using std::string;
 using std::ostream;
 using std::list;
 using std::atomic;
+using std::set;
 
 using namespace expr;
 
@@ -38,4 +39,20 @@ Object* Object::eval(LocalRuntime& r, LexicalScope& s) {
 ostream &expr::operator<<(ostream &os, const Object *obj) {
   os << obj->to_string();
   return os;
+}
+
+Object *Object::derive_check(set<expr::Object*> ptypes) {
+  for (auto* proto : ptypes) {
+    if (proto == this) {
+      return expr::t::get();
+    }
+    std::set<expr::Object*> ptypes2;
+    for (auto s : proto->parents) {
+      ptypes2.insert(proto->slots[s]);
+    }
+    if (!derive_check(ptypes2)->null()) {
+      return expr::t::get();
+    }
+  }
+  return expr::nil::get();
 }

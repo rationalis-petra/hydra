@@ -28,6 +28,7 @@ struct Object {
   virtual bool null() const;
   virtual std::string to_string() const = 0;
   virtual Object* eval(LocalRuntime& r, LexicalScope& s);
+  Object* derive_check(std::set<Object*> ptypes);
   Object();
   virtual ~Object();
 

@@ -13,7 +13,7 @@ add_library(types OBJECT cons.cpp
                          stream.cpp
                          char.cpp
                          string.cpp
-                         type_eql.cpp
+                         is.cpp
                          symbol.cpp
                          fn.cpp
                          vector.cpp)

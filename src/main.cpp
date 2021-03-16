@@ -282,7 +282,7 @@ void make_modules() {
     make_pair("get-restarts", op::get_restarts),
 
     // types
-    make_pair("Eql", new type::EqlConstructor),
+    make_pair("Is", new type::IsConstructor),
     make_pair("Derives", new type::DerivesConstructor),
     //make_pair("Object", new type::Object),
     make_pair("Tuple", new type::Tuple),

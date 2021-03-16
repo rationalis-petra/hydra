@@ -59,7 +59,7 @@ expr::Object *Tuple::subtype(Type * ty) {
     if (other->types.size() != types.size()) {
       return expr::nil::get();
     } else {
-      for (int i = 0; i < types.size(); i++) {
+      for (unsigned i = 0; i < types.size(); i++) {
         if (!types[i]->subtype(other->types[i])) {
           return expr::nil::get();
         }
