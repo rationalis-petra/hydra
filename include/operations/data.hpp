@@ -46,5 +46,6 @@ namespace op {
   extern expr::Operator* lock;
   extern expr::Operator* unlock;
 
-} // namespace op
-#endif // __HYDRA_DATA_HPP
+} 
+
+#endif

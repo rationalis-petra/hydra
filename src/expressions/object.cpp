@@ -4,8 +4,9 @@
 using std::string;
 using std::ostream;
 using std::list;
-using std::atomic;
 using std::set;
+using std::mutex;
+using std::atomic;
 
 using namespace expr;
 
@@ -17,13 +18,16 @@ Runtime Object::r;
 atomic<unsigned long> Object::counter = 0;
 //runtime *Object::r;
 
+mutex Object::root_mutex;
+
 Object::Object() {
+  std::unique_lock<mutex> lck(root_mutex);
   node_list.push_front(this);
   marked = false;
   counter++;
   invoker = nullptr;
 
-  // collect garbage??
+  lck.unlock();
 }
 
 void Object::mark_node() {

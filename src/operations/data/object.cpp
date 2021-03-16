@@ -8,7 +8,7 @@ using namespace expr;
 Object* op_obj_get(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
   
 
-  UserObject* obj = dynamic_cast<UserObject*>(arg_list.front());
+  Object* obj = arg_list.front();
   Symbol* sym = dynamic_cast<Symbol*>(arg_list.back());
 
   try {

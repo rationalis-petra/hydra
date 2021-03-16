@@ -10,7 +10,7 @@ struct LocalRuntime;
 struct LexicalScope;
 
 struct Thread : public Object {
-  Thread(Operator* op, LocalRuntime& r, LexicalScope& s);
+  Thread(Operator* op, std::list<Object*> args, LocalRuntime& r, LexicalScope& s);
 
   void mark_node();
   std::string to_string() const;

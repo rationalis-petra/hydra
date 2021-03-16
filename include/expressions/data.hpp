@@ -40,8 +40,11 @@ struct Cons : public Object {
   unsigned len();
 };
 
+struct IntegerClass : public Object {
+  std::string to_string() const;
+};
 struct Integer : public Object {
-  virtual void mark_node();
+  static IntegerClass* parent;
 
   Integer(int num);
   std::string to_string() const;

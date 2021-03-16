@@ -19,6 +19,8 @@ Module *expr::core_module;
 GenericFn *expr::equal_operator;
 GenericFn *expr::gn_to_string;
 
+IntegerClass *Integer::parent;;
+
 using type::hydra_cast;
 
 vector<pair<string, Object *>> inbuilts;
@@ -38,6 +40,8 @@ Object *read(Istream *istm);
 void make_modules();
 
 int main(int argc, char **argv) {
+  Integer::parent = new IntegerClass;
+  op::mk_arithmetic();
   make_modules();
 
   // Object::r = &r;
@@ -290,6 +294,8 @@ void make_modules() {
     make_pair("handler-bind", op::handler_bind),
     make_pair("with-restart", op::add_restart),
     make_pair("get-restarts", op::get_restarts),
+
+    make_pair("Integer-Parent", Integer::parent),
 
     // types
     make_pair("Is", new type::IsConstructor),

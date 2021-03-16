@@ -54,9 +54,12 @@ struct Object {
   static std::list<Object*> node_list; 
   // The list of root hydra objects - these are objects
   // which should not be deleted for reasons 'outside'
+  // also a mutex to prevent concurrent access
   static hydra_roots roots; 
+  static std::mutex root_mutex;
   // the list of all lexical contexts
   static std::list<LexicalScope*> context_list; 
+  static std::mutex context_mutex;
 };
 
 

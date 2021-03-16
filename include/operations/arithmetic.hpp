@@ -5,6 +5,7 @@
 
 namespace op {
 
+  extern void mk_arithmetic();
   extern expr::Operator *plus;
   extern expr::Operator *minus;
   extern expr::Operator *multiply;
