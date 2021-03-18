@@ -10,7 +10,6 @@ using namespace expr;
 using type::hydra_cast;
 
 Object *op_lock(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments to lock: " +
                  std::to_string(arg_list.size()) + " expected 1";
@@ -20,13 +19,8 @@ Object *op_lock(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   return arg_list.front();
 }
 
-Operator *op::lock = new InbuiltOperator(
-    "Takes a symbol, and prevents set from being used to modify its' value",
-    op_lock, type::Fn::with_all({new type::Symbol}, nullptr, new type::Symbol),
-    true);
 
 Object *op_unlock(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments to unlock: " +
                  std::to_string(arg_list.size()) + " expected 1";
@@ -37,7 +31,18 @@ Object *op_unlock(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   return arg_list.front();
 }
 
-Operator *op::unlock = new InbuiltOperator(
-    "Takes a symbol, and will allow set to be used to modify it's value",
-    op_lock, type::Fn::with_all({new type::Symbol}, nullptr, new type::Symbol),
-    true);
+
+Operator* op::lock;
+Operator *op::unlock;
+
+void op::initialize_symbol() {
+  op::lock = new InbuiltOperator(
+      "Takes a symbol, and prevents set from being used to modify its' value",
+      op_lock,
+      type::Fn::with_all({new type::Symbol}, nullptr, new type::Symbol), true);
+
+  op::unlock = new InbuiltOperator(
+      "Takes a symbol, and will allow set to be used to modify it's value",
+      op_lock,
+      type::Fn::with_all({new type::Symbol}, nullptr, new type::Symbol), true);
+}

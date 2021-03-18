@@ -7,7 +7,6 @@ using std::list;
 using std::string;
 
 using namespace expr;
-using type::hydra_cast;
 
 Object *make_list(list<Object *> objects) {
   if (objects.size() == 1) {
@@ -25,23 +24,12 @@ Object *make_list(list<Object *> objects) {
   }
 }
 
-Object *op_cons(list<Object*> alist, LocalRuntime &r, LexicalScope &s) {
+Object *op_cons(list<Object *> alist, LocalRuntime &r, LexicalScope &s) {
   return make_list(alist);
 }
 
-Operator* op::mk_cons =
-    new InbuiltOperator("Creates a new cons cell and places the first "
-                        "argument in the car,\n the second in the cdr."
-                        "Will fail if the second is not cons or nil",
-                        op_cons,
-                        type::Fn::with_all({new type::Any, new type::Any},
-                                           new type::Any, new type::Cons),
-                        true);
+Object *op_cdr(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-
-
-Object *op_cdr(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
   if (arg_list.size() != 1) {
     throw "invalid number of args to cdr";
   }
@@ -55,18 +43,8 @@ Object *op_cdr(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-Operator *op::cdr =
-    new InbuiltOperator("Takes a cons cell as input, and returns the cdr",
-                        op_cdr, type::Fn::with_args({new type::Cons}), true);
+Object *op_car(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-
-
-
-
-
-
-Object *op_car(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
   if (arg_list.size() != 1) {
     throw "invalid number of args to car";
   }
@@ -80,17 +58,10 @@ Object *op_car(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
+Object *op_cons_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-
-Operator *op::car =
-    new InbuiltOperator("Takes a cons cell as input, and returns the car",
-                        op_car, type::Fn::with_args({new type::Cons}), true);
-
-#include <iostream>
-Object *op_cons_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
-  Cons* cons1 = dynamic_cast<Cons*>(arg_list.front());
-  Cons* cons2 = dynamic_cast<Cons*>(arg_list.back());
+  Cons *cons1 = dynamic_cast<Cons *>(arg_list.front());
+  Cons *cons2 = dynamic_cast<Cons *>(arg_list.back());
 
   if (equal_operator->call({cons1->car, cons2->car}, r, s)->null()) {
     return nil::get();
@@ -101,6 +72,28 @@ Object *op_cons_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-Operator *op::cons_eq =
-    new InbuiltOperator("Equality test for Conses",
-                        op_cons_eq, type::Fn::with_args({new type::Cons, new type::Cons}), true);
+Operator *op::mk_cons;
+Operator *op::cdr;
+Operator *op::car;
+Operator *op::cons_eq;
+
+void op::initialize_cons() {
+  op::mk_cons =
+      new InbuiltOperator("Creates a new cons cell and places the first "
+                          "argument in the car,\n the second in the cdr."
+                          "Will fail if the second is not cons or nil",
+                          op_cons,
+                          type::Fn::with_all({new type::Any, new type::Any},
+                                             new type::Any, new type::Cons),
+                          true);
+  op::cdr =
+      new InbuiltOperator("Takes a cons cell as input, and returns the cdr",
+                          op_cdr, type::Fn::with_args({new type::Cons}), true);
+
+  op::car =
+      new InbuiltOperator("Takes a cons cell as input, and returns the car",
+                          op_car, type::Fn::with_args({new type::Cons}), true);
+  op::cons_eq = new InbuiltOperator(
+      "Equality test for Conses", op_cons_eq,
+      type::Fn::with_args({new type::Cons, new type::Cons}), true);
+}

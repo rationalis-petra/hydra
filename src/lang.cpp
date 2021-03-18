@@ -75,7 +75,7 @@ std::string lang = R"(
 
 "The comment character macro - we may have comments at last!"
 (def comment-reader (stream char)
-  (if (= char #newline)
+  (if (or (= char #newline) (end? stream))
       (read stream)
       (comment-reader stream (next stream))))
 
@@ -102,8 +102,6 @@ std::string lang = R"(
 (def @s symbol)
 (export (current-module) '@c)
 (def @c cons)
-(export (current-module) '@t)
-(def @t type)
 
 
 ;;; DATA MANIPULATION
@@ -247,7 +245,7 @@ std::string lang = R"(
 (export (current-module) 'get!)
 (export (current-module) 'set!)
 (def ref-object {})
-(def Ref (type Derives ref-object)) 
+(def Ref (Derives ref-object)) 
 
 (def ref (val)
   (object
@@ -338,5 +336,6 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 (use-module &:user &:hydra:foreign)
 ;;(use-module &:user &:hydra:concurrent)
 (in-module &:user)
+
 
 )";

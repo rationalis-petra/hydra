@@ -5,6 +5,15 @@
 
 namespace op {
 
+  void initialize_symbol();
+
+  void initialize_string();
+  void initialize_vector();
+  void initialize_tuple();
+  void initialize_object();
+  void initialize_cons();
+  void initialize_user_obj();
+
 // Cons-Cell creation, Car, Cdr
   extern expr::Operator* mk_cons;
   extern expr::Operator* car;

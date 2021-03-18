@@ -5,6 +5,8 @@
 
 namespace op {
 
+  void initialize_io();
+
   extern expr::Operator* print;
   extern expr::Operator* open_file;
   extern expr::Operator* close;

@@ -5,7 +5,6 @@
 #include "types.hpp"
 
 using std::string;
-using std::list;
 using std::set;
 
 using namespace type;
@@ -38,10 +37,6 @@ expr::Object *Is::check_type(expr::Object* obj) {
   return object->derive_check(ptypes);
 }
 
-void IsConstructor::mark_node() {
-  marked = true;
-}
-
 
 expr::Object *Is::subtype(Type* ty) {
   // TODO: derives??
@@ -57,12 +52,4 @@ expr::Object *Is::subtype(Type* ty) {
 }
 
 
-
-Type *IsConstructor::constructor(list<expr::Object*> lst) {
-  return new Is(lst.front());
-}
-
-string IsConstructor::to_string() const {
-  return "Type constructor for is";
-}
 

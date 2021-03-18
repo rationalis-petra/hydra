@@ -24,12 +24,12 @@ Object *to_value(string token, LocalRuntime &r) {
 
   // character literal
   if (token[0] == '#') {
-    Char *ch = new Char;
+    Char *ch;
     if (token.size() == 2) {
-      ch->value = token[1];
+      ch = new Char(token[1]);
     } else {
       if (token == "#newline") {
-        ch->value = '\n';
+        ch = new Char('\n');
       } else {
         string err = "non-regognized character: " + token;
         throw err;
@@ -252,7 +252,7 @@ Object *read(Object *raw, LocalRuntime &r) {
 
       // generate a blank 'dummy' scope
       LexicalScope s;
-      list<Object*> arg_list = r.r.readtable[c]->get_arg_list(cns2, r, s);
+      list<Object *> arg_list = r.r.readtable[c]->get_arg_list(cns2, r, s);
       return r.r.readtable[c]->call(arg_list, r, s);
     }
     switch (c) {
@@ -294,8 +294,8 @@ Object *read(Object *raw, LocalRuntime &r) {
   return nil::get();
 }
 
-Object *op_read(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
+Object *op_read(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+
   if (arg_list.size() != 1) {
     string err = "Incorrect number of arguments provided to read";
     throw err;
@@ -304,15 +304,9 @@ Object *op_read(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   return obj;
 }
 
-Operator *op::read = new InbuiltOperator(
-    "Takes a string or input stream, and returns a hydra expression.\n"
-    "Programmable via set-macro-character",
-    //type (Union Input-stream String)
-    op_read, type::Fn::with_args({new type::Any}), true);
+Object *op_set_mac_char(list<Object *> arg_list, LocalRuntime &r,
+                        LexicalScope &s) {
 
-Object *op_set_mac_char(list<Object*> arg_list, LocalRuntime &r,
-                       LexicalScope &s) {
-  
   if (arg_list.size() != 2) {
     string err =
         "Incorrect number of arguments provided to set-macro-character";
@@ -332,7 +326,19 @@ Object *op_set_mac_char(list<Object*> arg_list, LocalRuntime &r,
   return function;
 }
 
-Operator *op::set_mac_char = new InbuiltOperator(
-    "Updates the readtable entry for the character (first argument)\n"
-    "to point to the provided function (second argumetn)",
-    op_set_mac_char, type::Fn::with_args({new type::Char, new type::Fn}), true);
+Operator *op::read;
+Operator *op::set_mac_char;
+
+void op::initialize_read() {
+  op::read = new InbuiltOperator(
+      "Takes a string or input stream, and returns a hydra expression.\n"
+      "Programmable via set-macro-character",
+      // type (Union Input-stream String)
+      op_read, type::Fn::with_args({new type::Any}), true);
+
+  op::set_mac_char = new InbuiltOperator(
+      "Updates the readtable entry for the character (first argument)\n"
+      "to point to the provided function (second argumetn)",
+      op_set_mac_char, type::Fn::with_args({type::character_type, new type::Fn}),
+      true);
+}

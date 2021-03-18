@@ -5,7 +5,6 @@
 #include "types.hpp"
 
 using std::string;
-using std::list;
 using std::set;
 
 using namespace type;
@@ -33,10 +32,6 @@ expr::Object *Derives::check_type(expr::Object* obj) {
   return object->derive_check(ptypes);
 }
 
-void DerivesConstructor::mark_node() {
-  Object::mark_node();
-}
-
 
 expr::Object *Derives::subtype(Type* ty) {
   if (Derives* drv = dynamic_cast<Derives*>(ty)) {
@@ -49,14 +44,3 @@ expr::Object *Derives::subtype(Type* ty) {
   }
   return expr::nil::get();
 }
-
-
-
-Type *DerivesConstructor::constructor(list<expr::Object*> lst) {
-  return new Derives(lst.front());
-}
-
-string DerivesConstructor::to_string() const {
-  return "Type constructor for derives";
-}
-

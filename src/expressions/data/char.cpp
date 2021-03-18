@@ -6,9 +6,12 @@
 using namespace std;
 using namespace expr;
 
-Char::Char() : Object() {}
 
-Char::Char(int c) : value(c) {}
+Char::Char(int c) : value(c) {
+  Symbol* pt = keyword_module->intern("parent");
+  parents.insert(pt);
+  slots[pt] = parent;
+}
 
 void Char::mark_node() { marked = true; }
 

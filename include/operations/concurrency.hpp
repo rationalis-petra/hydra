@@ -5,6 +5,8 @@
 
 namespace op {
 
+  void initialize_concurrency();
+
   extern expr::Operator* thread;
   extern expr::Operator* thread_join;
   extern expr::Operator* thread_id;

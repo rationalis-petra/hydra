@@ -4,13 +4,12 @@
 #include <string>
 #include <list>
 
-#include "expressions.hpp"
-#include "operations.hpp"
+#include "expressions/object.hpp"
 
 #include "types/type.hpp"
 
 namespace type {
-struct Fn : public Type {
+  struct Fn : public Type {
   virtual void mark_node();
 
   Fn();
@@ -27,7 +26,7 @@ struct Fn : public Type {
   expr::Object* check_args(std::list<expr::Object*> alist);
   virtual expr::Object *equal(Type* ty);
 
-  Type* constructor(std::list<expr::Object*> lst);
+    Type* constructor(std::list<expr::Object*> lst, expr::LocalRuntime& r, expr::LexicalScope&s);
 
   Type* return_type;
   Type* rest_type;

@@ -1,13 +1,25 @@
 #include <string>
 #include <list>
 
+#include "operations/types.hpp"
 #include "expressions.hpp"
 #include "types.hpp"
 
 using std::string;
-using std::list;
 
 using namespace type;
+
+Cons::Cons() {
+  type_car = new Any;
+  type_cdr = new Any;
+  invoker = op::mk_cons_type;
+}
+
+Cons::Cons(Type* tcar, Type* tcdr) {
+  type_car = tcar;
+  type_cdr = tcdr;
+  invoker = op::mk_cons_type;
+}
 
 void Cons::mark_node() {
   Object::mark_node();
@@ -17,27 +29,24 @@ string Cons::to_string() const {
   return "Cons";
 }
 
-expr::Object *Cons::check_type(expr::Object* obj) {
-  if ((dynamic_cast<expr::Cons*>(obj)) == nullptr) {
-    return expr::nil::get();
-  } else {
+expr::Object *Cons::check_type(expr::Object *obj) {
+  if (expr::Cons *cns = dynamic_cast<expr::Cons *>(obj)) {
+    if (type_car->check_type(cns->car)->null()) {
+      return expr::nil::get();
+    }
+    if (type_cdr->check_type(cns->cdr)->null()) {
+      return expr::nil::get();
+    }
     return expr::t::get();
-  }
-}
-
-Type *Cons::constructor(list<Object*> lst) {
-  if (lst.size() == 0) {
-    return this;
   } else {
-    string err = "Cannot provide argument to the Char Type constructor";
-    throw err;
+    return expr::nil::get();
   }
 }
 
 expr::Object *Cons::subtype(Type *obj) {
   if (Cons *tcons = dynamic_cast<Cons*>(obj)) {
-    // if (type_car->subtype(tcons->type_car) &&
-    //     type_cdr->subtype(tcons->type_cdr))
+    if (type_car->subtype(tcons->type_car) &&
+        type_cdr->subtype(tcons->type_cdr))
     return expr::t::get();
   }
   return expr::nil::get();

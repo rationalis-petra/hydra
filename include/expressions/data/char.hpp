@@ -15,7 +15,6 @@ struct Char : public Object {
   virtual void mark_node();
   static Parent* parent;
 
-  Char();
   Char(int c);
   std::string to_string() const;
   int value;

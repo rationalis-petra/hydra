@@ -39,13 +39,6 @@ Object *op_foreign_lib(list<Object*> arg_list, LocalRuntime &r,
   }
 }
 
-Operator *op::foreign_lib =
-    new InbuiltOperator("takes a string and tries to open the "
-                        "corresponding\n shared object (.so) or"
-                        "dynamic link library (.dll) file",
-                        op_foreign_lib,
-                        type::Fn::with_args({new type::TString}),
-                        true);
 
 Object *op_foreign_sym(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   if (arg_list.size() != 2) {
@@ -74,13 +67,6 @@ Object *op_foreign_sym(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s)
 }
 
 
-Operator* op::foreign_sym =
-  new InbuiltOperator("Takes a string and a foreign library, and"
-                      "will find the\n foreign symbol whose name"
-                      "matches this string in the library",
-                      op_foreign_sym,
-                      type::Fn::with_args({new type::TString, new type::Any}),
-                      true);
 
 // define-foreign-function
 Object *op_internalize(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
@@ -189,94 +175,30 @@ Object *op_internalize(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s)
   }
 }
 
-Operator *op::internalize =
-    new InbuiltOperator("Takes a foreign symbol and a type declaration"
-                        "and returns a hydra\n value that can be used"
-                        "to access the symbol",
-                        op_internalize,
-                        type::Fn::with_args({new type::Any, new type::Any}),
-                        true);
+Operator *op::foreign_lib;
+Operator *op::foreign_sym;
+Operator *op::internalize;
 
-Object *ForeignOperator::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  if (arg_list.size() != arg_types.size()) {
-    string err =
-        "Error in foreign function call: arg list is not of expected size";
-    throw err;
-  }
 
-  void *mynull = nullptr;
-  void **arg_values = new void *[arg_list.size()];
+void op::initialize_foreign() {
 
-  list<Object *>::iterator vals = arg_list.begin();
-  list<foreign_type>::iterator types = arg_types.begin();
-  for (unsigned i = 0; i < arg_list.size(); i++) {
-    Object *val = *vals;
-    foreign_type type = *types;
+  op::foreign_lib = new InbuiltOperator(
+      "takes a string and tries to open the "
+      "corresponding\n shared object (.so) or"
+      "dynamic link library (.dll) file",
+      op_foreign_lib, type::Fn::with_args({type::string_type}), true);
 
-    switch (type) {
-    case Int32: {
-      Integer *num = dynamic_cast<Integer *>(val);
-      if (num == nullptr) {
-        string err = "Provided non-num type to function!";
-        throw err;
-      }
-      arg_values[i] = &num->value;
-    } break;
-    case Pointer:
-      if (val->null()) {
-        arg_values[i] = &mynull;
-      } else if (ForeignSymbol* ptr = dynamic_cast<ForeignSymbol*>(val)) {
-        arg_values[i] = &ptr->address;
-      } else {
-        string err = "Haven't properly implemented pointers yet...";
-        throw err;
-      }
-      break;
-    case String: {
-      HString *str = dynamic_cast<HString *>(val);
-      if (str == nullptr) {
-        string err = "Provided non-num type to function!";
-        throw err;
-      } else {
-        const char* cstr = str->value.c_str();
-        arg_values[i] = &cstr;
-      }
-    } break;
-    case Void:
-      string err = "Void in arg_list?";
-      throw err;
-      break;
-    }
+  op::foreign_sym = new InbuiltOperator(
+      "Takes a string and a foreign library, and"
+      "will find the\n foreign symbol whose name"
+      "matches this string in the library",
+      op_foreign_sym, type::Fn::with_args({type::string_type, new type::Any}),
+      true);
 
-    vals++;
-    types++;
-  }
-
-  ffi_arg result;
-
-  ffi_call(&fn_def, fn_address, &result, arg_values);
-  switch (return_type) {
-  case Void:
-    return nil::get();
-    break;
-  case Int32:
-    return new Integer((int) result);
-    break;
-  case String: {
-    const char *str = (const char *)result;
-    HString *out = new HString();
-    out->value = str;
-    return out;
-  } break;
-  case Pointer: {
-    return new ForeignSymbol((void*) result);
-  } break;
-  }
-  string err = "reached end of foreign call??";
-  throw err;
-}
-
-ForeignOperator::ForeignOperator() {
-  is_fn = true;
-  docstring = new HString("A foriegn operator");
-}
+  op::internalize = new InbuiltOperator(
+      "Takes a foreign symbol and a type declaration"
+      "and returns a hydra\n value that can be used"
+      "to access the symbol",
+      op_internalize, type::Fn::with_args({new type::Any, new type::Any}),
+      true);
+};

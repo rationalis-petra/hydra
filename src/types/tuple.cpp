@@ -2,14 +2,20 @@
 
 #include "expressions.hpp"
 #include "types.hpp"
+#include "operations/types.hpp"
 
 using std::string;
 using std::list;
 
 using namespace type;
 
-Tuple::Tuple(){};
-Tuple::Tuple(std::vector<Type*> _types) : types(_types) {}
+Tuple::Tuple() {
+  invoker = op::mk_tuple_type;
+}
+
+Tuple::Tuple(std::vector<Type *> _types) : types(_types) {
+  invoker = op::mk_tuple_type;
+}
   
 
 void Tuple::mark_node() {
@@ -44,15 +50,6 @@ expr::Object *Tuple::check_type(expr::Object* obj) {
   }
 }
 
-Type *Tuple::constructor(list<expr::Object*> lst) {
-  Tuple * tup = new Tuple;
-  for (expr::Object* obj : lst) {
-    if (Type *t = dynamic_cast<Type*>(obj)) {
-      tup->types.push_back(t);
-    }
-  }
-  return tup;
-}
 
 expr::Object *Tuple::subtype(Type * ty) {
   if (Tuple* other = dynamic_cast<Tuple*>(ty)) {
@@ -70,3 +67,15 @@ expr::Object *Tuple::subtype(Type * ty) {
     return expr::nil::get();
   }
 }
+
+expr::Object* op_mk_tuple(list<expr::Object*> lst, expr::LocalRuntime &r, expr::LexicalScope& s) {
+  Tuple* tup = new Tuple;
+  for (expr::Object* obj : lst) {
+    if (Type *t = dynamic_cast<Type*>(obj)) {
+      tup->types.push_back(t);
+    }
+  }
+  return tup;
+}
+
+

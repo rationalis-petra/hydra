@@ -4,11 +4,24 @@
 #include "types.hpp"
 
 using std::string;
-using std::list;
 
 using type::Vector;
 using type::Type;
 using expr::Object;
+
+
+Vector::Vector() {
+  type_elt = new type::Any();
+}
+
+Vector::Vector(Type* t) {
+  type_elt = t;
+}
+
+Vector::Vector(Type* t, int i) {
+  type_elt = t;
+  // TODO: 
+}
 
 void Vector::mark_node() {
   Object::mark_node();
@@ -23,16 +36,6 @@ Object *Vector::check_type(Object* obj) {
     return expr::t::get();
   } else {
     return expr::nil::get();
-  }
-}
-
-Type *Vector::constructor(list<Object*> lst) {
-  if (lst.size() == 0) {
-    return this;
-  } else {
-    Vector* vc = new Vector();
-    vc->type_elt = dynamic_cast<Type*>(lst.front());
-    return vc;
   }
 }
 

@@ -38,26 +38,52 @@ Object *read(Istream *istm);
 void make_modules();
 
 int main(int argc, char **argv) {
-  Integer::parent = new Parent("integer parent");
-  HString::parent = new Parent("string parent");
-  Cons::parent = new Parent("cons parent");
-  Tuple::parent = new Parent("tuple parent");
+  Integer::parent = new Parent("Integer parent");
+  HString::parent = new Parent("String parent");
+  Cons::parent = new Parent("Cons parent");
+  Tuple::parent = new Parent("Tuple parent");
   Char::parent = new Parent("Char parent");
   Union::parent = new Parent("Union parent");
-  type::initialize_types();
-
-  op::mk_arithmetic();
-  make_modules();
-
-  // Object::r = &r;
 
   g.root = new Module("");
+  language_module = new Module("hydra");
   Symbol *sym = g.root->intern("hydra");
   sym->value = language_module;
   r.active_module = language_module;
   sym = g.root->intern("keyword");
   sym->value = new Module("keyword");
   keyword_module = (Module*) sym->value;
+
+  // SPECIAL: type initialization
+  op::initialize_type_ops();
+  type::initialize_types();
+  op::type_type_ops();
+
+
+  op::mk_arithmetic();
+  op::initialize_user_obj();
+  op::initialize_cons();
+  op::initialize_string();
+  op::initialize_vector();
+  op::initialize_tuple();
+  op::initialize_dev();
+  op::initialize_conditions();
+  op::initialize_logic();
+  op::initialize_language();
+  op::initialize_module();
+  op::initialize_mkoperator();
+  op::initialize_io();
+  op::initialize_foreign();
+  op::initialize_concurrency();
+
+  // we place read last because it uses other operations
+  op::initialize_read();
+
+
+  make_modules();
+
+  // Object::r = &r;
+
   // arithmetic
 
   Module *mod = language_module;
@@ -89,7 +115,7 @@ int main(int argc, char **argv) {
       hydra_cast<Module>(language_module->intern("io")->value)->intern("+cin+");
   sym->value = stm;
 
-  string in = "";
+  string in;
   Istream *prog = new Istream();
   prog->stream = new stringstream(lang);
   Object *ast;
@@ -150,7 +176,6 @@ int main(int argc, char **argv) {
 }
 
 void make_modules() {
-  language_module = new Module("hydra");
   inbuilts = {// other modules
               make_pair("core", new Module("core")),
               make_pair("io", new Module("io")),
@@ -158,21 +183,20 @@ void make_modules() {
               make_pair("concurrent", new Module("concurrent")),
               make_pair("dev", new Module("dev"))};
 
-  dev = {make_pair("doc", op::describe), make_pair("time", op::time)};
+  dev = {make_pair("doc", op::describe),
+    make_pair("macro-expand", op::macexpand),
+    make_pair("time", op::time)};
 
-  equal_operator = new GenericFn;
-  equal_operator->is_fn = true;
-  equal_operator->type->arg_list.push_back(new type::Any);
-  equal_operator->type->arg_list.push_back(new type::Any);
-
-  equal_operator->add(op::obj_eq);
-  equal_operator->add(op::int_eq);
-  equal_operator->add(op::char_eq);
-  equal_operator->add(op::tuple_eq);
-  equal_operator->add(op::cons_eq);
-  equal_operator->add(op::vec_eq);
-  equal_operator->add(op::str_eq);
-  equal_operator->add(op::type_eq);
+  Operator* op_int_eq = op::equal->functions.front();
+  op::equal->add(op::obj_eq);
+  op::equal->add(op_int_eq);
+  op::equal->add(op::char_eq);
+  op::equal->add(op::tuple_eq);
+  op::equal->add(op::cons_eq);
+  op::equal->add(op::vec_eq);
+  op::equal->add(op::str_eq);
+  op::equal->add(op::type_eq);
+  equal_operator = op::equal;
 
   GenericFn *gn_elt = new GenericFn;
   gn_elt->is_fn = true;
@@ -193,13 +217,7 @@ void make_modules() {
   gn_concat->add(op::str_cat);
   gn_concat->add(op::vec_cat);
 
-  GenericFn *gn_gr = new GenericFn;
-  gn_gr->is_fn = true;
-  gn_gr->type->arg_list.push_back(new type::Any);
-  gn_gr->type->arg_list.push_back(new type::Any);
-
-  gn_gr->add(op::int_gr);
-  gn_gr->add(op::str_gr);
+  op::greater->add(op::str_gr);
 
   GenericFn *gn_get = new GenericFn;
   gn_get->is_fn = true;
@@ -219,7 +237,7 @@ void make_modules() {
   gn_to_string = new GenericFn;
   gn_to_string->is_fn = true;
   gn_to_string->type->arg_list.push_back(new type::Any);
-  gn_to_string->type->return_type = new type::TString;
+  gn_to_string->type->return_type = type::string_type;
   gn_to_string->add(op::to_str);
 
   core = {
@@ -229,7 +247,7 @@ void make_modules() {
     make_pair("-", op::minus),
     make_pair("*", op::multiply),
     make_pair("/", op::divide),
-    make_pair(">", gn_gr),
+    make_pair(">", op::greater),
     // data
     make_pair("object", op::mk_obj),
     make_pair("tuple", op::mk_tuple),
@@ -259,7 +277,7 @@ void make_modules() {
     make_pair("read", op::read),
     make_pair("set-macro-character", op::set_mac_char),
     // logic
-    make_pair("=", equal_operator),
+    make_pair("=", op::equal),
     make_pair("or", op::do_or),
     make_pair("and", op::do_and),
     make_pair("not", op::do_not),
@@ -303,13 +321,14 @@ void make_modules() {
     make_pair("Integer-Parent", Integer::parent),
 
     // types
-    make_pair("Is", new type::IsConstructor),
-    make_pair("Derives", new type::DerivesConstructor),
+    make_pair("Is", op::mk_is),
+    make_pair("Derives", op::mk_derives),
     //make_pair("Object", new type::Object),
     make_pair("Any", new type::Any),
     make_pair("Integer", type::integer_type),
     make_pair("Nil", type::nil_type),
     make_pair("String", type::string_type),
+    make_pair("Char", type::character_type),
     make_pair("Tuple", new type::Tuple),
     make_pair("Vector", new type::Vector),
     make_pair("Type", new type::MetaType),
@@ -326,7 +345,7 @@ void make_modules() {
     make_pair("Gen", new type::GenFn),
 
     make_pair("type?", op::typep),
-    make_pair("type", op::mk_type),
+    //make_pair("type", op::mk_type),
     make_pair("subtype", op::subtype)
   };
 

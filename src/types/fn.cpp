@@ -29,6 +29,9 @@ void Fn::mark_node() {
   if (rest_type) {
     rest_type->mark_node();
   }
+  if (return_type) {
+    return_type->mark_node();
+  }
 }
 
 Fn::Fn() {
@@ -98,15 +101,6 @@ Object *Fn::check_args(list<Object*> alist) {
 }
 
 
-Type *Fn::constructor(list<Object*> lst) {
-  if (lst.size() == 0) {
-    return this;
-  } else {
-    string err = "type_fn::constructor unimplemented";
-    throw err;
-  }
-}
-
 Fn *Fn::with_all(std::vector<Type *> args, Type *rest, Type *ret) {
   Fn* tfn = new Fn;
   tfn->arg_list = args;
@@ -135,6 +129,11 @@ Fn *Fn::with_args_optional(std::vector<Type *> args, std::vector<Type *> opts) {
   tfn->rest_type = nullptr;
   return tfn;
 }
+
+
+
+
+
 
 expr::Object* Fn::subtype(Type* other) {
   if (Fn* tfn = dynamic_cast<Fn*>(other)) {
@@ -188,3 +187,6 @@ expr::Object* Fn::equal(Type* other) {
 
   return expr::t::get();
 }
+
+
+// Function Constructor

@@ -5,6 +5,8 @@
 
 namespace op {
 
+  void initialize_module();
+
   extern expr::Operator* mk_symbol;
   extern expr::Operator* mk_module;
   extern expr::Operator* in_module;

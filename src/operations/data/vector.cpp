@@ -8,8 +8,7 @@ using std::string;
 
 using namespace expr;
 
-Object *op_vec(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
+Object *op_vec(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   Vector *out = new Vector;
   for (Object *o : arg_list)
@@ -17,13 +16,8 @@ Object *op_vec(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   return out;
 }
 
-Operator *op::mk_vec = new expr::InbuiltOperator(
-    "Will return an array whose elements are the arg-list", op_vec,
-    type::Fn::with_rest(new type::Any), true);
+Object *op_vec_cat(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-Object *op_vec_cat(list<Object*> arg_list, LocalRuntime &r,
-                  LexicalScope &s) {
-  
   Vector *vec = new Vector;
   for (Object *obj : arg_list) {
     Vector *a = dynamic_cast<Vector *>(obj);
@@ -36,16 +30,8 @@ Object *op_vec_cat(list<Object*> arg_list, LocalRuntime &r,
   return vec;
 }
 
-Operator *op::vec_cat = new InbuiltOperator(
-    "Concatenates two vectors", op_vec_cat,
-    type::Fn::with_all({}, new type::Vector, new type::Vector), true);
+Object *op_vec_elt(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-
-
-
-Object *op_vec_elt(list<Object*> arg_list, LocalRuntime &r,
-                  LexicalScope &s) {
-  
   if (arg_list.size() != 2) {
     string err = "invalid number of args to elt";
     throw err;
@@ -63,41 +49,15 @@ Object *op_vec_elt(list<Object*> arg_list, LocalRuntime &r,
   return arr->array.at(idx->value);
 }
 
-Operator *op::vec_elt = new InbuiltOperator(
-    "Takes an array and an index, and returns the element at that index",
-    op_vec_elt,
-    type::Fn::with_all({new type::Vector, new type::Integer}, nullptr,
-                       new type::Any),
-    true);
-
-
-
-
-
-Object *op_vec_len(list<Object*> arg_list, LocalRuntime &r,
-                  LexicalScope &s) {
-  
+Object *op_vec_len(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   Vector *arr = dynamic_cast<Vector *>(arg_list.front());
 
   return new Integer(arr->array.size());
 }
 
-Operator *op::vec_len = new InbuiltOperator(
-    "Returns the length of a given vector", op_vec_len,
-    type::Fn::with_all({new type::Vector}, nullptr, new type::Integer), true);
+Object *op_vec_set(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-
-
-
-
-
-
-
-
-Object *op_vec_set(list<Object*> arg_list, LocalRuntime &r,
-                  LexicalScope &s) {
-  
   Vector *arr = dynamic_cast<Vector *>(arg_list.front());
   Integer *idx = dynamic_cast<Integer *>(arg_list.back());
   if (!arr) {
@@ -111,19 +71,10 @@ Object *op_vec_set(list<Object*> arg_list, LocalRuntime &r,
   return arr->array.at(idx->value);
 }
 
-Operator *op::vec_set = new InbuiltOperator(
-    "Takes an array, an index, and an element. Sets the value at index to element ",
-    op_vec_elt,
-    type::Fn::with_all({new type::Vector, new type::Integer, new type::Any}, nullptr,
-                       new type::Any),
-    true);
+Object *op_vec_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-
-
-Object *op_vec_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  
-  Vector* vec1 = dynamic_cast<Vector*>(arg_list.front());
-  Vector* vec2 = dynamic_cast<Vector*>(arg_list.back());
+  Vector *vec1 = dynamic_cast<Vector *>(arg_list.front());
+  Vector *vec2 = dynamic_cast<Vector *>(arg_list.back());
 
   if (vec1->size() == vec2->size()) {
     for (int i = 0; i < vec1->size(); i++) {
@@ -136,6 +87,38 @@ Object *op_vec_eq(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
   return nil::get();
 }
 
-Operator *op::vec_eq =
-    new InbuiltOperator("Equality test for Vectors",
-                        op_vec_eq, type::Fn::with_args({new type::Vector, new type::Vector}), true);
+Operator *op::mk_vec;
+Operator *op::vec_cat;
+Operator *op::vec_elt;
+Operator *op::vec_len;
+Operator *op::vec_set;
+Operator *op::vec_eq;
+
+void op::initialize_vector() {
+  op::mk_vec = new expr::InbuiltOperator(
+      "Will return an array whose elements are the arg-list", op_vec,
+      type::Fn::with_rest(new type::Any), true);
+  op::vec_cat = new InbuiltOperator(
+      "Concatenates two vectors", op_vec_cat,
+      type::Fn::with_all({}, new type::Vector, new type::Vector), true);
+  op::vec_elt = new InbuiltOperator(
+      "Takes an array and an index, and returns the element at that index",
+      op_vec_elt,
+      type::Fn::with_all({new type::Vector, type::integer_type}, nullptr,
+                         new type::Any),
+      true);
+
+  op::vec_len = new InbuiltOperator(
+      "Returns the length of a given vector", op_vec_len,
+      type::Fn::with_all({new type::Vector}, nullptr, type::integer_type), true);
+  op::vec_set = new InbuiltOperator(
+      "Takes an array, an index, and an element. Sets the value at index to "
+      "element ",
+      op_vec_elt,
+      type::Fn::with_all({new type::Vector, type::integer_type, new type::Any},
+                         nullptr, new type::Any),
+      true);
+  op::vec_eq = new InbuiltOperator(
+      "Equality test for Vectors", op_vec_eq,
+      type::Fn::with_args({new type::Vector, new type::Vector}), true);
+}

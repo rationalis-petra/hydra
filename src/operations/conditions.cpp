@@ -54,10 +54,6 @@ Object* op_handler_catch(list<Object*> arg_list, LocalRuntime &r, LexicalScope& 
   }
 }
 
-Operator* op::handler_catch =
-  new InbuiltOperator("Catches a thrown exepction",
-                      op_handler_catch, type::Fn::with_all({new type::Any}, new type::Cons, new type::Any),
-                      false);
 
 Object* op_handler_bind(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
   
@@ -89,11 +85,6 @@ Object* op_handler_bind(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s
     throw e;
   }
 }
-
-Operator* op::handler_bind =
-  new InbuiltOperator("Catches a thrown exepction",
-                      op_handler_bind,
-                      type::Fn::with_all({new type::Any}, new type::Cons, new type::Any),false);
 
 // RESTARTS
 
@@ -128,11 +119,6 @@ Object* op_add_restart(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s)
   }
 }
 
-Operator* op::add_restart =
-  new InbuiltOperator("signals an object as an exception",
-                      op_add_restart,
-                      type::Fn::with_args({new type::Any, new type::Any, new type::Any}),
-                      false);
 
 Object* gen_list(std::list<hydra_restart*> lst) {
   if (lst.empty()) {
@@ -149,11 +135,6 @@ Object *op_get_restarts(list<Object*> arg_list, LocalRuntime &r,
   return gen_list(r.restarts);
 }
 
-Operator* op::get_restarts =
-  new InbuiltOperator("Returns the list (stack) of all active restarts!",
-                      op_get_restarts,
-                      type::Fn::with_args({}),
-                      true);
 
 // SIGNALLING CONDITIONS
 Object* op_signal_condition(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
@@ -175,8 +156,36 @@ Object* op_signal_condition(list<Object*> arg_list, LocalRuntime &r, LexicalScop
 }
 
 
-Operator* op::signal_condition =
-  new InbuiltOperator("signals an object as an exception",
-                      op_signal_condition,
-                      type::Fn::with_args({new type::Any}),
-                      true);
+Operator* op::handler_catch;
+Operator *op::handler_bind;
+Operator* op::add_restart;
+Operator* op::get_restarts;
+Operator* op::signal_condition;
+
+void op::initialize_conditions() {
+
+  op::handler_catch = new InbuiltOperator(
+      "Catches a thrown exepction", op_handler_catch,
+      type::Fn::with_all({new type::Any}, new type::Cons, new type::Any),
+      false);
+
+  op::handler_bind = new InbuiltOperator(
+      "Catches a thrown exepction", op_handler_bind,
+      type::Fn::with_all({new type::Any}, new type::Cons, new type::Any),
+      false);
+
+  op::add_restart = new InbuiltOperator(
+      "signals an object as an exception", op_add_restart,
+      type::Fn::with_args({new type::Any, new type::Any, new type::Any}),
+      false);
+
+  op::get_restarts =
+      new InbuiltOperator("Returns the list (stack) of all active restarts!",
+                          op_get_restarts, type::Fn::with_args({}), true);
+
+  op::signal_condition = new InbuiltOperator(
+      "signals an object as an exception", op_signal_condition,
+      type::Fn::with_args({new type::Any}), true);
+
+
+}

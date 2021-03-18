@@ -6,6 +6,7 @@
 #include "operations/arithmetic.hpp"
 #include "operations/concurrency.hpp"
 #include "operations/language.hpp"
+#include "operations/operator.hpp"
 #include "operations/logic.hpp"
 #include "operations/data.hpp"
 #include "operations/io.hpp"

@@ -2,12 +2,12 @@
 #define __HYDRA_TYPE_TYPE_HPP
 
 #include <list>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "expressions/object.hpp"
-#include "expressions/user_object.hpp"
 #include "expressions/operation.hpp"
+#include "expressions/user_object.hpp"
 
 namespace type {
 
@@ -15,106 +15,103 @@ struct Type : public virtual expr::Object {
 public:
   virtual expr::Object *check_type(expr::Object *obj) = 0;
   virtual expr::Object *subtype(Type *ty) = 0;
-  virtual expr::Object *equal(Type* ty);
-};
-
-struct TypeConstructor : public virtual expr::Object {
-public:
-  virtual Type* constructor(std::list<expr::Object*> lst) = 0;
+  virtual expr::Object *equal(Type *ty);
 };
 
 struct Symbol : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Object* check_type(expr::Object* obj);
+  expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
 };
 
 // TODO: TUPLE, UNION!!!
 
-struct Cons : public Type, public TypeConstructor {
+struct Cons : public Type {
+  Cons();
+  Cons(Type *tcar, Type *tcdr);
   virtual void mark_node();
   std::string to_string() const;
-  expr::Object* check_type(expr::Object* obj);
+  expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
-  Type* constructor(std::list<expr::Object*> lst);
 
-  Type* type_car;
-  Type* type_cdr;
+  Type *type_car;
+  Type *type_cdr;
 };
 
-struct Vector : public Type, public TypeConstructor {
+struct Vector : public Type {
+  Vector();
+  Vector(Type* t);
+  Vector(Type* t, int i);
+
   virtual void mark_node();
   std::string to_string() const;
-  expr::Object* check_type(expr::Object* obj);
+  expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
-  Type* constructor(std::list<expr::Object*> lst);
 
-  Type* type_elt;
+  Type *type_elt;
 };
 
-struct List : public Type, public TypeConstructor {
+struct List : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Object* check_type(expr::Object* obj);
+  expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
-  Type* constructor(std::list<expr::Object*> lst);
 
-  Type* elt_type;
+  Type *elt_type;
 };
 
-struct Tuple : public Type, public TypeConstructor {
+struct Tuple : public Type {
   Tuple();
-  Tuple(std::vector<Type*> types);
+  Tuple(std::vector<Type *> types);
   virtual void mark_node();
   std::string to_string() const;
-  expr::Object* check_type(expr::Object* obj);
+  expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
-  Type* constructor(std::list<expr::Object*> lst);
 
-  std::vector<Type*> types;
+  std::vector<Type *> types;
 };
 
-struct Union : public Type, public TypeConstructor {
+struct Union : public Type {
   virtual void mark_node();
   std::string to_string() const;
-  expr::Object* check_type(expr::Object* obj);
-  Type* constructor(std::list<expr::Object*> lst);
+  expr::Object *check_type(expr::Object *obj);
+  Type *constructor(std::list<expr::Object *> lst);
 
   virtual expr::Object *subtype(Type *ty);
-  std::list<Type*> types;
+  std::list<Type *> types;
 };
 
-struct DerivesConstructor : public TypeConstructor {
+struct DerivesConstructor {
   void mark_node();
   std::string to_string() const;
-  Type* constructor(std::list<expr::Object*> lst);
+  Type *constructor(std::list<expr::Object *> lst);
+};
+
+struct IsConstructor : public expr::Operator {
+  void mark_node();
+  expr::Object *object;
+  std::string to_string() const;
+  Type *constructor(std::list<expr::Object *> lst);
 };
 
 struct Derives : public Type {
-  Derives(Object* obj);
+  Derives(Object *obj);
   void mark_node();
-  expr::Object* object;
+  expr::Object *object;
   std::string to_string() const;
   virtual expr::Object *subtype(Type *ty);
   virtual expr::Object *check_type(expr::Object *obj);
-};
-
-struct IsConstructor : public TypeConstructor{
-  void mark_node();
-  expr::Object* object;
-  std::string to_string() const;
-  Type* constructor(std::list<expr::Object*> lst);
 };
 
 struct Is : public Type {
-  Is(expr::Object* v);
+  Is(expr::Object *v);
   void mark_node();
-  expr::Object* object;
+  expr::Object *object;
   std::string to_string() const;
   virtual expr::Object *subtype(Type *ty);
   virtual expr::Object *check_type(expr::Object *obj);
 };
 
-}
+} // namespace type
 #endif

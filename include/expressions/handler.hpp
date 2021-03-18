@@ -36,7 +36,7 @@ struct hydra_restart : public Operator {
   hydra_restart(Operator* o, Symbol* s);
   void mark_node();
 
-  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false);
   Operator* op;
   Symbol* sym;
 };

@@ -17,10 +17,17 @@ Object *op_mk_thread(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
   return t;
 }
 
-Operator *op::thread =
-  new InbuiltOperator ("Takes function Fn () -> Any and creates a new thread"
-                       "\n where it calls that function",
-                       op_mk_thread,
-                       // TODO: introduce type Thread...
-                       type::Fn::with_all({type::Fn::with_rest(new type::Any)}, new type::Any, new type::Any),
-                       true);
+
+Operator *op::thread;
+
+void op::initialize_concurrency() {
+
+  op::thread = new InbuiltOperator(
+      "Takes function Fn () -> Any and creates a new thread"
+      "\n where it calls that function",
+      op_mk_thread,
+      // TODO: introduce type Thread...
+      type::Fn::with_all({type::Fn::with_rest(new type::Any)}, new type::Any,
+                         new type::Any),
+      true);
+}

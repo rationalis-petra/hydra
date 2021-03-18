@@ -26,7 +26,7 @@ struct Operator : public Object {
   std::string to_string() const;
   bool is_fn;
 
-  virtual Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) = 0;
+  virtual Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false) = 0;
   std::list<Object *> get_arg_list(Object* arg_list, LocalRuntime &r, LexicalScope &s);
 
   // STATE
@@ -39,7 +39,7 @@ struct UserOperator : public Operator {
 
   ~UserOperator();
   std::string to_string() const;
-  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false);
 
   Symbol *rest; // for accepting variable arguments
   Symbol *self; // name of function within function's scope
@@ -56,12 +56,13 @@ struct UserOperator : public Operator {
 
 struct GenericFn : public Operator {
   // FUNTCIONS
+  GenericFn();
   virtual void mark_node();
 
   void add (Operator* op);
   void add_safe (Operator* op, LocalRuntime& r, LexicalScope& s);
   std::string to_string() const;
-  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false);
 
   //STATE
   std::list<Operator*> functions;
@@ -74,7 +75,7 @@ struct InbuiltOperator : public Operator {
                               LexicalScope &s),
                   type::Fn *t, bool is_fn);
 
-  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s);
+  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false);
 
   // STATE
   Object *(*fnc)(std::list<Object*>arg_list, LocalRuntime &r, LexicalScope &s);
@@ -84,7 +85,7 @@ struct InbuiltOperator : public Operator {
 struct NextFnc : public Operator {
   // FUNCTIONS
   NextFnc(std::list<Operator*> funcs, std::list<Object*> arg_list, Symbol* nextsym);
-  Object *call(std::list<Object*> arg_list, LocalRuntime&r, LexicalScope& s);
+  Object *call(std::list<Object*> arg_list, LocalRuntime&r, LexicalScope& s, bool macexpand = false);
 
   Symbol* nextsym;
   std::list<Operator*> funcs;

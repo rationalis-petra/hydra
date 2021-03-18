@@ -6,12 +6,12 @@
 namespace op {
 
   extern void mk_arithmetic();
-  extern expr::Operator *plus;
-  extern expr::Operator *minus;
-  extern expr::Operator *multiply;
-  extern expr::Operator *divide;
-  extern expr::Operator *int_gr;
-  extern expr::Operator *int_eq;
+  extern expr::GenericFn *plus;
+  extern expr::GenericFn *minus;
+  extern expr::GenericFn *multiply;
+  extern expr::GenericFn *divide;
+  extern expr::GenericFn *greater;
+  extern expr::GenericFn *equal;
 
 } // namespace op
 

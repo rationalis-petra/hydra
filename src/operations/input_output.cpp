@@ -24,8 +24,8 @@ Object *op_print(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   if (HString *str = dynamic_cast<HString *>(arg_list.front())) {
     cout << str->value;
   } else {
-    Object* obj = gn_to_string->call(arg_list, r, s);
-    if ((str = dynamic_cast<HString*>(obj))) {
+    Object *obj = gn_to_string->call(arg_list, r, s);
+    if ((str = dynamic_cast<HString *>(obj))) {
       cout << str->value;
     } else {
       string err = "non-string returend from to-string";
@@ -36,11 +36,6 @@ Object *op_print(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Object::roots.remove(arg_list.front());
   return arg_list.front();
 }
-
-Operator *op::print = new InbuiltOperator(
-    "Prints a string representation of the provided argument to\n"
-    "the standard output stream",
-    op_print, type::Fn::with_args({new type::Any}), true);
 
 Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
                      LexicalScope &s) {
@@ -57,16 +52,31 @@ Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
   if (HString *strfilename = dynamic_cast<HString *>(filename)) {
     if (method->name == "input") {
       Istream *outs = new Istream();
-      outs->stream = new ifstream(strfilename->value);
-      out = outs;
+      ifstream* file = new ifstream(strfilename->value);
+      if (file->is_open()) {
+        outs->stream = file;
+        out = outs;
+      } else {
+        out = nil::get();
+      }
     } else if (method->name == "output") {
       Ostream *outs = new Ostream();
-      outs->stream = new ofstream(strfilename->value);
-      out = outs;
+      ofstream* file = new ofstream(strfilename->value);
+      if (file->is_open()) {
+        outs->stream = file;
+        out = outs;
+      } else {
+        out = nil::get();
+      }
     } else if (method->name == "both") {
       IOstream *outs = new IOstream();
-      outs->stream = new fstream(strfilename->value);
-      out = outs;
+      fstream* file = new fstream(strfilename->value);
+      if (file->is_open()) {
+        outs->stream = file;
+        out = outs;
+      } else {
+        out = nil::get();
+      }
     } else {
       string err = "Invalid argument to open: " + method->name;
       throw err;
@@ -80,13 +90,6 @@ Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
   }
   return out;
 }
-
-Operator *op::open_file = new InbuiltOperator(
-    "Takes a string (path), and returns an input stream located\n"
-    "by the path",
-    op_open_file,
-    type::Fn::with_args_optional({new type::TString}, {new type::Symbol}),
-    true);
 
 Object *op_next(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
@@ -110,12 +113,6 @@ Object *op_next(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return new Char(ch);
 }
 
-Operator *op::next = new InbuiltOperator(
-    "Takes an input stream, advances it one character\n"
-    "and returns the character at the 'current' position",
-    op_next,
-    type::Fn::with_all({new type::Istream}, nullptr, new type::Istream), true);
-
 Object *op_peek(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   istream *stream;
@@ -135,12 +132,6 @@ Object *op_peek(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return new Char(ch);
 }
 
-Operator *op::peek = new InbuiltOperator(
-    "Takes an input stream, and peeks at the next character\n"
-    "but does not advance the input stream",
-    op_peek, type::Fn::with_all({new type::Istream}, nullptr, new type::Char),
-    true);
-
 Object *op_put(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   Ostream *stream = dynamic_cast<Ostream *>(arg_list.front());
@@ -150,12 +141,6 @@ Object *op_put(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   return stream;
 }
-
-Operator *op::put = new InbuiltOperator(
-    "Takes an output stream, a character, and puts the\n"
-    "character in the output stream's current position",
-    op_put, type::Fn::with_all({new type::Ostream}, nullptr, new type::Char),
-    true);
 
 Object *op_endp(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
@@ -181,11 +166,6 @@ Object *op_endp(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-Operator *op::endp = new InbuiltOperator(
-    "Returns t if a given input stream has reached the\n"
-    "end of the file, and nil otherwise",
-    op_endp, type::Fn::with_args({new type::Istream}), true);
-
 Object *op_close(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   if (Istream *stream = dynamic_cast<Istream *>(arg_list.front())) {
@@ -206,7 +186,55 @@ Object *op_close(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
+Operator *op::close;
+Operator *op::print;
+Operator *op::open_file;
+Operator *op::peek;
+Operator *op::next;
+Operator *op::put;
+Operator *op::endp;
+
 // TODO: stream type??
-Operator *op::close = new InbuiltOperator(
-    "Takes an input stream representing a file, and closes it", op_close,
-    type::Fn::with_args({new type::Any}), true);
+
+void op::initialize_io() {
+  op::close = new InbuiltOperator(
+      "Takes an input stream representing a file, and closes it", op_close,
+      type::Fn::with_args({new type::Any}), true);
+
+  op::print = new InbuiltOperator(
+      "Prints a string representation of the provided argument to\n"
+      "the standard output stream",
+      op_print, type::Fn::with_args({new type::Any}), true);
+
+  op::open_file = new InbuiltOperator(
+      "Takes a string (path), and returns an input stream located\n"
+      "by the path",
+      op_open_file,
+      type::Fn::with_args_optional({type::string_type}, {new type::Symbol}),
+      true);
+
+  op::next = new InbuiltOperator(
+      "Takes an input stream, advances it one character\n"
+      "and returns the character at the 'current' position",
+      op_next,
+      type::Fn::with_all({new type::Istream}, nullptr, new type::Istream),
+      true);
+
+  op::peek = new InbuiltOperator(
+      "Takes an input stream, and peeks at the next character\n"
+      "but does not advance the input stream",
+      op_peek, type::Fn::with_all({new type::Istream}, nullptr, type::character_type),
+      true);
+
+  op::put = new InbuiltOperator(
+      "Takes an output stream, a character, and puts the\n"
+      "character in the output stream's current position",
+      op_put, type::Fn::with_all({new type::Ostream}, nullptr, type::character_type),
+      true);
+
+  op::endp = new InbuiltOperator(
+      "Returns t if a given input stream has reached the\n"
+      "end of the file, and nil otherwise",
+      op_endp, type::Fn::with_args({new type::Istream}), true);
+}
+

@@ -4,6 +4,7 @@
 #include "expressions.hpp"
 
 namespace op {
+  void initialize_conditions();
 
   extern expr::Operator* handler_bind;
   extern expr::Operator* handler_catch;

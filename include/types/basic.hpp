@@ -40,28 +40,7 @@ struct Any : public Type {
   virtual expr::Object *subtype(Type *obj);
 };
 
-struct Integer : public Type {
-  virtual void mark_node();
-  std::string to_string() const;
-  expr::Object *check_type(expr::Object *obj);
-  virtual expr::Object *subtype(Type *obj);
-};
-
-struct TString : public Type {
-  virtual void mark_node();
-  std::string to_string() const;
-  expr::Object *check_type(expr::Object *obj);
-  virtual expr::Object *subtype(Type *obj);
-};
-
 struct Module : public Type {
-  virtual void mark_node();
-  std::string to_string() const;
-  expr::Object *check_type(expr::Object *obj);
-  virtual expr::Object *subtype(Type *obj);
-};
-
-struct Char : public Type {
   virtual void mark_node();
   std::string to_string() const;
   expr::Object *check_type(expr::Object *obj);

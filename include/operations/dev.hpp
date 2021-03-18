@@ -5,6 +5,9 @@
 
 namespace op {
 
+  void initialize_dev();
+
+  extern expr::Operator *macexpand;
   extern expr::Operator *describe;
   extern expr::Operator *trace;
   extern expr::Operator *time;

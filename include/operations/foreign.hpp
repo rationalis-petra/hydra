@@ -8,6 +8,8 @@
 // define-foreign-library
 namespace op {
 
+  void initialize_foreign();
+
   // Find a foreign library on disk & return handle
   extern expr::Operator* foreign_lib;
   // Find a foreign symbol in a given library

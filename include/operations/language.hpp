@@ -4,15 +4,15 @@
 #include "expressions.hpp"
 
 namespace op {
+
+  void initialize_language();
+  void initialize_read();
+
 // language
   extern expr::Operator* do_if;
   extern expr::Operator* do_while;
   extern expr::Operator* bind;
   extern expr::Operator* unbind;
-  extern expr::Operator* addfn;
-  extern expr::Operator* genfn;
-  extern expr::Operator* fn;
-  extern expr::Operator* mac;
   extern expr::Operator* progn;
   extern expr::Operator* definedp;
 

@@ -49,7 +49,8 @@ string MetaConstructor::to_string() const {
 }
 
 expr::Object *MetaConstructor::check_type(expr::Object* obj) {
-  if (dynamic_cast<TypeConstructor*>(obj)) {
+  Type* t;
+  if ((t = dynamic_cast<Type*>(obj)) && t->invoker) {
     return expr::t::get();
   } else {
     return expr::nil::get();

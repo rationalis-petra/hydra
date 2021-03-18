@@ -42,7 +42,7 @@ void hydra_restart::mark_node() {
   sym->mark_node();
 }
 
-Object *hydra_restart::call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+Object *hydra_restart::call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool) {
   // invokesn a restart
   hydra_exception *e = new hydra_exception(RESTART_CALL);
   e->res = this;

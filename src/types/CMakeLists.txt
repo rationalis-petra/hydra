@@ -1,7 +1,6 @@
 
 add_library(types OBJECT cons.cpp
                          initialize.cpp
-                         integer.cpp
                          any.cpp
                          mac.cpp
                          list.cpp
@@ -12,8 +11,6 @@ add_library(types OBJECT cons.cpp
                          gen_fn.cpp
                          module.cpp
                          stream.cpp
-                         char.cpp
-                         string.cpp
                          is.cpp
                          symbol.cpp
                          fn.cpp

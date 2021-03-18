@@ -16,7 +16,6 @@ using std::list;
 using std::string;
 using std::function;
 
-
 string UserOperator::to_string() const {
   string type = is_fn ? "function" : "macro";
   if (self) {
@@ -200,7 +199,7 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
 }
 
 Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
-                              LexicalScope &s) {
+                           LexicalScope &s, bool macexpand) {
   // ASSUME that this and the alist are rooted
   // ASSUME all values in arg_list are rooted
 
@@ -287,9 +286,13 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
     out = expr->eval(r, *scope);
   } else {
     Object* intermediate = expr->eval(r, *scope);
-    Object::roots.insert(intermediate);
-    out = intermediate->eval(r, s);
-    Object::roots.remove(intermediate);
+    if (!macexpand) {
+      Object::roots.insert(intermediate);
+      out = intermediate->eval(r, s);
+      Object::roots.remove(intermediate);
+    } else {
+      out = intermediate;
+    }
   }
 
   return out;

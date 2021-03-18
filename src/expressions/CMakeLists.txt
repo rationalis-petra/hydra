@@ -17,6 +17,7 @@ add_library(expressions OBJECT
                         object.cpp
                         user_object.cpp
                         oper.cpp
+                        genericfn.cpp
                         handler.cpp
                         user_oper.cpp
                         symbol.cpp
