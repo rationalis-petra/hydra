@@ -19,7 +19,7 @@ struct Tuple : public Object {
   Object* operator[](int i);
   int size();
 
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   std::vector<Object*> values;
 };
 

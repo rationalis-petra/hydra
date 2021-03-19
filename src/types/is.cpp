@@ -2,6 +2,8 @@
 #include <list>
 
 #include "expressions.hpp"
+#include "operations.hpp"
+#include "utils.hpp"
 #include "types.hpp"
 
 using std::string;
@@ -19,8 +21,8 @@ void Is::mark_node() {
   object->mark_node();
 }
 
-string Is::to_string() const {
-  return "{Is " + object->to_string() +  "}";
+string Is::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+  return "{Is " + hydra_to_string(object, r, s) +  "}";
 }
 
 

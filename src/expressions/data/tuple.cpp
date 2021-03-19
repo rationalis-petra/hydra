@@ -2,6 +2,7 @@
 #include <string>
 #include <typeinfo>
 
+#include "utils.hpp"
 #include "expressions.hpp"
 
 using namespace std;
@@ -25,11 +26,11 @@ void Tuple::mark_node() {
   }
 }
 
-string Tuple::to_string() const {
+string Tuple::to_string(LocalRuntime &r, LexicalScope &s) {
   string out = "[";
 
   for (unsigned i = 0; i < values.size() ; i++) {
-    out += values[i]->to_string();
+    out += hydra_to_string(values[i], r, s);
     if (i != values.size() - 1)
       out += " ";
   }

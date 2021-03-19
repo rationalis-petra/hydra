@@ -6,7 +6,7 @@
 using namespace std;
 using namespace expr;
 
-string Parent::to_string() const {
+string Parent::to_string(LocalRuntime &r, LexicalScope &s) {
   return name;
 }
 

@@ -23,9 +23,10 @@ struct Operator : public Object {
   Operator();
 
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   bool is_fn;
 
+  Object* operator()(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope&s, bool macexpand = false);
   virtual Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false) = 0;
   std::list<Object *> get_arg_list(Object* arg_list, LocalRuntime &r, LexicalScope &s);
 
@@ -38,7 +39,7 @@ struct UserOperator : public Operator {
   virtual void mark_node();
 
   ~UserOperator();
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope &s);
   Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false);
 
   Symbol *rest; // for accepting variable arguments
@@ -61,7 +62,7 @@ struct GenericFn : public Operator {
 
   void add (Operator* op);
   void add_safe (Operator* op, LocalRuntime& r, LexicalScope& s);
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope &s);
   Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false);
 
   //STATE

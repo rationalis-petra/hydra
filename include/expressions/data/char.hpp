@@ -16,7 +16,7 @@ struct Char : public Object {
   static Parent* parent;
 
   Char(int c);
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   int value;
 };
 

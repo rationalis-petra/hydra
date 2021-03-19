@@ -17,7 +17,7 @@ struct Union : public Object {
   virtual void mark_node();
   static Parent* parent;
 
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   Symbol *tag;
   Object *value;
 };

@@ -21,7 +21,7 @@ struct Vector : public Object {
 
   virtual void mark_node();
 
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   std::vector<Object*> array;
 };
 

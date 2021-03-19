@@ -20,7 +20,7 @@ void MetaType::mark_node() {
   Object::mark_node();
 }
 
-string MetaType::to_string() const {
+string MetaType::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "Type";
 }
 
@@ -44,7 +44,7 @@ void MetaConstructor::mark_node() {
   Object::mark_node();
 }
 
-string MetaConstructor::to_string() const {
+string MetaConstructor::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "{Type Constructor}";
 }
 

@@ -18,7 +18,7 @@ struct HString : public Object {
   HString();
   HString(std::string str);
 
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   std::string value;  
 };
 

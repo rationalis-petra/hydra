@@ -13,7 +13,7 @@ struct Thread : public Object {
   Thread(Operator* op, std::list<Object*> args, LocalRuntime& r, LexicalScope& s);
 
   void mark_node();
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   std::thread* thread;
 };
 

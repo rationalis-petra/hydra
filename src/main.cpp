@@ -8,6 +8,8 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
+
 using namespace std;
 
 extern string lang;
@@ -169,7 +171,8 @@ int main(int argc, char **argv) {
 
   cout << Object::node_list.size() << endl;
   for (Object *obj : Object::node_list) {
-    cout << obj << endl;
+    LexicalScope s;
+    cout << hydra_to_string(obj, r, s) << endl;
     delete obj;
   }
   return 0;
@@ -265,6 +268,7 @@ void make_modules() {
     make_pair("set-invoker", op::set_invoker),
     make_pair("get-invoker", op::get_invoker),
     make_pair("set", gn_set),
+    make_pair("set-parent", op::obj_pset),
     make_pair("get", gn_get),
     make_pair("clone", op::clone),
 

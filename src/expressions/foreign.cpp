@@ -15,7 +15,7 @@ void ForeignLib::mark_node() {
   Object::mark_node();
 }
     
-string ForeignLib::to_string() const {
+string ForeignLib::to_string(LocalRuntime &r, LexicalScope &s) {
   return "<foreign library>";
 }
 
@@ -29,7 +29,7 @@ ForeignSymbol::ForeignSymbol(void* addr) {
   address = addr;
 }
 
-string ForeignSymbol::to_string() const {
+string ForeignSymbol::to_string(LocalRuntime &r, LexicalScope &s) {
   char buffer[50];
   sprintf(buffer, "<foreign symbol: %p>", address);
   return string(buffer);

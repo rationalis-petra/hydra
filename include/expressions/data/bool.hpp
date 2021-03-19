@@ -10,7 +10,7 @@ namespace expr {
 struct t : public Object {
   virtual void mark_node();
 
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   static t *get();
 
 private:
@@ -21,7 +21,7 @@ private:
 struct nil : public Object {
   virtual void mark_node();
 
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   static nil *get();
   bool null() const;
 

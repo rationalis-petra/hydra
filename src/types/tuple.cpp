@@ -1,5 +1,6 @@
 #include <string>
 
+#include "utils.hpp"
 #include "expressions.hpp"
 #include "types.hpp"
 #include "operations/types.hpp"
@@ -26,10 +27,10 @@ void Tuple::mark_node() {
   }
 }
 
-string Tuple::to_string() const {
+string Tuple::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   string str =  "{Tuple";
   for (Type* t : types) {
-    str += " " + t->to_string();
+    str += " " + hydra_to_string(t, r, s);
   }
   str += "}";
   return str;

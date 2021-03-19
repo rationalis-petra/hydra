@@ -19,16 +19,6 @@ Object *op_typep(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return type_rep->check_type(obj);
 }
 
-// Object *op_mk_type(list<Object*> arg_list, LocalRuntime &r,
-//                   LexicalScope &s) {
-
-//   type::TypeConstructor *type =
-//       dynamic_cast<type::TypeConstructor *>(arg_list.front());
-//   arg_list.pop_front();
-
-//   return type->constructor(arg_list);
-// }
-
 Object *op_subtype(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   type::Type *t1 = dynamic_cast<type::Type *>(arg_list.front());
@@ -50,7 +40,7 @@ Object *op_type_is(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_type_derives(list<Object *> arg_list, LocalRuntime &r,
                         LexicalScope &s) {
-  return new type::Is(arg_list.front());
+  return new type::Derives(arg_list.front());
 }
 
 Object *op_mk_cons_type(list<Object *> arg_list, LocalRuntime &r,

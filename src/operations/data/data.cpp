@@ -1,4 +1,5 @@
 #include <list>
+#include "utils.hpp"
 
 #include "expressions.hpp"
 #include "operations.hpp"
@@ -38,7 +39,7 @@ Object *op_cdr(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     return cons->cdr;
   } else {
     string err =
-        "Non-cons argument provided to cdr: " + arg_list.front()->to_string();
+      "Non-cons argument provided to cdr: " + hydra_to_string(arg_list.front(), r, s);
     throw err;
   }
 }
@@ -53,7 +54,7 @@ Object *op_car(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     return cons->car;
   } else {
     string err =
-        "Non-cons argument provided to car: " + arg_list.front()->to_string();
+      "Non-cons argument provided to car: " + hydra_to_string(arg_list.front(), r, s);
     throw err;
   }
 }

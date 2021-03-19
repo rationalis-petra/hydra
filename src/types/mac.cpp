@@ -4,6 +4,7 @@
 
 #include "expressions.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 using std::string;
 using std::list;
@@ -33,19 +34,19 @@ void Mac::mark_node() {
 }
 
 
-std::string Mac::to_string() const {
+std::string Mac::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   //return string("{type (") + ") -> " + return_type->to_string() + "}";
   string str = "fn (";
   bool once = false;
   for (Type* t : arg_list) {
     str += once ? " " : (once = true, "");
-    str += t->to_string();
+    str += hydra_to_string(t, r, s);
   }
   if (rest_type) {
     str += once ? " " : (once = true, "");
-    str += ":rest " + rest_type->to_string();
+    str += ":rest " + hydra_to_string(rest_type, r, s);
   }
-  str += ") -> " + return_type->to_string();
+  str += ") -> " + hydra_to_string(return_type, r, s);
   return str;
 }
 
@@ -88,7 +89,7 @@ Object *Mac::check_args(list<Object*> alist) {
     alist.clear();
   }
   if (alist.size() != 0) {
-    string err = "Too many arguments to function" + this->to_string();
+    string err = "Too many arguments to function (c++: types/mac.cpp)";
     throw err;
   }
   // now, we check keyword argumnets

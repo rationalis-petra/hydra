@@ -50,6 +50,7 @@ namespace op {
   extern expr::Operator* obj_set;
   extern expr::Operator* clone;
   extern expr::Operator* obj_eq;
+  extern expr::Operator* obj_pset;
 
 // Symbol operations: making mutable/unmutable
   extern expr::Operator* lock;

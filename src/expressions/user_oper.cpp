@@ -16,7 +16,7 @@ using std::list;
 using std::string;
 using std::function;
 
-string UserOperator::to_string() const {
+string UserOperator::to_string(LocalRuntime &r, LexicalScope &s) {
   string type = is_fn ? "function" : "macro";
   if (self) {
     return "<" + type + ": " + self->name + ">";

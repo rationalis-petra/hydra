@@ -53,11 +53,6 @@ Object* Object::eval(LocalRuntime& r, LexicalScope& s) {
   return this;
 }
 
-ostream &expr::operator<<(ostream &os, const Object *obj) {
-  os << obj->to_string();
-  return os;
-}
-
 Object *Object::derive_check(set<expr::Object*> ptypes) {
   for (auto* proto : ptypes) {
     if (proto == this) {

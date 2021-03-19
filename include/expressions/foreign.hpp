@@ -18,7 +18,7 @@ struct ForeignLib : public Object {
   virtual void mark_node();
 
   ForeignLib(lt_dlhandle lib);
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
 
   lt_dlhandle lib;
 };
@@ -27,7 +27,7 @@ struct ForeignSymbol : public Object {
   virtual void mark_node();
 
   ForeignSymbol(void *addr);
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
 
   void* address;
 };

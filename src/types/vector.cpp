@@ -29,7 +29,7 @@ void Vector::mark_node() {
   type_elt->mark_node();
 }
 
-string Vector::to_string() const {
+string Vector::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "type Vector";
 }
 

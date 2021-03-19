@@ -21,7 +21,7 @@ namespace type {
   static Fn* with_args_optional(std::vector<Type*> args, std::vector<Type*> opts);
   static Fn* with_all(std::vector<Type*> args, Type* rest, Type* ret);
 
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object* check_type(expr::Object* obj);
   expr::Object* check_args(std::list<expr::Object*> alist);
   virtual expr::Object *equal(Type* ty);
@@ -40,7 +40,7 @@ struct Mac : public Fn {
   virtual void mark_node();
   virtual expr::Object *subtype(Type *obj);
 
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object* check_type(expr::Object* obj);
   expr::Object* check_args(std::list<expr::Object*> alist);
   Type* constructor(std::list<expr::Object*> lst);
@@ -51,7 +51,7 @@ struct GenFn : public Type {
   virtual expr::Object *subtype(Type *obj);
 
   GenFn();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object* check_type(expr::Object* obj);
   Type* constructor(std::list<expr::Object*> lst);
 

@@ -13,7 +13,7 @@ void Istream::mark_node() {
   marked = true;
 }
 
-string Istream::to_string() const {
+string Istream::to_string(LocalRuntime &r, LexicalScope &s) {
   return "input stream";
 }
 
@@ -28,7 +28,7 @@ void Ostream::mark_node() {
   marked = true;
 }
 
-string Ostream::to_string() const {
+string Ostream::to_string(LocalRuntime &r, LexicalScope &s) {
   return "output stream";
 }
 
@@ -43,7 +43,7 @@ void IOstream::mark_node() {
   marked = true;
 }
 
-string IOstream::to_string() const {
+string IOstream::to_string(LocalRuntime &r, LexicalScope &s) {
   return "input/output stream";
 }
 

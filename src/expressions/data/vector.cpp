@@ -3,6 +3,7 @@
 #include <typeinfo>
 
 #include "expressions.hpp"
+#include "utils.hpp"
 
 using namespace std;
 using namespace expr;
@@ -25,11 +26,11 @@ void Vector::mark_node() {
   }
 }
 
-string Vector::to_string() const {
+string Vector::to_string(LocalRuntime &r, LexicalScope &s) {
   string out = "(vector ";
 
   for (unsigned i = 0; i < array.size() ; i++) {
-    out += array[i]->to_string();
+    out += hydra_to_string(array[i], r, s);
     if (i != array.size() - 1)
       out += " ";
   }

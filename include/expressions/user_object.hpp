@@ -11,7 +11,7 @@ namespace expr {
 
 struct UserObject : public Object {
   void mark_node();
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
 };
 
 }

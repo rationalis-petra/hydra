@@ -4,12 +4,13 @@
 
 #include "expressions.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 using std::string;
 
 using namespace type;
 
-string Module::to_string() const {
+string Module::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "Module";
 }
 

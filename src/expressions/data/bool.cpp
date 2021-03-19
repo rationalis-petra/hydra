@@ -21,7 +21,7 @@ t* t::get() {
   return singleton;
 }
 
-string t::to_string() const {
+string t::to_string(LocalRuntime &r, LexicalScope& s) {
   return "t";
 }
 void nil::mark_node() {
@@ -41,6 +41,6 @@ bool nil::null() const {
   return true;
 }
 
-string nil::to_string() const {
+string nil::to_string(LocalRuntime &r, LexicalScope& s) {
   return "nil";
 }

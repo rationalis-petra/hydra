@@ -28,7 +28,7 @@ void Cons::mark_node() {
   type_cdr->mark_node();
 }
 
-string Cons::to_string() const {
+string Cons::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "Cons";
 }
 

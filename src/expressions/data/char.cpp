@@ -15,6 +15,8 @@ Char::Char(int c) : value(c) {
 
 void Char::mark_node() { marked = true; }
 
-string Char::to_string() const { return string("") + ((char)value); }
+string Char::to_string(LocalRuntime &r, LexicalScope &s) {
+  return string("") + ((char)value);
+}
 
-Parent* Char::parent;
+Parent *Char::parent;

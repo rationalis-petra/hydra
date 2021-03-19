@@ -21,7 +21,9 @@ GenericFn::GenericFn() {
   type->return_type = new type::Any;
 }
 
-string GenericFn::to_string() const { return "<generic function>"; }
+string GenericFn::to_string(LocalRuntime &r, LexicalScope &s) {
+  return "<generic function>";
+}
 
 void GenericFn::mark_node() {
   if (marked)

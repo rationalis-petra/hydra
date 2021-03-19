@@ -2,6 +2,7 @@
 #include <typeinfo>
 
 #include "expressions.hpp"
+#include "utils.hpp"
 
 using namespace std;
 using namespace expr;
@@ -35,19 +36,19 @@ Object *Cons::eval(LocalRuntime &r, LexicalScope &s) {
       throw e;
     }
   } else {
-    string excp = "Attempted to call " + oper->to_string() +
+    string excp = "Attempted to call " + hydra_to_string(oper, r, s) +
                   " which is not an operation!";
     roots.remove(oper);
     throw excp;
   }
 }
 
-string Cons::to_string() const {
+string Cons::to_string(LocalRuntime &r, LexicalScope &s) {
   string out = "(";
   const Object *elt = this;
   while (!elt->null()) {
     if (const Cons *obj = dynamic_cast<const Cons *>(elt)) {
-      out += obj->car->to_string();
+      out += hydra_to_string(obj->car, r, s);
       if (!obj->cdr->null()) {
         out += " ";
       }

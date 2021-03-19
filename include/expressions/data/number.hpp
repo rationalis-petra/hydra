@@ -15,7 +15,7 @@ struct Integer : public Object {
   static Parent* parent;
 
   Integer(int num);
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
 
   int value;
 };

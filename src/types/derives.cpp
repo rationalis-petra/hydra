@@ -3,6 +3,7 @@
 
 #include "expressions.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 using std::string;
 using std::set;
@@ -19,8 +20,8 @@ void Derives::mark_node() {
   object->mark_node();
 }
 
-string Derives::to_string() const {
-  return "{Derives " + object->to_string() +  "}";
+string Derives::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+  return "{Derives " + hydra_to_string(object, r, s) +  "}";
 }
 
 

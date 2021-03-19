@@ -21,7 +21,7 @@ Module::Module(string _name) {
   name = _name;
 }
 
-string Module::to_string() const {
+string Module::to_string(LocalRuntime &r, LexicalScope &s) {
   if (name == "") {
     return "<anonymous module>";
   } else {

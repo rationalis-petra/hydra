@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 
+#include "utils.hpp"
 #include "expressions.hpp"
 #include "operations.hpp"
 #include "types.hpp"
@@ -21,20 +22,15 @@ using std::ostream;
 using namespace expr;
 
 Object *op_print(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-  if (HString *str = dynamic_cast<HString *>(arg_list.front())) {
-    cout << str->value;
-  } else {
-    Object *obj = gn_to_string->call(arg_list, r, s);
-    if ((str = dynamic_cast<HString *>(obj))) {
+  for (Object *obj : arg_list) {
+    if (HString *str = dynamic_cast<HString *>(obj)) {
       cout << str->value;
     } else {
-      string err = "non-string returend from to-string";
-      throw err;
+      cout << hydra_to_string(obj, r, s);
     }
+    Object::roots.remove(obj);
   }
-
-  Object::roots.remove(arg_list.front());
-  return arg_list.front();
+  return arg_list.back();
 }
 
 Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
@@ -82,7 +78,7 @@ Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
       throw err;
     }
   } else {
-    string err = "Inavalid argument to open-file: " + filename->to_string();
+    string err = "Inavalid argument to open-file: " + hydra_to_string(filename, r, s);
     throw err;
   }
   for (Object *v : arg_list) {
@@ -204,7 +200,7 @@ void op::initialize_io() {
   op::print = new InbuiltOperator(
       "Prints a string representation of the provided argument to\n"
       "the standard output stream",
-      op_print, type::Fn::with_args({new type::Any}), true);
+      op_print, type::Fn::with_rest(new type::Any), true);
 
   op::open_file = new InbuiltOperator(
       "Takes a string (path), and returns an input stream located\n"

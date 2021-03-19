@@ -25,7 +25,7 @@ HString::HString(string str) {
   value = str;
 }
 
-string HString::to_string() const {
+string HString::to_string(LocalRuntime &r, LexicalScope &s) {
   return '"' + value + '"';
 }
 

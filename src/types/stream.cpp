@@ -14,7 +14,7 @@ void IOStream::mark_node() {
   Object::mark_node();
 }
 
-string IOStream::to_string() const {
+string IOStream::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "IOStream";
 }
 
@@ -39,7 +39,7 @@ void Istream::mark_node() {
   marked = true;
 }
 
-string Istream::to_string() const {
+string Istream::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "IStream";
 }
 
@@ -65,7 +65,7 @@ void Ostream::mark_node() {
   marked = true;
 }
 
-string Ostream::to_string() const {
+string Ostream::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "OStream";
 }
 

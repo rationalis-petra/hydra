@@ -16,23 +16,23 @@ Object *op_describe(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   if (UserOperator *uop = dynamic_cast<UserOperator *>(arg_list.front())) {
     string str = "generic function:\n" + uop->docstring->value +
-                 "\nlambda-list: " + "\ntype: " + uop->type->to_string();
+      "\nlambda-list: " + "\ntype: " + hydra_to_string(uop->type, r, s);
     // str += "\n expression:\n";
     // str += "(fn " + uop->expr->to_string() + ")";
     return new HString(str);
   } else if (GenericFn *generic = dynamic_cast<GenericFn *>(arg_list.front())) {
     string str = "generic function:\n" + generic->docstring->value +
-                 "\nlambda-list: " + "\ntype: " + generic->type->to_string() +
+      "\nlambda-list: " + "\ntype: " + hydra_to_string(generic->type, r, s) +
                  "\nfunctions: \n";
 
     for (Operator *op : generic->functions) {
-      str += op->to_string() + "\n";
+      str += hydra_to_string(op, r, s) + "\n";
     }
     return new HString(str);
   }
   if (Operator *op = dynamic_cast<Operator *>(arg_list.front())) {
     string str = "function:\n" + op->docstring->value +
-                 "\nlambda-list: " + "\ntype: " + op->type->to_string();
+      "\nlambda-list: " + "\ntype: " + hydra_to_string(op->type, r, s);
     return new HString(str);
   } else {
     return new HString("no documentation for this type");

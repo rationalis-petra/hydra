@@ -82,7 +82,7 @@ Object *op_char_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_to_str(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  return new HString(arg_list.front()->to_string());
+  return new HString(arg_list.front()->to_string(r, s));
 }
 
 Operator *op::str_elt;

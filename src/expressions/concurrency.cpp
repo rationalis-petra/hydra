@@ -22,6 +22,6 @@ void Thread::mark_node() {
   Object::mark_node();
 };
 
-string Thread::to_string() const {
+string Thread::to_string(LocalRuntime &r, LexicalScope &s) {
   return "A thread handle";
 }

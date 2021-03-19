@@ -10,7 +10,7 @@ namespace expr {
 struct Istream : public Object {
   virtual void mark_node();
 
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   std::istream *stream;  
   ~Istream();
 };
@@ -18,7 +18,7 @@ struct Istream : public Object {
 struct Ostream : public Object {
   virtual void mark_node();
 
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   std::ostream *stream;
   ~Ostream();
 };
@@ -26,7 +26,7 @@ struct Ostream : public Object {
 struct IOstream : public Object {
   virtual void mark_node();
 
-  std::string to_string() const;
+  std::string to_string(LocalRuntime &r, LexicalScope& s);
   std::iostream *stream;
   ~IOstream();
 };

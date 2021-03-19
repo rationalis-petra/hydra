@@ -11,7 +11,7 @@ void Nil::mark_node() {
   Object::mark_node();
 }
 
-string Nil::to_string() const {
+string Nil::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "Nil";
 }
 

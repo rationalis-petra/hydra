@@ -13,7 +13,7 @@ void Symbol::mark_node() {
   Object::mark_node();
 }
 
-string Symbol::to_string() const {
+string Symbol::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   return "Symbol";
 }
 

@@ -15,7 +15,7 @@ struct Cons : public Object {
   virtual void mark_node();
   static Parent* parent;
 
-  std::string to_string() const; 
+  std::string to_string(LocalRuntime &r, LexicalScope& s); 
   Cons(Object* car, Object* cdr);
   Object* eval(LocalRuntime& r, LexicalScope& s);
 

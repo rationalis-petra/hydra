@@ -28,7 +28,7 @@ struct Object {
   Operator* invoker;
 
   virtual bool null() const;
-  virtual std::string to_string() const = 0;
+  virtual std::string to_string(LocalRuntime &r, LexicalScope &s) = 0;
   virtual Object* eval(LocalRuntime& r, LexicalScope& s);
   Object* derive_check(std::set<Object*> ptypes);
   Object();
@@ -61,9 +61,6 @@ struct Object {
   static std::list<LexicalScope*> context_list; 
   static std::mutex context_mutex;
 };
-
-
-std::ostream &operator<<(std::ostream &os, const Object *obj);
 
 }
 

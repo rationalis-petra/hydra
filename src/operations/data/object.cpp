@@ -1,4 +1,5 @@
 #include "operations/data.hpp"
+#include "utils.hpp"
 
 using std::list;
 using std::string;
@@ -14,7 +15,7 @@ Object *op_obj_get(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     return obj->slots.at(sym);
   } catch (std::out_of_range &e) {
     string err =
-        "Attempt to get non-existent slot in object: " + sym->to_string();
+      "Attempt to get non-existent slot in object: " + hydra_to_string(sym, r, s);
     throw err;
   }
 }
@@ -64,11 +65,23 @@ Object *op_obj_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Object *obj1 = dynamic_cast<Object *>(arg_list.front());
   Object *obj2 = dynamic_cast<Object *>(arg_list.back());
 
-  // TODO: maybe compare slots???
   if (obj1 == obj2) {
     return t::get();
   }
   return nil::get();
+}
+
+Object *op_obj_pset(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+  Symbol *sym = dynamic_cast<Symbol *>(arg_list.front());
+  Object *obj = dynamic_cast<Object *>(arg_list.back());
+
+  if (obj->slots.find(sym) != obj->slots.end()) {
+    obj->parents.insert(sym);
+    return obj;
+  } else {
+    string err = "Cannot set as parent non-existent slot";
+    throw err;
+  }
 }
 
 Operator *op::obj_get;
@@ -76,6 +89,7 @@ Operator *op::mk_obj;
 Operator *op::obj_set;
 Operator *op::clone;
 Operator *op::obj_eq;
+Operator *op::obj_pset;
 
 void op::initialize_user_obj() {
 
@@ -99,4 +113,8 @@ void op::initialize_user_obj() {
   op::obj_eq = new InbuiltOperator(
       "Equality test for Objects", op_obj_eq,
       type::Fn::with_args({new type::Any, new type::Any}), true);
+
+  op::obj_pset = new InbuiltOperator(
+      "Sets provided slot to a parent slot", op_obj_eq,
+      type::Fn::with_args({new type::Symbol, new type::Any}), true);
 }

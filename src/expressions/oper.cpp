@@ -12,7 +12,15 @@ using std::list;
 using std::string;
 
 using namespace expr;
-string Operator::to_string() const { return "<inbuilt operation>"; }
+string Operator::to_string(LocalRuntime &r, LexicalScope &s) {
+  return "<inbuilt operation>";
+}
+
+Object *Operator::operator()(std::list<Object *> arg_list, LocalRuntime &r,
+                             LexicalScope &s, bool macexpand) {
+  return call(arg_list, r, s, macexpand);
+}
+
 
 Operator::Operator() {
   type = new type::Fn;
@@ -47,9 +55,9 @@ list<Object *> Operator::get_arg_list(Object *arg_list, LocalRuntime &r,
     }
   }
   if (type->check_args(out_list)->null()) {
-    string err =
-        "type check failed! for arg_list: " + original_list->to_string() +
-        "expected type: " + type->to_string();
+    string err = "type check failed! for arg_list: " +
+                 hydra_to_string(original_list, r, s) +
+      "expected type: " + hydra_to_string(type, r, s);
     throw err;
   }
   return out_list;

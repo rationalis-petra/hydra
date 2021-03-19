@@ -3,6 +3,7 @@
 #include <typeinfo>
 
 #include "expressions.hpp"
+#include "utils.hpp"
 
 using namespace std;
 using namespace expr;
@@ -16,11 +17,11 @@ void Union::mark_node() {
   value->mark_node();
 }
 
-string Union::to_string() const {
+string Union::to_string(LocalRuntime &r, LexicalScope &s) {
   string out = "(Sum ";
-  out += tag->to_string();
+  out += hydra_to_string(tag, r, s);
   out += " ";
-  out += value->to_string();
+  out += hydra_to_string(value, r, s);
   out += ")";
   return out;
 }

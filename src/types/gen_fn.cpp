@@ -3,6 +3,7 @@
 
 #include "expressions.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 using std::string;
 using std::list;
@@ -34,19 +35,19 @@ GenFn::GenFn() {
   return_type = new Any;
 }
 
-std::string GenFn::to_string() const {
+std::string GenFn::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
   //return string("{type (") + ") -> " + return_type->to_string() + "}";
   string str = "Gen Fn (";
   bool once = false;
   for (Type* t : arg_list) {
     str += once ? " " : (once = true, "");
-    str += t->to_string();
+    str += hydra_to_string(t, r, s);
   }
   if (rest_type) {
     str += once ? " " : (once = true, "");
-    str += ":rest " + rest_type->to_string();
+    str += ":rest " + hydra_to_string(rest_type, r, s);
   }
-  str += ") -> " + return_type->to_string();
+  str += ") -> " + hydra_to_string(return_type, r, s);
   return str;
 }
 
@@ -57,15 +58,6 @@ expr::Object *GenFn::check_type(expr::Object *obj) {
   return expr::nil::get();
 }
 
-
-Type *GenFn::constructor(list<expr::Object*> lst) {
-  if (lst.size() == 0) {
-    return this;
-  } else {
-    string err = "type_gen_fn::constructor not implemented";
-    throw err;
-  }
-}
 
 expr::Object* GenFn::subtype(Type* other) {
   string err = "Interpreter Error: subtype not implemented for gen_fn";

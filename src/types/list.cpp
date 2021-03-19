@@ -2,6 +2,7 @@
 
 #include "expressions.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 using std::string;
 
@@ -13,8 +14,8 @@ void List::mark_node() {
   elt_type->mark_node();
 }
 
-string List::to_string() const {
-  return "{List " + elt_type->to_string() + "}";
+string List::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+  return "{List " + hydra_to_string(elt_type, r, s) + "}";
 }
 
 expr::Object *List::check_type(expr::Object* obj) {

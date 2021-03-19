@@ -263,16 +263,6 @@ std::string lang = R"(
 
 (insert (current-module) '&:hydra:concurrent:thread)
 
-(def thread-fn (x)
-  (print x)
-  (println ": thread-running"))
-
-(def thread-test ()
-  (let ((x (ref 10)))
-    (while (>= (! x) 0)
-      (set! x (- x 1))
-      (thread thread-fn (! x)))))
-
 ;;; FUNCTIONALS
 (export (current-module) 'apply)
 (def apply ((fnc Fn) (values List))
@@ -336,6 +326,5 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 (use-module &:user &:hydra:foreign)
 ;;(use-module &:user &:hydra:concurrent)
 (in-module &:user)
-
 
 )";

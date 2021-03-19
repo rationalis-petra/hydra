@@ -9,8 +9,8 @@ using namespace expr;
 
 Parent* Integer::parent;
 
-string Integer::to_string() const {
-  return ::to_string(value);
+string Integer::to_string(LocalRuntime &r, LexicalScope &s) {
+  return std::to_string(value);
 }
 
 Integer::Integer(int num) : value(num) {

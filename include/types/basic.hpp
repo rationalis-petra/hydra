@@ -4,6 +4,7 @@
 #include <list>
 
 #include "types/type.hpp"
+#include "expressions/runtime.hpp"
 
 namespace type {
 
@@ -21,63 +22,63 @@ namespace type {
 
 struct UserObject : public Type {
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   virtual expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };
 
 struct Nil : public Type {
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   virtual expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };
 
 struct Any : public Type {
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   virtual expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };
 
 struct Module : public Type {
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };
 
 struct IOStream : public Type {
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };
 
 struct Istream : public Type {
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };
 
 struct Ostream : public Type {
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };
 
 struct MetaType : public Type {
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };
 
 struct MetaConstructor : public Type {
   virtual void mark_node();
-  std::string to_string() const;
+  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *obj);
 };

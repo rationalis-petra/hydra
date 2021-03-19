@@ -14,7 +14,7 @@ void Symbol::mark_node() {
   }
 }
 
-string Symbol::to_string() const {
+string Symbol::to_string(LocalRuntime &r, LexicalScope &s) {
   return name;
 }
 
