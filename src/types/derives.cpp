@@ -35,11 +35,14 @@ expr::Object *Derives::check_type(expr::Object* obj) {
 
 expr::Object *Derives::subtype(Type* ty) {
   if (Derives* drv = dynamic_cast<Derives*>(ty)) {
-    // an object does not dervie itself 
-    if (drv->check_type(object)->null()) {
-      return expr::nil::get();
-    } else {
+    // subtupe if they are the same obejct...
+    if (drv->object == object) {
       return expr::t::get();
+      // or if their obect derives from ours
+    } if (!check_type(drv->object)->null()) {
+      return expr::t::get();
+    } else {
+      return expr::nil::get();
     }
   }
   return expr::nil::get();

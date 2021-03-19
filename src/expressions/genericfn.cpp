@@ -86,7 +86,7 @@ Object *GenericFn::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s
   // Now, we have a list of applicable functions, we need to support them
   // using the subtype relation
  applicables.sort([](Operator *op1, Operator *op2) {
-    return (op1->type->subtype(op2->type))->null();
+    return !(op1->type->subtype(op2->type))->null();
   });
   // now we have a sorted list, we just need to execute the methods, one-by-one
   // only executing the next method if the previous one executed

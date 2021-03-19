@@ -19,7 +19,11 @@ Tuple::Tuple(std::vector<Type *> _types) : types(_types) {
   
 
 void Tuple::mark_node() {
+  if (marked) return;
   Object::mark_node();
+  for (Type* t : types) {
+    t->mark_node();
+  }
 }
 
 string Tuple::to_string() const {

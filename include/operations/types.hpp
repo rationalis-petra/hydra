@@ -18,8 +18,9 @@ namespace op {
   extern expr::Operator* mk_tuple_type;
   extern expr::Operator* mk_vector_type;
   extern expr::Operator* mk_cons_type;
-  extern expr::Operator* mk_fn_type;
+
   extern expr::Operator* mk_mac_type;
+  extern expr::Operator* mk_fn_type;
 }
 
 #endif

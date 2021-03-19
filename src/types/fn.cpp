@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 
+#include "operations.hpp"
 #include "expressions.hpp"
 #include "types.hpp"
 
@@ -10,6 +11,12 @@ using std::list;
 using expr::Object;
 using type::Fn;
 using type::Type;
+
+Fn::Fn() {
+  rest_type = nullptr;
+  return_type = new type::Any;
+  invoker = op::mk_fn_type;
+}
 
 void Fn::mark_node() {
   if (marked) return;
@@ -32,11 +39,6 @@ void Fn::mark_node() {
   if (return_type) {
     return_type->mark_node();
   }
-}
-
-Fn::Fn() {
-  rest_type = nullptr;
-  return_type = new type::Any;
 }
 
 std::string Fn::to_string() const {
@@ -100,7 +102,6 @@ Object *Fn::check_args(list<Object*> alist) {
   return expr::t::get();
 }
 
-
 Fn *Fn::with_all(std::vector<Type *> args, Type *rest, Type *ret) {
   Fn* tfn = new Fn;
   tfn->arg_list = args;
@@ -130,11 +131,7 @@ Fn *Fn::with_args_optional(std::vector<Type *> args, std::vector<Type *> opts) {
   return tfn;
 }
 
-
-
-
-
-
+#include <iostream>
 expr::Object* Fn::subtype(Type* other) {
   if (Fn* tfn = dynamic_cast<Fn*>(other)) {
     if (arg_list.size() == tfn->arg_list.size()) {
@@ -142,7 +139,8 @@ expr::Object* Fn::subtype(Type* other) {
       auto their_ir = tfn->arg_list.begin();
       // all of our arguments have to be subtypes of theirs
       while (our_ir != arg_list.end()) {
-        if (!(*their_ir)->subtype(*our_ir)) {
+        if ((*their_ir)->subtype(*our_ir)->null()) {
+
           return expr::nil::get(); 
         }
         their_ir++;
@@ -187,6 +185,3 @@ expr::Object* Fn::equal(Type* other) {
 
   return expr::t::get();
 }
-
-
-// Function Constructor

@@ -24,7 +24,9 @@ Vector::Vector(Type* t, int i) {
 }
 
 void Vector::mark_node() {
+  if (marked) return;
   Object::mark_node();
+  type_elt->mark_node();
 }
 
 string Vector::to_string() const {

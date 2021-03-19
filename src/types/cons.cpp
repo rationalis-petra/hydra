@@ -22,7 +22,10 @@ Cons::Cons(Type* tcar, Type* tcdr) {
 }
 
 void Cons::mark_node() {
+  if (marked) return;
   Object::mark_node();
+  type_car->mark_node();
+  type_cdr->mark_node();
 }
 
 string Cons::to_string() const {

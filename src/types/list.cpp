@@ -1,4 +1,3 @@
-
 #include <string>
 
 #include "expressions.hpp"
@@ -9,7 +8,9 @@ using std::string;
 using namespace type;
 
 void List::mark_node() {
+  if (marked) return;
   Object::mark_node();
+  elt_type->mark_node();
 }
 
 string List::to_string() const {
