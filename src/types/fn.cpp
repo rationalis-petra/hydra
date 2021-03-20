@@ -1,5 +1,4 @@
 #include <string>
-#include <iostream>
 
 #include "operations.hpp"
 #include "expressions.hpp"
@@ -65,11 +64,11 @@ Object *Fn::check_type(Object *obj) {
   return expr::nil::get();
 }
 
+
 Object *Fn::check_args(list<Object*> alist) {
   for (auto type : arg_list) {
     if (alist.empty()) {
-      string err = "Too few arguments to function";
-      throw err;
+      throw new TooFewException;
     }
     if (type->check_type(alist.front())->null()) {
       return expr::nil::get();
@@ -96,8 +95,7 @@ Object *Fn::check_args(list<Object*> alist) {
     alist.clear();
   }
   if (alist.size() != 0) {
-    string err = "Too many arguments to function (c++: no to_string fn.cpp)";
-    throw err;
+    throw new TooManyException;
   }
   // now, we check keyword argumnets
   return expr::t::get();
@@ -160,6 +158,9 @@ expr::Object* Fn::subtype(Type* other) {
 
 expr::Object* Fn::equal(Type* other) {
   Fn* fn2 = dynamic_cast<Fn*>(other);
+  if (!fn2) 
+    return expr::nil::get();
+
   if (rest_type && fn2->rest_type) {
     if (fn2->rest_type->equal(rest_type)->null())
       return expr::nil::get();
@@ -176,12 +177,16 @@ expr::Object* Fn::equal(Type* other) {
   while (it1 != arg_list.end()) {
     if ((*it1)->equal(*it2)->null()) 
       return expr::nil::get();
+    it1++;
+    it2++;
   }
   it1 = optional_list.begin();
   it2 = fn2->optional_list.begin();
-  while (it1 != arg_list.end()) {
+  while (it1 != optional_list.end()) {
     if ((*it1)->equal(*it2)->null()) 
       return expr::nil::get();
+    it1++;
+    it2++;
   }
 
   return expr::t::get();

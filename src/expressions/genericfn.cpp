@@ -78,11 +78,13 @@ Object *GenericFn::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s
   // first find a list of applicable functions
   std::list<Operator*> applicables;
   for (Operator *fn : functions) {
-    if (!fn->type->check_args(arg_list)->null()) {
-      applicables.push_back(fn);
+    try {
+      if (!fn->type->check_args(arg_list)->null()) {
+        applicables.push_back(fn);
 
-      // we need to unroot values in the arg_list
-    }
+        // we need to unroot values in the arg_list
+      }
+    } catch (TypeCheckException *e) {}
   }
 
   // Now, we have a list of applicable functions, we need to support them

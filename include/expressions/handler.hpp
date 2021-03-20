@@ -26,11 +26,6 @@ struct case_handler : public condition_handler {
   Object* handle(Object* condition);
 };
 
-enum exception_type {
-  RESTART_CALL,
-  CASE_THROW
-};
-
 
 struct hydra_restart : public Operator {
   hydra_restart(Operator* o, Symbol* s);
@@ -41,20 +36,30 @@ struct hydra_restart : public Operator {
   Symbol* sym;
 };
 
+enum exception_type {
+  RESTART_CALL,
+  CASE_THROW
+};
 
 struct hydra_exception {
   hydra_exception(exception_type t);
 
+  // this used to be a union, but c++
+  // didn't like it for some reason, so we
+  // use tag:
   exception_type type;
 
-  // was a union, doesn't like it??
+
   // FAKE UNION PT1
+  // data for CASE_THROW
   Object *obj;
 
   // FAKE UNION PT2
+  // data for RESTART_CALL
   hydra_restart *res;
   std::list<Object *> args;
   LexicalScope *s;
 };
+
 }
 #endif

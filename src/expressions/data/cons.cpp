@@ -49,7 +49,7 @@ string Cons::to_string(LocalRuntime &r, LexicalScope& s) {
   Object *elt = this;
   while (!elt->null()) {
     if (Cons *obj = dynamic_cast<Cons *>(elt)) {
-      out += hydra_to_string(obj, r, s);
+      out += hydra_to_string(obj->car, r, s);
       if (!obj->cdr->null()) {
         out += " ";
       }

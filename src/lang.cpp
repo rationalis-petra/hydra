@@ -313,10 +313,10 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
    (in-module module)))
 
 (export (current-module) 'println)
-(def println (val)
-  (print val)
+(def println (:rest vals)
+  (apply print vals)
   (print #newline)
-  val)
+  vals)
 
 (&:hydra:core:in-module &:hydra:core)
 (def &:user (module "user"))

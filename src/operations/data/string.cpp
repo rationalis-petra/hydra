@@ -69,10 +69,6 @@ Object *op_char_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Char *c1 = get_inbuilt<Char *>(arg_list.front());
   Char *c2 = get_inbuilt<Char *>(arg_list.back());
 
-  if (c1 == nullptr || c2 == nullptr) {
-    std::cout << "either c1 or c2 is nullptr" << std::endl;
-  }
-
   // TODO: maybe compare slots???
   if (c1->value == c2->value) {
     return t::get();
@@ -80,8 +76,8 @@ Object *op_char_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return nil::get();
 }
 
+#include <iostream>
 Object *op_to_str(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-
   return new HString(arg_list.front()->to_string(r, s));
 }
 

@@ -146,9 +146,9 @@ int main(int argc, char **argv) {
   }
 
   while (true) {
+    LexicalScope s;
     try {
       cout << r.active_module->name << "> ";
-      LexicalScope s;
       ast = read(stm);
       Object::roots.insert(ast);
       out = ast->eval(r, s);
@@ -158,8 +158,8 @@ int main(int argc, char **argv) {
       Object::roots.remove(ast);
       Object::collect_garbage(r);
     } catch (hydra_exception *e) {
-      cout << "Top-level exception thrown!" << endl;
-      cout << "Object: " << e->obj << endl;
+      cout << "Caught exception at top level!" << endl;
+      cout << hydra_to_string(e->obj, r, s) << endl;
     } catch (string e) {
       cout << e << endl;
     } catch (const char *err) {

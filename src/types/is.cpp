@@ -39,19 +39,20 @@ expr::Object *Is::check_type(expr::Object* obj) {
   return object->derive_check(ptypes);
 }
 
+#include <iostream>
 
 expr::Object *Is::subtype(Type* ty) {
   // TODO: derives??
   // is derives a subtype of us, or are we a subtype of derives?
-  if (Is* drv = dynamic_cast<Is*>(ty)) {
-    if (drv->check_type(object)->null()) {
-      return expr::nil::get();
-    } else {
+  if (Is* is = dynamic_cast<Is*>(ty)) {
+    // their type must be a subtype of ours...
+    if (!check_type(is->object)->null()) {
+      return expr::t::get();
+    }
+  } else if (Derives* drv = dynamic_cast<Derives*>(ty)) {
+    if (!check_type(drv->object)->null()) {
       return expr::t::get();
     }
   }
   return expr::nil::get();
 }
-
-
-

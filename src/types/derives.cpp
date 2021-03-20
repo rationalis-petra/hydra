@@ -42,8 +42,12 @@ expr::Object *Derives::subtype(Type* ty) {
       // or if their obect derives from ours
     } if (!check_type(drv->object)->null()) {
       return expr::t::get();
-    } else {
-      return expr::nil::get();
+    } 
+  } else if (Is* is = dynamic_cast<Is*>(ty)) {
+    // if the is has an object which descends from 
+    // us, we are ok :)
+    if (!check_type(is->object)->null()) {
+      return expr::t::get();
     }
   }
   return expr::nil::get();

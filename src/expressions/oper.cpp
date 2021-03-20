@@ -54,11 +54,24 @@ list<Object *> Operator::get_arg_list(Object *arg_list, LocalRuntime &r,
       Object::roots.insert(arg);
     }
   }
-  if (type->check_args(out_list)->null()) {
-    string err = "type check failed! for arg_list: " +
-                 hydra_to_string(original_list, r, s) +
-      "expected type: " + hydra_to_string(type, r, s);
-    throw err;
+  try {
+    if (type->check_args(out_list)->null()) {
+      string ierr = "type check failed! for arg_list: " +
+                   hydra_to_string(original_list, r, s) +
+                   "expected type: " + hydra_to_string(type, r, s);
+      throw ierr;
+    }
+  } catch (TooFewException *e) {
+    string ierr = "type check failed! for arg_list: " +
+                  hydra_to_string(original_list, r, s) +
+                  "too few arguments to function " + hydra_to_string(this, r, s);
+    throw ierr;
+
+  } catch (TooManyException *e) {
+    string ierr = "type check failed! for arg_list: " +
+      hydra_to_string(original_list, r, s) +
+                  "too many arguments to function " + hydra_to_string(this, r, s);
+    throw ierr;
   }
   return out_list;
 }

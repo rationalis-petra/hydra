@@ -24,7 +24,10 @@ Object *op_subtype(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   type::Type *t1 = dynamic_cast<type::Type *>(arg_list.front());
   type::Type *t2 = dynamic_cast<type::Type *>(arg_list.back());
 
-  return t1->subtype(t2);
+  // subtype is like <
+  // (subtype? t1 t2) is (t1 < t2)
+  // i.e. return true if t1 is a subtype of t2
+  return t2->subtype(t1);
 }
 
 Object *op_type_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {

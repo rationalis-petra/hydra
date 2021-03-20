@@ -53,6 +53,7 @@ struct Vector : public Type {
 };
 
 struct List : public Type {
+  List();
   virtual void mark_node();
   std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);

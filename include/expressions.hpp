@@ -14,6 +14,7 @@
 #include "expressions/handler.hpp"
 #include "expressions/io.hpp"
 #include "expressions/language.hpp"
+#include "expressions/exception.hpp"
 #include "expressions/object.hpp"
 #include "expressions/operation.hpp"
 #include "expressions/user_object.hpp"

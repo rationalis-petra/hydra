@@ -182,7 +182,9 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
   op_def.pop_front();
   if (HString *dstring = dynamic_cast<HString *>(op_def.front())) {
     docstring = dstring;
-    op_def.pop_front();
+    if (op_def.size() != 1) {
+      op_def.pop_front();
+    }
   }
 
   Symbol *progn = hydra_cast<Symbol>(

@@ -8,6 +8,10 @@ using std::string;
 
 using namespace type;
 
+List::List() {
+  elt_type = new Any();
+}
+
 void List::mark_node() {
   if (marked) return;
   Object::mark_node();
