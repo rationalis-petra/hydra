@@ -104,11 +104,19 @@ Object *GenericFn::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s
     Operator *op = applicables.front();
     applicables.pop_front();
     NextFnc *nextfnc = new NextFnc(applicables, arg_list, call_next);
-    if (UserOperator* uop = dynamic_cast<UserOperator*>(op)) {
-      // TODO come up with a better solution than permanelty changing call-next...
+
+    UserOperator* uop = nullptr;
+    if ((uop = dynamic_cast<UserOperator*>(op))) {
       uop->scope->map[call_next] = nextfnc;
     }
-    return op->call(arg_list, r, s);
+    Object* out = op->call(arg_list, r, s);
+    for (Object *obj : arg_list) {
+      roots.remove(obj);
+    }
+    if (uop) {
+      uop->scope->map.erase(call_next);
+    }
+    return out;
   }
 }
 
@@ -118,12 +126,17 @@ NextFnc::NextFnc(list<Operator*> _fncs, list<Object*> _arg_list, Symbol* _nextsy
   nextsym = _nextsym;
 }
 
+#include <iostream>
 Object* NextFnc::call(std::list<Object*> arglist, LocalRuntime& r, LexicalScope& s, bool) {
-  for (Object* obj : arglist) {
-    roots.remove(obj);
-  }
   Operator* op = funcs.front();
   funcs.pop_front();
-  s.map[nextsym] = this;
-  return op->call(arg_list, r, s);
+  UserOperator *uop = nullptr;
+  if ((uop = dynamic_cast<UserOperator*>(op))) {
+    uop->scope->map[nextsym] = this;
+  }
+  Object* out = op->call(arg_list, r, s);
+  if (uop) {
+      uop->scope->map.erase(nextsym);
+  }
+  return out;
 }
