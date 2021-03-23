@@ -51,21 +51,21 @@ Operator *op::addfn;
 
 void op::initialize_mkoperator() {
 
-  op::fn = new InbuiltOperator("Generates a new function object", op_fn,
+  op::fn = new InbuiltOperator("fn", "Generates a new function object", op_fn,
                                type::Fn::with_rest(new type::Any), false);
 
   op::mac = new InbuiltOperator(
-      "Generates a new macro object", op_mac,
+      "mac", "Generates a new macro object", op_mac,
       type::Fn::with_all({new type::Cons}, new type::Any, new type::Mac),
       false);
 
   op::genfn = new InbuiltOperator(
-      "Generates a new generic function object", op_gen,
+      "gen", "Generates a new generic function object", op_gen,
       type::Fn::with_all({new type::List}, new type::Any, new type::GenFn),
       false);
 
   op::addfn = new InbuiltOperator(
-      "Combines functions into an effective function", op_addfn,
+      "addfn", "Combines functions into an effective function", op_addfn,
       type::Fn::with_all({new type::GenFn}, new type::Fn, new type::GenFn),
       true);
 }

@@ -23,6 +23,7 @@ Operator *op::thread;
 void op::initialize_concurrency() {
 
   op::thread = new InbuiltOperator(
+                                   "thread",
       "Takes function Fn () -> Any and creates a new thread"
       "\n where it calls that function",
       op_mk_thread,

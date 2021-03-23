@@ -289,6 +289,13 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
     (simple-map func (apply zip arg-vec))))
 
 ;;; MODULES
+(export (current-module) 'gensym)
+(def gensym-counter (ref 0))
+(def gensym ()
+  (let ((x (get! gensym-counter)))
+     (set! gensym-counter (+ gensym-counter 1))
+     (symbol (to-string x))))
+
 (export (current-module) 'use-module)
 (def use-module (module1 module2)
   "Places all symbols exported by MODULE2 in MODULE1"

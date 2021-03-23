@@ -96,12 +96,13 @@ Operator *op::vec_eq;
 
 void op::initialize_vector() {
   op::mk_vec = new expr::InbuiltOperator(
-      "Will return an array whose elements are the arg-list", op_vec,
+      "vector", "Will return an array whose elements are the arg-list", op_vec,
       type::Fn::with_rest(new type::Any), true);
   op::vec_cat = new InbuiltOperator(
-      "Concatenates two vectors", op_vec_cat,
+      "vector concat", "Concatenates two vectors", op_vec_cat,
       type::Fn::with_all({}, new type::Vector, new type::Vector), true);
   op::vec_elt = new InbuiltOperator(
+      "vector elt",
       "Takes an array and an index, and returns the element at that index",
       op_vec_elt,
       type::Fn::with_all({new type::Vector, type::integer_type}, nullptr,
@@ -109,9 +110,11 @@ void op::initialize_vector() {
       true);
 
   op::vec_len = new InbuiltOperator(
-      "Returns the length of a given vector", op_vec_len,
-      type::Fn::with_all({new type::Vector}, nullptr, type::integer_type), true);
+      "vector len", "Returns the length of a given vector", op_vec_len,
+      type::Fn::with_all({new type::Vector}, nullptr, type::integer_type),
+      true);
   op::vec_set = new InbuiltOperator(
+      "vector set",
       "Takes an array, an index, and an element. Sets the value at index to "
       "element ",
       op_vec_elt,
@@ -119,6 +122,6 @@ void op::initialize_vector() {
                          nullptr, new type::Any),
       true);
   op::vec_eq = new InbuiltOperator(
-      "Equality test for Vectors", op_vec_eq,
+      "vector =", "Equality test for Vectors", op_vec_eq,
       type::Fn::with_args({new type::Vector, new type::Vector}), true);
 }

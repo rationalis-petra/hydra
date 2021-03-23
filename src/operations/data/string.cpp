@@ -91,6 +91,7 @@ Operator *op::to_str;
 void op::initialize_string() {
 
   op::str_elt = new InbuiltOperator(
+                                    "string elt",
       "Takes a string and an index, and returns the character at that index",
       op_str_elt,
       type::Fn::with_all({type::string_type, type::integer_type}, nullptr,
@@ -98,23 +99,27 @@ void op::initialize_string() {
       true);
 
   op::str_cat = new InbuiltOperator(
+                                    "string cat",
       "Concatenates two strings", op_str_cat,
       type::Fn::with_all({}, type::string_type, type::string_type), true);
 
   op::str_gr = new InbuiltOperator(
+                                   "string >",
       "Returns true if the first argument is greater than the second",
       op_str_gr, type::Fn::with_args({type::string_type, type::string_type}),
       true);
 
   op::str_eq = new InbuiltOperator(
+                                   "string =",
       "Equality test for Strings", op_str_eq,
       type::Fn::with_args({type::string_type, type::string_type}), true);
 
   op::char_eq = new InbuiltOperator(
+                                    "char =",
       "Equality test for Characters", op_char_eq,
       type::Fn::with_args({type::character_type, type::character_type}), true);
 
-  op::to_str = new InbuiltOperator(
+  op::to_str = new InbuiltOperator("to-string",
       "Converts an object into a string", op_to_str,
       type::Fn::with_all({new type::Any}, nullptr, type::string_type), true);
 

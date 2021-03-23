@@ -3,10 +3,10 @@
 #include <list>
 #include <string>
 
-#include "utils.hpp"
 #include "expressions.hpp"
 #include "operations.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 using std::cout;
 using std::list;
@@ -48,7 +48,7 @@ Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
   if (HString *strfilename = dynamic_cast<HString *>(filename)) {
     if (method->name == "input") {
       Istream *outs = new Istream();
-      ifstream* file = new ifstream(strfilename->value);
+      ifstream *file = new ifstream(strfilename->value);
       if (file->is_open()) {
         outs->stream = file;
         out = outs;
@@ -57,7 +57,7 @@ Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
       }
     } else if (method->name == "output") {
       Ostream *outs = new Ostream();
-      ofstream* file = new ofstream(strfilename->value);
+      ofstream *file = new ofstream(strfilename->value);
       if (file->is_open()) {
         outs->stream = file;
         out = outs;
@@ -66,7 +66,7 @@ Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
       }
     } else if (method->name == "both") {
       IOstream *outs = new IOstream();
-      fstream* file = new fstream(strfilename->value);
+      fstream *file = new fstream(strfilename->value);
       if (file->is_open()) {
         outs->stream = file;
         out = outs;
@@ -78,7 +78,8 @@ Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
       throw err;
     }
   } else {
-    string err = "Inavalid argument to open-file: " + hydra_to_string(filename, r, s);
+    string err =
+        "Inavalid argument to open-file: " + hydra_to_string(filename, r, s);
     throw err;
   }
   for (Object *v : arg_list) {
@@ -194,15 +195,17 @@ Operator *op::endp;
 
 void op::initialize_io() {
   op::close = new InbuiltOperator(
-      "Takes an input stream representing a file, and closes it", op_close,
-      type::Fn::with_args({new type::Any}), true);
+      "close", "Takes an input stream representing a file, and closes it",
+      op_close, type::Fn::with_args({new type::Any}), true);
 
   op::print = new InbuiltOperator(
+      "print",
       "Prints a string representation of the provided argument to\n"
       "the standard output stream",
       op_print, type::Fn::with_rest(new type::Any), true);
 
   op::open_file = new InbuiltOperator(
+      "open-file",
       "Takes a string (path), and returns an input stream located\n"
       "by the path",
       op_open_file,
@@ -210,6 +213,7 @@ void op::initialize_io() {
       true);
 
   op::next = new InbuiltOperator(
+      "next",
       "Takes an input stream, advances it one character\n"
       "and returns the character at the 'current' position",
       op_next,
@@ -217,20 +221,24 @@ void op::initialize_io() {
       true);
 
   op::peek = new InbuiltOperator(
+      "peek",
       "Takes an input stream, and peeks at the next character\n"
       "but does not advance the input stream",
-      op_peek, type::Fn::with_all({new type::Istream}, nullptr, type::character_type),
+      op_peek,
+      type::Fn::with_all({new type::Istream}, nullptr, type::character_type),
       true);
 
   op::put = new InbuiltOperator(
+      "put",
       "Takes an output stream, a character, and puts the\n"
       "character in the output stream's current position",
-      op_put, type::Fn::with_all({new type::Ostream}, nullptr, type::character_type),
+      op_put,
+      type::Fn::with_all({new type::Ostream}, nullptr, type::character_type),
       true);
 
   op::endp = new InbuiltOperator(
+      "end?",
       "Returns t if a given input stream has reached the\n"
       "end of the file, and nil otherwise",
       op_endp, type::Fn::with_args({new type::Istream}), true);
 }
-

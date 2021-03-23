@@ -205,6 +205,8 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
   // ASSUME that this and the alist are rooted
   // ASSUME all values in arg_list are rooted
 
+  // clone the scope into s
+
   // too few arguments OR too many arguments
   if ((arg_list.size() < arg_names.size()) ||
       (((arg_list.size() > arg_names.size() + optionals.size() + (keys.size() * 2)) &&
@@ -213,9 +215,11 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
     throw err;
   }
 
+  LexicalScope* scope = new LexicalScope(*this->scope);
+
   // so, all we need to to is perform lexical substitution!
-  for (Symbol *s : arg_names) {
-    scope->map[s] = arg_list.front();
+  for (Symbol *sym : arg_names) {
+    scope->map[sym] = arg_list.front();
     // unroot values as we add them to a scope
     Object::roots.remove(arg_list.front());
     arg_list.pop_front();
@@ -296,6 +300,7 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
       out = intermediate;
     }
   }
+  delete scope;
 
   return out;
 }

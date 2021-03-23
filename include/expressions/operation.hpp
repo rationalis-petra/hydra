@@ -6,6 +6,7 @@
 #include <string>
 #include <functional>
 
+#include "parent.hpp"
 #include "object.hpp"
 
 namespace type {
@@ -21,6 +22,7 @@ struct HString;
 struct Operator : public Object {
   // FUNCTIONS
   Operator();
+  static Parent* parent;
 
   virtual void mark_node();
   std::string to_string(LocalRuntime &r, LexicalScope& s);
@@ -71,12 +73,14 @@ struct GenericFn : public Operator {
 
 struct InbuiltOperator : public Operator {
   // FUNCTIONS
-  InbuiltOperator(std::string str,
+  InbuiltOperator(std::string name, std::string str,
                   Object* (*call)(std::list<Object*> arg_list, LocalRuntime &r,
                               LexicalScope &s),
                   type::Fn *t, bool is_fn);
 
   Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false);
+  std::string to_string(LocalRuntime &r, LexicalScope &s);
+  std::string name;
 
   // STATE
   Object *(*fnc)(std::list<Object*>arg_list, LocalRuntime &r, LexicalScope &s);

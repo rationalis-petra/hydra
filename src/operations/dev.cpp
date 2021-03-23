@@ -15,15 +15,17 @@ using std::string;
 Object *op_describe(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   if (UserOperator *uop = dynamic_cast<UserOperator *>(arg_list.front())) {
-    string str = "generic function:\n" + uop->docstring->value +
-      "\nlambda-list: " + "\ntype: " + hydra_to_string(uop->type, r, s);
+    string str =
+        "generic function:\n" + uop->docstring->value +
+        "\nlambda-list: " + "\ntype: " + hydra_to_string(uop->type, r, s);
     // str += "\n expression:\n";
     // str += "(fn " + uop->expr->to_string() + ")";
     return new HString(str);
   } else if (GenericFn *generic = dynamic_cast<GenericFn *>(arg_list.front())) {
-    string str = "generic function:\n" + generic->docstring->value +
-      "\nlambda-list: " + "\ntype: " + hydra_to_string(generic->type, r, s) +
-                 "\nfunctions: \n";
+    string str =
+        "generic function:\n" + generic->docstring->value +
+        "\nlambda-list: " + "\ntype: " + hydra_to_string(generic->type, r, s) +
+        "\nfunctions: \n";
 
     for (Operator *op : generic->functions) {
       str += hydra_to_string(op, r, s) + "\n";
@@ -31,8 +33,8 @@ Object *op_describe(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     return new HString(str);
   }
   if (Operator *op = dynamic_cast<Operator *>(arg_list.front())) {
-    string str = "function:\n" + op->docstring->value +
-      "\nlambda-list: " + "\ntype: " + hydra_to_string(op->type, r, s);
+    string str = "function:\n" + op->docstring->value + "\nlambda-list: " +
+                 "\ntype: " + hydra_to_string(op->type, r, s);
     return new HString(str);
   } else {
     return new HString("no documentation for this type");
@@ -75,14 +77,14 @@ Operator *op::macexpand;
 
 void op::initialize_dev() {
   op::describe =
-      new InbuiltOperator("describes the provided argument", op_describe,
+      new InbuiltOperator("doc", "describes the provided argument", op_describe,
                           type::Fn::with_args({new type::Any}), true);
 
   op::time = new InbuiltOperator(
-      "evaluates the argument(s), and returns a time object", op_time,
+      "time", "evaluates the argument(s), and returns a time object", op_time,
       type::Fn::with_args({new type::Any}), true);
 
   op::macexpand = new InbuiltOperator(
-      "Expands global macros within a program", op_macexpand,
+      "macroexpand", "Expands global macros within a program", op_macexpand,
       type::Fn::with_args({new type::Any}), true);
 }

@@ -179,42 +179,47 @@ Operator *op::get_invoker;
 
 void op::initialize_language() {
   op::do_if = new InbuiltOperator(
+      "if",
       "Takes three expressions: evaluates the first one.\n"
       "If it is nil, then evaluate the second expression & return\n"
       "Otherwise, evaluate the first expression.",
       op_if, type::Fn::with_args({new type::Any, new type::Any, new type::Any}),
       false);
   op::do_while = new InbuiltOperator(
+      "while",
       "Evaluate the first expression. If it is nil, return\n"
       "Otherwise, evaluate rest of the expression(s), and repeat",
       op_while, type::Fn::with_rest(new type::Any), false);
   op::bind = new InbuiltOperator(
-      "Sets the value symbol (first argument) to the second argument", op_bind,
-      type::Fn::with_args({new type::Symbol, new type::Any}), true);
+      "bind", "Sets the value symbol (first argument) to the second argument",
+      op_bind, type::Fn::with_args({new type::Symbol, new type::Any}), true);
 
-  op::unbind =
-      new InbuiltOperator("Removes the value from a symbol", op_unbind,
-                          type::Fn::with_args({new type::Symbol}), true);
-  op::definedp = new InbuiltOperator(
-      "Returns t if symbol contains a value, and nil otherwise", op_definedp,
+  op::unbind = new InbuiltOperator(
+      "unbind", "Removes the value from a symbol", op_unbind,
       type::Fn::with_args({new type::Symbol}), true);
+  op::definedp = new InbuiltOperator(
+      "defined?", "Returns t if symbol contains a value, and nil otherwise",
+      op_definedp, type::Fn::with_args({new type::Symbol}), true);
   op::quote = new InbuiltOperator(
-      "Prevents evaluation of the argument it is provided", op_quote,
+      "quote", "Prevents evaluation of the argument it is provided", op_quote,
       type::Fn::with_args({new type::Any}), false);
   op::eval = new InbuiltOperator(
-      "Evaluates it's argument as if it was a hydra program", op_eval,
+      "eval", "Evaluates it's argument as if it was a hydra program", op_eval,
       type::Fn::with_args({new type::Any}), true);
   op::progn = new InbuiltOperator(
+      "progn",
       "Evaluates its arguments in sequential order, returning the value\n"
       "of the last one",
       op_progn, type::Fn::with_rest(new type::Any), false);
-  op::exit = new InbuiltOperator("Exits the current running application",
-                                 op_exit, type::Fn::with_args({}), true);
+  op::exit =
+      new InbuiltOperator("exit", "Exits the current running application",
+                          op_exit, type::Fn::with_args({}), true);
   op::set_invoker = new InbuiltOperator(
+      "set-invoker",
       "Sets the invoker: an object which is used when this object\n"
       "is called, allowing it to act as a function.",
       op_set_invoker, type::Fn::with_args({new type::Any, new type::Fn}), true);
   op::get_invoker = new InbuiltOperator(
-      "Retrieves the invoker for this obejct.", op_get_invoker,
+      "get-invoker", "Retrieves the invoker for this obejct.", op_get_invoker,
       type::Fn::with_all({new type::Any}, nullptr, new type::Fn), true);
 }

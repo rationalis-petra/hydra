@@ -63,12 +63,14 @@ Operator *op::do_not;
 
 void op::initialize_logic() {
   op::do_or = new InbuiltOperator(
+      "or",
       "Returns the first non-nil argument, or nil if all arguments are nil",
       op_or, type::Fn::with_rest(new type::Any), false);
   op::do_and = new InbuiltOperator(
+      "and",
       "Returns the first nil argument, or the last argument if all are non-nil",
       op_and, type::Fn::with_rest(new type::Any), false);
-  op::do_not =
-      new InbuiltOperator("Returns t if argument is nil, and nil otherwise",
-                          op_not, type::Fn::with_args({new type::Any}), true);
+  op::do_not = new InbuiltOperator(
+      "not", "Returns t if argument is nil, and nil otherwise", op_not,
+      type::Fn::with_args({new type::Any}), true);
 }

@@ -193,6 +193,7 @@ Operator *op::mk_fn_type;
 void op::initialize_type_ops() {
 
   op::typep = new InbuiltOperator(
+                                  "type?",
       "Returns t if the first argument is the type defined by the\n"
       "second, otherwise returns nil",
       op_typep, nullptr, true);
@@ -204,26 +205,27 @@ void op::initialize_type_ops() {
   //     true);
 
   op::subtype = new InbuiltOperator(
+                                    "subtype?",
       "Returns true if the first argument is a subtype of the second",
       op_subtype, nullptr, true);
 
   op::type_eq =
-      new InbuiltOperator("Equality for types", op_type_eq, nullptr, true);
+    new InbuiltOperator("type =", "Equality for types", op_type_eq, nullptr, true);
 
   op::mk_is =
-      new InbuiltOperator("Constructs an Is type", op_type_is, nullptr, true);
+    new InbuiltOperator("Is", "Constructs an Is type", op_type_is, nullptr, true);
 
-  op::mk_derives = new InbuiltOperator("Constructs a Derives type",
+  op::mk_derives = new InbuiltOperator("Derives", "Constructs a Derives type",
                                        op_type_derives, nullptr, true);
 
-  op::mk_tuple_type = new InbuiltOperator("Constructs a Tuple Type",
+  op::mk_tuple_type = new InbuiltOperator("Tuple", "Constructs a Tuple Type",
                                           op_mk_tuple_type, nullptr, true);
 
-  op::mk_vector_type = new InbuiltOperator("Constructs a vector type",
+  op::mk_vector_type = new InbuiltOperator("Vector", "Constructs a vector type",
                                            op_mk_vector_type, nullptr, true);
 
   op::mk_fn_type =
-      new InbuiltOperator("Constructs a fn type", op_mk_fn_type, nullptr, true);
+    new InbuiltOperator("Fn", "Constructs a fn type", op_mk_fn_type, nullptr, true);
 }
 
 //

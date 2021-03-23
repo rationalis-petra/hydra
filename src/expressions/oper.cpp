@@ -57,8 +57,9 @@ list<Object *> Operator::get_arg_list(Object *arg_list, LocalRuntime &r,
   try {
     if (type->check_args(out_list)->null()) {
       string ierr = "type check failed! for arg_list: " +
-                   hydra_to_string(original_list, r, s) +
-                   "expected type: " + hydra_to_string(type, r, s);
+                    hydra_to_string(original_list, r, s) +
+                    " in function: " + hydra_to_string(this, r, s) +
+                    "\nexpected type: " + hydra_to_string(type, r, s);
       throw ierr;
     }
   } catch (TooFewException *e) {
@@ -77,11 +78,12 @@ list<Object *> Operator::get_arg_list(Object *arg_list, LocalRuntime &r,
 }
 
 
-InbuiltOperator::InbuiltOperator(string _docstring,
+InbuiltOperator::InbuiltOperator(string _name, string _docstring,
                                  Object *(*_fnc)(std::list<Object *> arg_list,
                                                 LocalRuntime &r,
                                                 LexicalScope &s),
                                  type::Fn *t, bool isfn) {
+  name = _name;
   fnc = _fnc;
   docstring = new HString(_docstring);
   type = t;
@@ -93,4 +95,8 @@ Object *InbuiltOperator::call(std::list<Object *> arg_list, LocalRuntime &r,
   // ASSUME arg_list is rooted
   // WE delegate rooting to inbuilt functions
   return fnc(arg_list, r, s);
+}
+
+string InbuiltOperator::to_string(LocalRuntime &r, LexicalScope &s) {
+  return name;
 }

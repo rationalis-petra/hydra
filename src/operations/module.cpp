@@ -170,29 +170,33 @@ Object *op_export(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return mod;
 }
 
-Operator* op::mk_symbol;
-Operator* op::mk_module;
-Operator* op::in_module;
-Operator* op::intern;
-Operator* op::insert;
-Operator* op::get;
-Operator* op::get_module;
-Operator* op::get_symbols;
-Operator* op::remove;
-Operator* op::do_export;
+Operator *op::mk_symbol;
+Operator *op::mk_module;
+Operator *op::in_module;
+Operator *op::intern;
+Operator *op::insert;
+Operator *op::get;
+Operator *op::get_module;
+Operator *op::get_symbols;
+Operator *op::remove;
+Operator *op::do_export;
 
 void op::initialize_module() {
   op::mk_symbol = new InbuiltOperator(
+      "symbol",
       "Generates a new, unique symbol whose name is the provided string",
       op_mk_symbol,
       type::Fn::with_all({type::string_type}, nullptr, new type::Symbol), true);
   op::mk_module = new InbuiltOperator(
-      "Generates a new module whose name is the provided string", op_mk_module,
+      "module", "Generates a new module whose name is the provided string",
+      op_mk_module,
       type::Fn::with_all({type::string_type}, nullptr, new type::Module), true);
   op::in_module = new InbuiltOperator(
-      "Sets the current (active) module to the provided argument", op_in_module,
+      "in-module", "Sets the current (active) module to the provided argument",
+      op_in_module,
       type::Fn::with_all({new type::Module}, nullptr, new type::Module), true);
   op::intern = new InbuiltOperator(
+      "intern",
       "Take a module and a string; if a symbol with that name exists\n"
       "then return it, otherwise place a new symbol in the current\n"
       "package with that name and return it",
@@ -201,6 +205,7 @@ void op::initialize_module() {
                          new type::Symbol),
       true);
   op::insert = new InbuiltOperator(
+      "insert",
       "Takes a module and a symbol; insert the symbol into the module,\n"
       "or return an error if a symbol with that name already exists in\n"
       "current module",
@@ -210,21 +215,24 @@ void op::initialize_module() {
       true);
 
   op::get = new InbuiltOperator(
+      "get",
       "Takes a module and a string; if a symbol with the name exists in"
       "the module, return it. Otherwise, return nil",
       op_get,
       type::Fn::with_all({type::string_type}, nullptr, new type::Symbol), true);
-  op::get_module = new InbuiltOperator("Returns the current (active) module",
+  op::get_module = new InbuiltOperator("current-module",
+                                       "Returns the current (active) module",
                                        op_get_module, new type::Fn, true);
   op::get_symbols = new InbuiltOperator(
-      "Returns a list of symbols which are exported by a module",
+      "get-symbols", "Returns a list of symbols which are exported by a module",
       op_get_symbols,
       type::Fn::with_all({new type::Module}, nullptr, new type::List), true);
   op::remove = new InbuiltOperator(
-      "Removes a symbol from a module, returns the module", op_remove,
+      "remove", "Removes a symbol from a module, returns the module", op_remove,
       type::Fn::with_args({new type::Module, type::string_type}), true);
   op::do_export = new InbuiltOperator(
-      "Moves a symbol into a modules' list of exported symbols", op_export,
+      "export", "Moves a symbol into a modules' list of exported symbols",
+      op_export,
       type::Fn::with_all({new type::Module, new type::Symbol}, nullptr,
                          new type::Module),
       true);

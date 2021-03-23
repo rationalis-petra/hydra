@@ -330,13 +330,13 @@ Operator *op::read;
 Operator *op::set_mac_char;
 
 void op::initialize_read() {
-  op::read = new InbuiltOperator(
+  op::read = new InbuiltOperator("read",
       "Takes a string or input stream, and returns a hydra expression.\n"
       "Programmable via set-macro-character",
       // type (Union Input-stream String)
       op_read, type::Fn::with_args({new type::Any}), true);
 
-  op::set_mac_char = new InbuiltOperator(
+  op::set_mac_char = new InbuiltOperator("set-macro-character",
       "Updates the readtable entry for the character (first argument)\n"
       "to point to the provided function (second argumetn)",
       op_set_mac_char, type::Fn::with_args({type::character_type, new type::Fn}),

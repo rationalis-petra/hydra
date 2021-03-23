@@ -1,5 +1,5 @@
-#include <string>
 #include <list>
+#include <string>
 
 #include "ffi.h"
 #include "ltdl.h"
@@ -13,8 +13,8 @@ using std::to_string;
 
 using namespace expr;
 
-Object *op_foreign_lib(list<Object*> arg_list, LocalRuntime &r,
-                                   LexicalScope &s) {
+Object *op_foreign_lib(list<Object *> arg_list, LocalRuntime &r,
+                       LexicalScope &s) {
   if (arg_list.size() != 1) {
     string err =
         "Incorrect number of arguments provided to function load-foreign-lib";
@@ -39,8 +39,8 @@ Object *op_foreign_lib(list<Object*> arg_list, LocalRuntime &r,
   }
 }
 
-
-Object *op_foreign_sym(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+Object *op_foreign_sym(list<Object *> arg_list, LocalRuntime &r,
+                       LexicalScope &s) {
   if (arg_list.size() != 2) {
     string err =
         "Incorrect number of arguments provided to function get-foreign-symbol";
@@ -66,10 +66,9 @@ Object *op_foreign_sym(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s)
   }
 }
 
-
-
 // define-foreign-function
-Object *op_internalize(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
+Object *op_internalize(list<Object *> arg_list, LocalRuntime &r,
+                       LexicalScope &s) {
   if (arg_list.size() != 2) {
     string err =
         "Expected 2 arguments when internalizing foreign symbol, got + " +
@@ -87,7 +86,6 @@ Object *op_internalize(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s)
     string err = "yo, idiot, fix the type-parsing to internalize!";
     throw err;
   }
-
 
   // for now, we assume we're creating a function
   ForeignOperator *op = new ForeignOperator();
@@ -112,7 +110,6 @@ Object *op_internalize(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s)
     }
     arglst = cell->cdr;
   }
-
 
   // arg_list[0] = foreign symbol
   // create a foreign function given a symbol and a type list
@@ -139,8 +136,7 @@ Object *op_internalize(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s)
   }
 
   Object *return_type =
-      dynamic_cast<Cons *>(dynamic_cast<Cons *>(type->cdr)->cdr)
-          ->car;
+      dynamic_cast<Cons *>(dynamic_cast<Cons *>(type->cdr)->cdr)->car;
   Symbol *return_sym = dynamic_cast<Symbol *>(return_type);
   if (return_sym == nullptr) {
     string err = "no return type provided!";
@@ -167,8 +163,8 @@ Object *op_internalize(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s)
 
   // TODO: what is ffi_default_abi??
   // now call function
-  if (ffi_prep_cif(&(op->fn_def), FFI_DEFAULT_ABI, op->arg_types.size(), rettype,
-                   arg_types) == FFI_OK) {
+  if (ffi_prep_cif(&(op->fn_def), FFI_DEFAULT_ABI, op->arg_types.size(),
+                   rettype, arg_types) == FFI_OK) {
     return op;
   } else {
     return nil::get();
@@ -179,16 +175,17 @@ Operator *op::foreign_lib;
 Operator *op::foreign_sym;
 Operator *op::internalize;
 
-
 void op::initialize_foreign() {
 
   op::foreign_lib = new InbuiltOperator(
+      "foreign-lib",
       "takes a string and tries to open the "
       "corresponding\n shared object (.so) or"
       "dynamic link library (.dll) file",
       op_foreign_lib, type::Fn::with_args({type::string_type}), true);
 
   op::foreign_sym = new InbuiltOperator(
+      "foreign-sym",
       "Takes a string and a foreign library, and"
       "will find the\n foreign symbol whose name"
       "matches this string in the library",
@@ -196,6 +193,7 @@ void op::initialize_foreign() {
       true);
 
   op::internalize = new InbuiltOperator(
+      "internalize",
       "Takes a foreign symbol and a type declaration"
       "and returns a hydra\n value that can be used"
       "to access the symbol",

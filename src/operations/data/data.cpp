@@ -1,5 +1,5 @@
-#include <list>
 #include "utils.hpp"
+#include <list>
 
 #include "expressions.hpp"
 #include "operations.hpp"
@@ -38,8 +38,8 @@ Object *op_cdr(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   if (Cons *cons = dynamic_cast<Cons *>(arg_list.front())) {
     return cons->cdr;
   } else {
-    string err =
-      "Non-cons argument provided to cdr: " + hydra_to_string(arg_list.front(), r, s);
+    string err = "Non-cons argument provided to cdr: " +
+                 hydra_to_string(arg_list.front(), r, s);
     throw err;
   }
 }
@@ -53,8 +53,8 @@ Object *op_car(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   if (Cons *cons = dynamic_cast<Cons *>(arg_list.front())) {
     return cons->car;
   } else {
-    string err =
-      "Non-cons argument provided to car: " + hydra_to_string(arg_list.front(), r, s);
+    string err = "Non-cons argument provided to car: " +
+                 hydra_to_string(arg_list.front(), r, s);
     throw err;
   }
 }
@@ -80,21 +80,22 @@ Operator *op::cons_eq;
 
 void op::initialize_cons() {
   op::mk_cons =
-      new InbuiltOperator("Creates a new cons cell and places the first "
+      new InbuiltOperator("cons",
+                          "Creates a new cons cell and places the first "
                           "argument in the car,\n the second in the cdr."
                           "Will fail if the second is not cons or nil",
                           op_cons,
                           type::Fn::with_all({new type::Any, new type::Any},
                                              new type::Any, new type::Cons),
                           true);
-  op::cdr =
-      new InbuiltOperator("Takes a cons cell as input, and returns the cdr",
-                          op_cdr, type::Fn::with_args({new type::Cons}), true);
+  op::cdr = new InbuiltOperator(
+      "cdr", "Takes a cons cell as input, and returns the cdr", op_cdr,
+      type::Fn::with_args({new type::Cons}), true);
 
-  op::car =
-      new InbuiltOperator("Takes a cons cell as input, and returns the car",
-                          op_car, type::Fn::with_args({new type::Cons}), true);
+  op::car = new InbuiltOperator(
+      "car", "Takes a cons cell as input, and returns the car", op_car,
+      type::Fn::with_args({new type::Cons}), true);
   op::cons_eq = new InbuiltOperator(
-      "Equality test for Conses", op_cons_eq,
+      "cons =", "Equality test for Conses", op_cons_eq,
       type::Fn::with_args({new type::Cons, new type::Cons}), true);
 }

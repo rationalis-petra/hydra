@@ -14,8 +14,8 @@ Object *op_obj_get(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   try {
     return obj->slots.at(sym);
   } catch (std::out_of_range &e) {
-    string err =
-      "Attempt to get non-existent slot in object: " + hydra_to_string(sym, r, s);
+    string err = "Attempt to get non-existent slot in object: " +
+                 hydra_to_string(sym, r, s);
     throw err;
   }
 }
@@ -94,27 +94,27 @@ Operator *op::obj_pset;
 void op::initialize_user_obj() {
 
   op::obj_get = new InbuiltOperator(
-      "Get a slot from an object", op_obj_get,
+      "get", "Get a slot from an object", op_obj_get,
       type::Fn::with_args({new type::Any, new type::Symbol}), true);
   op::mk_obj = new InbuiltOperator(
-      "Create a new object", op_mk_object,
+      "obj", "Create a new object", op_mk_object,
       type::Fn::with_all(
           {}, new type::Tuple({new type::Symbol, new type::Any, new type::Any}),
           new type::Any),
       true);
   op::obj_set = new InbuiltOperator(
-      "Set a particular slot in an object to a vlue", op_obj_set,
+      "set", "Set a particular slot in an object to a vlue", op_obj_set,
       type::Fn::with_args({new type::Any, new type::Symbol, new type::Any}),
       true);
   op::clone =
-      new InbuiltOperator("Derives an object from the provided object",
+      new InbuiltOperator("clone", "Derives an object from the provided object",
                           op_clone, type::Fn::with_rest(new type::Any), true);
 
   op::obj_eq = new InbuiltOperator(
-      "Equality test for Objects", op_obj_eq,
+      "object =", "Equality test for Objects", op_obj_eq,
       type::Fn::with_args({new type::Any, new type::Any}), true);
 
   op::obj_pset = new InbuiltOperator(
-      "Sets provided slot to a parent slot", op_obj_eq,
+      "parent-set", "Sets provided slot to a parent slot", op_obj_eq,
       type::Fn::with_args({new type::Symbol, new type::Any}), true);
 }

@@ -24,12 +24,12 @@ Object *op_plus(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_minus(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Integer *out = new Integer(0);
-  out->value = get_inbuilt<Integer*>(arg_list.front())->value;
+  out->value = get_inbuilt<Integer *>(arg_list.front())->value;
   Object::roots.remove(arg_list.front());
   arg_list.pop_front();
 
   for (Object *arg : arg_list) {
-    Integer *num = get_inbuilt<Integer*>(arg);
+    Integer *num = get_inbuilt<Integer *>(arg);
     out->value -= num->value;
     Object::roots.remove(arg);
   }
@@ -86,16 +86,17 @@ Object *op_int_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-GenericFn* op::plus;
-GenericFn* op::minus;
-GenericFn* op::multiply;
-GenericFn* op::divide;
-GenericFn* op::greater;
-GenericFn* op::equal;
+GenericFn *op::plus;
+GenericFn *op::minus;
+GenericFn *op::multiply;
+GenericFn *op::divide;
+GenericFn *op::greater;
+GenericFn *op::equal;
 
 void op::mk_arithmetic() {
 
   Operator *in_op_plus = new InbuiltOperator(
+      "Integer +",
       "Returns the sum of its arguemnts. When "
       "provided with no arguments, returns 0",
       op_plus, type::Fn::with_rest(type::integer_type), true);
@@ -104,20 +105,20 @@ void op::mk_arithmetic() {
   op::plus->add(in_op_plus);
   plus->type->rest_type = new type::Any;
 
-  Operator* in_op_minus = new InbuiltOperator(
+  Operator *in_op_minus = new InbuiltOperator(
+      "Integer -",
       "Subtract the second and all subsequent"
       "arguments from the first",
       op_minus,
-      type::Fn::with_all({type::integer_type,
-                          type::integer_type},
-                          type::integer_type,
-                          type::integer_type),
+      type::Fn::with_all({type::integer_type, type::integer_type},
+                         type::integer_type, type::integer_type),
       true);
   op::minus = new GenericFn;
   op::minus->type->rest_type = new type::Any;
   op::minus->add(in_op_minus);
 
-  Operator* in_op_multiply = new InbuiltOperator(
+  Operator *in_op_multiply = new InbuiltOperator(
+      "Integer *",
       "Returns the product of all its arguments,\n or "
       "one if no arguments provided",
       op_multiply, type::Fn::with_rest(new type::Derives(Integer::parent)),
@@ -126,24 +127,22 @@ void op::mk_arithmetic() {
   op::multiply->type->rest_type = new type::Any;
   op::multiply->add(in_op_multiply);
 
-  Operator* in_op_divide = new InbuiltOperator(
+  Operator *in_op_divide = new InbuiltOperator(
+      "Integer /",
       "Divides the first argument by the second and all subsequent arguments",
       op_divide,
-      type::Fn::with_all({type::integer_type,
-                          type::integer_type},
-                          type::integer_type,
-                          type::integer_type),
+      type::Fn::with_all({type::integer_type, type::integer_type},
+                         type::integer_type, type::integer_type),
       true);
   op::divide = new GenericFn;
   op::divide->type->rest_type = new type::Any;
   op::divide->add(in_op_divide);
 
-  Operator* in_op_int_gr = new InbuiltOperator(
+  Operator *in_op_int_gr = new InbuiltOperator(
+      "Integer >",
       "Returns t iff the first argument is greater "
       "than the second, and nil otherwise",
-      op_int_gr,
-      type::Fn::with_args({type::integer_type,
-                           type::integer_type}),
+      op_int_gr, type::Fn::with_args({type::integer_type, type::integer_type}),
       true);
   op::greater = new GenericFn;
   op::greater->type->arg_list.push_back(new type::Any);
@@ -151,7 +150,7 @@ void op::mk_arithmetic() {
   op::greater->add(in_op_int_gr);
 
   Operator *in_op_int_eq = new InbuiltOperator(
-      "Equality for Integers", op_int_eq,
+      "Integer =", "Equality for Integers", op_int_eq,
       type::Fn::with_args({type::integer_type, type::integer_type}), true);
 
   op::equal = new GenericFn;
