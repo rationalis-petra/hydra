@@ -6,7 +6,7 @@ A [wiki](https://github.com/rationalis-petra/hydra/wiki) is available, but every
 If you are looking at the source-code, the [readme-source](README_SOURCE.md) should help, being as there are relatively few comments.
 
 ## Syntax
-Hydra syntax is extremely simple - the general form of a program is =(operation-to-perform value-1 value-2 ...)=. For example, and if statement:
+Hydra syntax is extremely simple - the general form of a program is `(operation-to-perform value-1 value-2 ...)`. For example, and if statement:
 ```
 (if (>= 1 3)
     "One is bigger"
@@ -72,6 +72,7 @@ Then, depending on your os:
 cmake .. -G "Visual Studio 16"
 cmake --build . --config Release
 ```
+The `--config Release` is very important - some debug flags will prevent certain parts of the lanugage from working correctly!
 Note: if you want to use g++ on windows, use `conan install .. --settings compiler="gcc"`, and `cmake .. -G "MinGw Makefiles"`
 ```sh
 (linux, osx)
