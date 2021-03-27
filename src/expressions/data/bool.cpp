@@ -2,10 +2,12 @@
 #include <typeinfo>
 
 #include "expressions.hpp"
+#include "interpreter.hpp"
 
-using namespace std;
 using namespace expr;
+using namespace interp;
 
+using std::string;
 
 void t::mark_node() {
   Object::mark_node();
@@ -16,7 +18,7 @@ t::t() {}
 t* t::get() {
   if (singleton == nullptr) {
     singleton = new t;
-    roots.insert(singleton);
+    collector->insert_root(singleton);
   }
   return singleton;
 }
@@ -33,7 +35,7 @@ nil* nil::singleton = nullptr;
 nil* nil::get() {
   if (singleton == nullptr) {
     singleton = new nil;
-    roots.insert(singleton);
+    collector->insert_root(singleton);
   }
   return singleton;
 }

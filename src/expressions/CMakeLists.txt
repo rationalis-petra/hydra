@@ -10,12 +10,8 @@ add_library(expressions OBJECT
                         data/vector.cpp
                         data/parent.cpp
 
-                        runtime.cpp
-                        lexical_scope.cpp
-
                         concurrency.cpp
                         object.cpp
-                        user_object.cpp
                         oper.cpp
                         genericfn.cpp
                         handler.cpp

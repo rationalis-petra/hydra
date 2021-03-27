@@ -8,6 +8,7 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
 
 Object *make_list(list<Object *> objects) {
   if (objects.size() == 1) {

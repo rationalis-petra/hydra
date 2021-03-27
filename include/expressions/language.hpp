@@ -5,6 +5,7 @@
 #include <set>
 #include <string>
 
+#include "interpreter/runtime.hpp"
 #include "object.hpp"
 
 namespace expr {
@@ -18,7 +19,7 @@ struct Module : public Object {
 
   Module();
   Module(std::string name);
-  std::string to_string(LocalRuntime &r, LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   std::map<std::string, Symbol *> symbols;
   std::map<std::string, Symbol *> exported_symbols;
 
@@ -41,20 +42,20 @@ struct Symbol : public Object {
   // std::list<hydra_module*> modules;
 
   Symbol(std::string name);
-  std::string to_string(LocalRuntime &r, LexicalScope& s);
-  Object *eval(LocalRuntime &r, LexicalScope &s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
+  Object *eval(interp::LocalRuntime &r, interp::LexicalScope &s);
 };
 
 struct Pattern : public Object {
   virtual void mark_node();
-  std::string to_string(LocalRuntime &r, LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
 
   Object* match(Object* o);
-  Object *eval(LocalRuntime &r, LexicalScope &s);
+  Object *eval(interp::LocalRuntime &r, interp::LexicalScope &s);
 };
 
 struct Ref : public Object {
-  std::string to_string(LocalRuntime &r, LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   virtual void mark_node();
 
   Object *ptr;

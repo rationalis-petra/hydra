@@ -1,6 +1,6 @@
 
-#ifndef __HYDRA_EXPRESSIONS_EXCEPTION_HPP
-#define __HYDRA_EXPRESSIONS_EXCEPTION_HPP
+#ifndef __HYDRA_INTERPRETER_EXCEPTION_HPP
+#define __HYDRA_INTERPRETER_EXCEPTION_HPP
 
 #include <exception>
 
@@ -10,9 +10,10 @@
 #include "ltdl.h"
 #include "ffi.h"
 
-#include "types.hpp"
-#include "object.hpp"
-#include "handler.hpp"
+#include "expressions/object.hpp"
+#include "expressions/handler.hpp"
+
+namespace interp {
 
 // A Control exception is intended to pass control flow
 // to a higher-level function, usually when some error 
@@ -25,10 +26,8 @@ struct TooFewException : public TypeCheckException {};
 struct TooManyException : public TypeCheckException {};
 
 
-
 // Here, we defined exceptions that are accessible from 
 // within the language
-namespace expr {
 
 struct InternalException : public expr::Object {
 };
@@ -37,6 +36,7 @@ struct InterpreterError : public expr::Object {
   InterpreterError(std::string msg);
 };
 
-} // namespace expr
+}
+
 
 #endif

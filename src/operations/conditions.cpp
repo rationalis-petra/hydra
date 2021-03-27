@@ -9,6 +9,7 @@ using std::string;
 using type::hydra_cast;
 
 using namespace expr;
+using namespace interp;
 
 // HANDLING CONDITIONS
 Object *op_handler_catch(list<Object *> arg_list, LocalRuntime &r,
@@ -20,7 +21,7 @@ Object *op_handler_catch(list<Object *> arg_list, LocalRuntime &r,
     r.handlers.push_front(new case_handler);
     Object *out = arg_list.front()->eval(r, s);
     for (Object *v : arg_list) {
-      Object::roots.remove(v);
+      Object::collector->remove_root(v);
     }
     r.handlers.pop_front();
     return out;
@@ -38,15 +39,15 @@ Object *op_handler_catch(list<Object *> arg_list, LocalRuntime &r,
       Object *fst = dynamic_cast<Cons *>(o)->car;
       Object *ty = hydra_cast<Cons>(fst)->car;
       type::Type *t = dynamic_cast<type::Type *>(ty->eval(r, s));
-      Object::roots.insert(t);
+      Object::collector->insert_root(t);
 
       if (!t->check_type(exc->obj)->null()) {
         delete exc;
         Object *out =
             dynamic_cast<Cons *>(dynamic_cast<Cons *>(o)->cdr)->car->eval(r, s);
-        Object::roots.remove(t);
+        Object::collector->remove_root(t);
         for (Object *v : arg_list) {
-          Object::roots.remove(v);
+          Object::collector->remove_root(v);
         }
         return out;
       }
@@ -70,7 +71,7 @@ Object *op_handler_bind(list<Object *> arg_list, LocalRuntime &r,
 
     r.handlers.pop_front();
     for (Object *v : arg_list) {
-      Object::roots.remove(v);
+      Object::collector->remove_root(v);
     }
     return out;
   } catch (hydra_exception *e) {
@@ -79,7 +80,7 @@ Object *op_handler_bind(list<Object *> arg_list, LocalRuntime &r,
       r.handlers.pop_front();
     }
     for (Object *v : arg_list) {
-      Object::roots.remove(v);
+      Object::collector->remove_root(v);
     }
     throw e;
   }

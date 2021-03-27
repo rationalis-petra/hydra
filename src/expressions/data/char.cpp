@@ -2,7 +2,9 @@
 #include <typeinfo>
 
 #include "expressions.hpp"
+#include "interpreter.hpp"
 
+using namespace interp;
 using namespace std;
 using namespace expr;
 

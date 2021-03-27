@@ -7,6 +7,7 @@
 using std::string;
 using std::list;
 using namespace expr;
+using namespace interp;
 
 // LIBRARIES
 ForeignLib::ForeignLib(lt_dlhandle _lib) : lib(_lib){}

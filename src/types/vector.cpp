@@ -1,7 +1,10 @@
 #include <string>
 
 #include "expressions.hpp"
+#include "interpreter.hpp"
 #include "types.hpp"
+
+using namespace interp;
 
 using std::string;
 
@@ -29,7 +32,7 @@ void Vector::mark_node() {
   type_elt->mark_node();
 }
 
-string Vector::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Vector::to_string(LocalRuntime &r, LexicalScope &s) {
   return "type Vector";
 }
 

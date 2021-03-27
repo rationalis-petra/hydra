@@ -8,6 +8,7 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_mk_thread(list<Object*> arg_list, LocalRuntime &r, LexicalScope& s) {
   Operator* op = dynamic_cast<Operator*>(arg_list.front());

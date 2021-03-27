@@ -13,6 +13,8 @@ using expr::Object;
 using type::Mac;
 using type::Type;
 
+using namespace interp;
+
 void Mac::mark_node() {
   if (marked) return;
   Object::mark_node();
@@ -34,7 +36,7 @@ void Mac::mark_node() {
 }
 
 
-std::string Mac::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+std::string Mac::to_string(LocalRuntime &r, LexicalScope &s) {
   //return string("{type (") + ") -> " + return_type->to_string() + "}";
   string str = "fn (";
   bool once = false;

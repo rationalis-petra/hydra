@@ -7,6 +7,7 @@
 using std::string;
 
 using namespace type;
+using namespace interp;
 
 expr::Object* Type::equal(Type* other) {
   if (this == other) {
@@ -20,7 +21,7 @@ void MetaType::mark_node() {
   Object::mark_node();
 }
 
-string MetaType::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string MetaType::to_string(LocalRuntime &r, LexicalScope &s) {
   return "Type";
 }
 
@@ -44,7 +45,7 @@ void MetaConstructor::mark_node() {
   Object::mark_node();
 }
 
-string MetaConstructor::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string MetaConstructor::to_string(LocalRuntime &r, LexicalScope &s) {
   return "{Type Constructor}";
 }
 

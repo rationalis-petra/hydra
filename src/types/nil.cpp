@@ -6,12 +6,13 @@
 using std::string;
 
 using namespace type;
+using namespace interp;
 
 void Nil::mark_node() {
   Object::mark_node();
 }
 
-string Nil::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Nil::to_string(LocalRuntime &r, LexicalScope &s) {
   return "Nil";
 }
 

@@ -12,6 +12,8 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
+
 string Operator::to_string(LocalRuntime &r, LexicalScope &s) {
   return "<inbuilt operation>";
 }
@@ -45,13 +47,13 @@ list<Object *> Operator::get_arg_list(Object *arg_list, LocalRuntime &r,
   if (is_fn) {
     for (Object* arg : alist) {
       out_list.push_back(arg->eval(r, s));
-      Object::roots.insert(out_list.back());
+      Object::collector->insert_root(out_list.back());
     }
   } else {
     out_list = alist;
     // TODO: make me able to remove this!!
     for (Object* arg : alist) {
-      Object::roots.insert(arg);
+      Object::collector->insert_root(arg);
     }
   }
   try {

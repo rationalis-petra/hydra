@@ -2,15 +2,18 @@
 
 // the garbage collector for the language
 using namespace expr;
+using namespace interp;
 
 using std::string;
 using std::list;
+using std::mutex;
+using std::unique_lock;
 
-void mark() {
+void mark(STWCollector& coll) {
   // mark all objects accessible from the root and active module
-  Object::r.root->mark_node();
+  coll.r.root->mark_node();
 
-  for (LocalRuntime* loc : Object::r.local_runtimes) {
+  for (LocalRuntime* loc : coll.r.local_runtimes) {
     loc->active_module->mark_node();
     for (auto o : loc->restarts) {
       o->mark_node();
@@ -18,13 +21,13 @@ void mark() {
   }
 
   // also, mark everything accessible via a lexical context
-  for (LexicalScope* s : Object::context_list) {
+  for (LexicalScope* s : coll.context_list) {
     for (auto o : s->map) {
       o.first->mark_node();
       o.second->mark_node();
     }
   }
-  for (auto o : Object::roots.data) {
+  for (auto o : coll.roots.data) {
     o.first->mark_node();
   }
 
@@ -32,9 +35,9 @@ void mark() {
   nil::get()->mark_node();
 }
 
-void sweep() {
+void sweep(STWCollector& coll) {
   list<Object*> new_list;
-  for (Object* obj : Object::node_list) {
+  for (Object* obj : coll.node_list) {
     if (!obj->marked) {
       delete obj;
     }
@@ -43,11 +46,12 @@ void sweep() {
       new_list.push_front(obj);
     }
   }
-  Object::node_list = new_list;
+  coll.node_list = new_list;
 }
 
-void Object::collect_garbage(LocalRuntime& r) {
-  Runtime& runtime = Object::r;
+
+void STWCollector::collect_garbage(LocalRuntime& r) {
+  Runtime& runtime = r.r;
 
   // counter is atomic, is all good :)
   if (counter > 10000) {
@@ -85,11 +89,10 @@ void Object::collect_garbage(LocalRuntime& r) {
         }
       }
 
-
       counter = 0;
 
-      mark();
-      sweep();
+      mark(*this);
+      sweep(*this);
 
       // get the lock and tell all threads that they can continue as normal
       std::unique_lock<std::mutex> finlck(runtime.finished_mutex);
@@ -98,3 +101,35 @@ void Object::collect_garbage(LocalRuntime& r) {
   } 
 }
 
+void STWCollector::register_node(expr::Object *obj) {
+  node_list_mutex.lock();
+  node_list.push_front(obj);
+  node_list_mutex.unlock();
+}
+
+void STWCollector::register_context(LexicalScope *s) {
+  unique_lock<mutex> lck(context_mutex);
+  context_list.push_front(s);
+  lck.unlock();
+}
+
+void STWCollector::remove_context(LexicalScope *s) {
+  unique_lock<mutex> lck(context_mutex);
+  context_list.remove(s);
+  lck.unlock();
+}
+
+void STWCollector::insert_root(Object *obj) {
+  unique_lock<mutex> lck(root_mutex);
+  roots.insert(obj);
+  lck.unlock();
+}
+
+void STWCollector::remove_root(Object *obj) {
+  unique_lock<mutex> lck(root_mutex);
+  roots.remove(obj);
+  lck.unlock();
+}
+
+
+STWCollector::STWCollector(Runtime& _r) : r(_r) {}

@@ -6,12 +6,13 @@
 using std::string;
 
 using namespace type;
+using namespace interp;
 
 void Any::mark_node() {
   Object::mark_node();
 }
 
-string Any::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Any::to_string(LocalRuntime &r, LexicalScope &s) {
   return "Any";
 }
 

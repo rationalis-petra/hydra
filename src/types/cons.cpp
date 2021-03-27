@@ -8,6 +8,7 @@
 using std::string;
 
 using namespace type;
+using namespace interp;
 
 Cons::Cons() {
   type_car = new Any;
@@ -28,7 +29,7 @@ void Cons::mark_node() {
   type_cdr->mark_node();
 }
 
-string Cons::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Cons::to_string(LocalRuntime &r, LexicalScope &s) {
   return "Cons";
 }
 

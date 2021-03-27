@@ -11,10 +11,11 @@
 #include "utils.hpp"
 
 using namespace std;
+using namespace interp;
+using namespace expr;
 
 extern string lang;
 
-using namespace expr;
 Module *expr::language_module;
 Module *expr::keyword_module;
 Module *expr::core_module;
@@ -33,19 +34,23 @@ vector<pair<string, Object *>> concurrent;
 // net
 // concurrent / parallel
 
-Runtime& g = Object::r;
+
+Runtime g;
 LocalRuntime r(g);
 
 Object *read(Istream *istm);
 void make_modules();
 
 int main(int argc, char **argv) {
+  Object::collector = new STWCollector(g);
+
   Integer::parent = new Parent("Integer parent");
   HString::parent = new Parent("String parent");
   Cons::parent = new Parent("Cons parent");
   Tuple::parent = new Parent("Tuple parent");
   Char::parent = new Parent("Char parent");
   Union::parent = new Parent("Union parent");
+  //Mirror::parent = new Parent("Mirror parent");
 
   g.root = new Module("");
   language_module = new Module("hydra");
@@ -150,13 +155,13 @@ int main(int argc, char **argv) {
     try {
       cout << r.active_module->name << "> ";
       ast = read(stm);
-      Object::roots.insert(ast);
+      Object::collector->insert_root(ast);
       out = ast->eval(r, s);
       cout << "* ";
       op::print->call({out}, r, s);
       cout << endl;
-      Object::roots.remove(ast);
-      Object::collect_garbage(r);
+      Object::collector->remove_root(ast);
+      Object::collector->collect_garbage(r);
     } catch (hydra_exception *e) {
       cout << "Caught exception at top level!" << endl;
       cout << hydra_to_string(e->obj, r, s) << endl;
@@ -167,13 +172,6 @@ int main(int argc, char **argv) {
     }
 
     getline(cin, in);
-  }
-
-  cout << Object::node_list.size() << endl;
-  for (Object *obj : Object::node_list) {
-    LexicalScope s;
-    cout << hydra_to_string(obj, r, s) << endl;
-    delete obj;
   }
   return 0;
 }

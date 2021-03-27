@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace expr;
+using namespace interp;
 
 void threadstart(Operator* op, std::list<Object*> args, LocalRuntime* r, LexicalScope* s) {
   op->call(args, *r, *s);

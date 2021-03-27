@@ -7,6 +7,7 @@
 using std::string;
 
 using namespace type;
+using namespace interp;
 
 List::List() {
   elt_type = new Any();
@@ -18,7 +19,7 @@ void List::mark_node() {
   elt_type->mark_node();
 }
 
-string List::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string List::to_string(LocalRuntime &r, LexicalScope &s) {
   return "{List " + hydra_to_string(elt_type, r, s) + "}";
 }
 

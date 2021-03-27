@@ -16,6 +16,7 @@ Type *type::string_type;
 Type *type::istream_type;
 Type *type::ostream_type;
 Type *type::iostream_type;
+Type *type::mirror_type;
 Type *type::meta_type;
 
 void type::initialize_types() {
@@ -29,4 +30,5 @@ void type::initialize_types() {
   // type::ostream_type = new Derives(expr::OStream::parent);
   //type::iostream_type = new Derives();
   //type::meta_type = new Derives(Type::parent);
+  //type::mirror_type = new Derives(expr::Mirror::parent);
 }

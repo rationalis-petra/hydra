@@ -14,10 +14,10 @@ struct condition_handler {
 };
 
 struct bind_handler : public condition_handler {
-  bind_handler(std::list<Object*>, LocalRuntime& r, LexicalScope &s);
+  bind_handler(std::list<Object*>, interp::LocalRuntime& r, interp::LexicalScope &s);
 
-  LocalRuntime& r;
-  LexicalScope& s;
+  interp::LocalRuntime& r;
+  interp::LexicalScope& s;
   std::list<Object*> handling_code;
   Object* handle(Object* condition);
 };
@@ -31,7 +31,7 @@ struct hydra_restart : public Operator {
   hydra_restart(Operator* o, Symbol* s);
   void mark_node();
 
-  Object *call(std::list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool macexpand = false);
+  Object *call(std::list<Object*> arg_list, interp::LocalRuntime &r, interp::LexicalScope &s, bool macexpand = false);
   Operator* op;
   Symbol* sym;
 };
@@ -58,7 +58,7 @@ struct hydra_exception {
   // data for RESTART_CALL
   hydra_restart *res;
   std::list<Object *> args;
-  LexicalScope *s;
+  interp::LexicalScope *s;
 };
 
 }

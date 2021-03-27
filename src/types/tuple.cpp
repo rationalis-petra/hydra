@@ -9,6 +9,7 @@ using std::string;
 using std::list;
 
 using namespace type;
+using namespace interp;
 
 Tuple::Tuple() {
   invoker = op::mk_tuple_type;
@@ -27,7 +28,7 @@ void Tuple::mark_node() {
   }
 }
 
-string Tuple::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Tuple::to_string(LocalRuntime &r, LexicalScope &s) {
   string str =  "{Tuple";
   for (Type* t : types) {
     str += " " + hydra_to_string(t, r, s);
@@ -73,7 +74,7 @@ expr::Object *Tuple::subtype(Type * ty) {
   }
 }
 
-expr::Object* op_mk_tuple(list<expr::Object*> lst, expr::LocalRuntime &r, expr::LexicalScope& s) {
+expr::Object* op_mk_tuple(list<expr::Object*> lst, LocalRuntime &r, LexicalScope& s) {
   Tuple* tup = new Tuple;
   for (expr::Object* obj : lst) {
     if (Type *t = dynamic_cast<Type*>(obj)) {

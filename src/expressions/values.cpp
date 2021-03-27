@@ -7,6 +7,7 @@ using std::string;
 using std::to_string;
 
 using namespace expr;
+using namespace interp;
 
 // INPUT STREAM
 void Istream::mark_node() {

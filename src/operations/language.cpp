@@ -10,24 +10,25 @@ using std::string;
 using type::hydra_cast;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_if(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   for (Object *v : arg_list)
-    Object::roots.remove(v);
+    Object::collector->remove_root(v);
 
   Object *condition = arg_list.front()->eval(r, s);
-  Object::roots.insert(condition);
+  Object::collector->insert_root(condition);
   arg_list.pop_front();
   // is nil?
   if (condition->null()) {
     Object *out = arg_list.back()->eval(r, s);
-    Object::roots.remove(condition);
+    Object::collector->remove_root(condition);
     return out;
   }
   // otherwise
   Object *out = arg_list.front()->eval(r, s);
-  Object::roots.remove(condition);
+  Object::collector->remove_root(condition);
   return out;
 }
 
@@ -45,7 +46,7 @@ Object *op_while(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     }
   }
   for (Object *v : arg_list) {
-    Object::roots.remove(v);
+    Object::collector->remove_root(v);
   }
   // otherwise
   return out;
@@ -135,9 +136,7 @@ Object *op_progn(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 }
 
 Object *op_exit(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-  for (Object *obj : Object::node_list) {
-    delete obj;
-  }
+  //Object::collector->exit_cleanup();
   exit(0);
 }
 

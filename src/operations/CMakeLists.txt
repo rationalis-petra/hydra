@@ -6,6 +6,7 @@ add_library(operations OBJECT
                        data/vector.cpp
                        data/adt.cpp
 
+                       mirror.cpp
                        arithmetic.cpp
                        operator.cpp
                        conditions.cpp

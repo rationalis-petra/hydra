@@ -6,60 +6,51 @@
 #include <set>
 #include <map>
 
-#include "expressions/runtime.hpp"
+#include "interpreter/garbage.hpp"
+#include "interpreter/runtime.hpp"
 
 namespace expr {
 
-struct Object;
 struct Operator;
 
-struct hydra_roots {
-public:
-  void remove(Object* obj);
-  void insert(Object* obj);
-  std::map<Object*, unsigned long> data;
-};
-
 struct Object {
-  //HString docstring;
-
-  std::set<Symbol*> parents;
-  std::map<Symbol*, Object*> slots;
-  Operator* invoker;
-
-  virtual bool null() const;
-  virtual std::string to_string(LocalRuntime &r, LexicalScope &s) = 0;
-  virtual Object* eval(LocalRuntime& r, LexicalScope& s);
-  Object* derive_check(std::set<Object*> ptypes);
+  // CREATION & DELETION
   Object();
   virtual ~Object();
 
-
-  // mark & sweep garbage collection
-  // local variables/functions
+  // GARBAGE COLLECTION
   bool marked;
   virtual void mark_node();
-  //virtual Object* clone() const = 0;
+  static interp::GarbageCollector* collector;
 
-  // self-explanatory
-  static void collect_garbage(LocalRuntime& r);
+  std::set<Symbol*> parents;
+  std::map<Symbol*, Object*> slots;
+  std::map<Symbol*, Object*> metadata;
+  Operator* invoker;
 
-  // A global Runtime
-  static Runtime r;
-  // how many objects exist?
-  static std::atomic<unsigned long> counter;
-  // number of objects after most recent collection
-  static unsigned long last;
-  // The list of all hydra objects
-  static std::list<Object*> node_list; 
-  // The list of root hydra objects - these are objects
-  // which should not be deleted for reasons 'outside'
-  // also a mutex to prevent concurrent access
-  static hydra_roots roots; 
-  static std::mutex root_mutex;
-  // the list of all lexical contexts
-  static std::list<LexicalScope*> context_list; 
-  static std::mutex context_mutex;
+  // STANDARD FUNCTIONS
+  virtual bool null() const;
+  virtual std::string to_string(interp::LocalRuntime &r, interp::LexicalScope &s);
+  virtual Object* eval(interp::LocalRuntime& r, interp::LexicalScope& s);
+
+  // TYPING
+  Object* derive_check(std::set<Object*> ptypes);
+
+  // REFLECTION
+  // the "get" and "set" functions provide hooks that mirror objects 
+  // can use to access the object's slots, and 
+  // virtual Object* mirror(interp::LocalRuntime &r, interp::LexicalScope &s);
+  // virtual Object* get_slots(interp::LocalRuntime &r, interp::LexicalScope &s);
+  // virtual Object* get_slot_value(interp::LocalRuntime &r, interp::LexicalScope &s);
+  // virtual Object* set_slot_value(interp::LocalRuntime &r, interp::LexicalScope &s);
+  // virtual Object* delete_slot(interp::LocalRuntime &r, interp::LexicalScope &s);
+
+  // virtual Object* get_meta(interp::LocalRuntime &r, interp::LexicalScope &s);
+  // virtual Object* get_meta_value(interp::LocalRuntime &r, interp::LexicalScope &s);
+  // virtual Object* set_meta_value(interp::LocalRuntime &r, interp::LexicalScope &s);
+  // virtual Object* delete_meta(interp::LocalRuntime &r, interp::LexicalScope &s);
+  
+
 };
 
 }

@@ -1,10 +1,12 @@
 #include "expressions.hpp"
 #include <iostream>
+#include <types.hpp>
 
 using namespace expr;
+using namespace interp;
+
 using std::string;
 
-#include <types.hpp>
 
 void Symbol::mark_node() {
   if (marked) return;

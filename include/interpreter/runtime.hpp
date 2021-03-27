@@ -10,23 +10,34 @@
 #include <condition_variable>
 
 namespace expr {
+  struct Object;
+  struct Module;
+  struct Operator;
+  struct Symbol;
+  
+  struct condition_handler;
+  struct hydra_restart;
+  
+} // namespace expr
 
-struct Object;
-struct Module;
-struct Operator;
-struct Symbol;
+namespace interp {
 
-struct condition_handler;
-struct hydra_restart;
+struct GarbageRoots {
+
+public:
+  void remove(expr::Object* obj);
+  void insert(expr::Object* obj);
+  std::unordered_map<expr::Object*, unsigned long> data;
+};
 
 struct LocalRuntime;
 
 struct Runtime {
-  Module* root;
+  expr::Module* root;
   // the set of all active threads and associated lock
   std::set<std::thread> thread_pool;
 
-  std::unordered_map<char, Operator*> readtable;
+  std::unordered_map<char, expr::Operator*> readtable;
   std::vector<LocalRuntime*> local_runtimes;
 
   // this is for the garbage collector. for more details,
@@ -42,20 +53,22 @@ struct Runtime {
 struct LocalRuntime {
   LocalRuntime(Runtime& r);
   Runtime& r;
-  std::list<condition_handler*> handlers;
-  std::list<hydra_restart*> restarts;
-  Module* active_module;
+  std::list<expr::condition_handler*> handlers;
+  std::list<expr::hydra_restart*> restarts;
+  expr::Module* active_module;
 
 
   // a thread will set this to true when it is waiting for garbage to be 
   // collected, and the garbage collector will set it to false when it is
   // done, so the thread may continue. 
   bool can_collect;
+  GarbageRoots roots; 
+  static std::mutex root_mutex;
 };
 
 // the lexical scope contians a mapping of symbols to their local values
 struct LexicalScope {
-  std::unordered_map<Symbol*, Object*> map;
+  std::unordered_map<expr::Symbol*, expr::Object*> map;
   LexicalScope();
   ~LexicalScope();
 };

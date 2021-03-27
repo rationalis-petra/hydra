@@ -18,10 +18,9 @@ struct Vector : public Object {
 
   static Parent* parent;
 
-
   virtual void mark_node();
 
-  std::string to_string(LocalRuntime &r, LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   std::vector<Object*> array;
 };
 

@@ -1,33 +1,20 @@
 #include <iostream>
 #include "expressions.hpp"
+#include "utils.hpp"
 
 using std::string;
 using std::ostream;
-using std::list;
 using std::set;
-using std::mutex;
-using std::atomic;
 
 using namespace expr;
+using namespace interp;
 
-list<Object*> Object::node_list;
-list<LexicalScope*> Object::context_list;
-hydra_roots Object::roots; 
-Runtime Object::r; 
-
-atomic<unsigned long> Object::counter = 0;
-//runtime *Object::r;
-
-mutex Object::root_mutex;
+GarbageCollector* Object::collector;
 
 Object::Object() {
-  std::unique_lock<mutex> lck(root_mutex);
-  node_list.push_front(this);
+  collector->register_node(this);
   marked = false;
-  counter++;
   invoker = nullptr;
-
-  lck.unlock();
 }
 
 void Object::mark_node() {
@@ -67,4 +54,23 @@ Object *Object::derive_check(set<expr::Object*> ptypes) {
     }
   }
   return expr::nil::get();
+}
+
+string Object::to_string(LocalRuntime &r, LexicalScope &s) {
+  string out = "\n{";
+  if (invoker) 
+    out += "invoker " + hydra_to_string(invoker, r, s);
+  for (auto x : slots) {
+    out += "[";
+    out += hydra_to_string(x.first, r, s);
+    out += " ";
+    out += hydra_to_string(x.second, r, s);
+
+    out += "]";
+    if (x != *(--slots.end())) {
+      out += "\n";
+    }
+  }
+  out += "}";
+  return out;
 }

@@ -12,6 +12,7 @@ using std::string;
 using std::stringstream;
 
 using namespace expr;
+using namespace interp;
 
 Object *read(Object *raw, LocalRuntime &r);
 

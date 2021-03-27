@@ -5,8 +5,9 @@
 #include "types.hpp"
 #include "utils.hpp"
 
+using namespace interp;
+
 using std::string;
-using std::list;
 
 using namespace type;
 
@@ -35,7 +36,7 @@ GenFn::GenFn() {
   return_type = new Any;
 }
 
-std::string GenFn::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+std::string GenFn::to_string(LocalRuntime &r, LexicalScope &s) {
   //return string("{type (") + ") -> " + return_type->to_string() + "}";
   string str = "Gen Fn (";
   bool once = false;

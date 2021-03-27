@@ -10,6 +10,7 @@ using std::string;
 using std::set;
 
 using namespace type;
+using namespace interp;
 
 Is::Is(Object* obj) {
   object = obj;
@@ -21,7 +22,7 @@ void Is::mark_node() {
   object->mark_node();
 }
 
-string Is::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Is::to_string(LocalRuntime &r, LexicalScope &s) {
   return "{Is " + hydra_to_string(object, r, s) +  "}";
 }
 

@@ -9,6 +9,7 @@ using std::string;
 using std::set;
 
 using namespace type;
+using namespace interp;
 
 Derives::Derives(Object* obj) {
   object = obj;
@@ -20,7 +21,7 @@ void Derives::mark_node() {
   object->mark_node();
 }
 
-string Derives::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Derives::to_string(LocalRuntime &r, LexicalScope &s) {
   return "{Derives " + hydra_to_string(object, r, s) +  "}";
 }
 

@@ -9,13 +9,14 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_plus(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   // ASSUME: all values in arg_list are rooted
   Integer *out = new Integer(0);
 
   for (Object *o : arg_list) {
-    Object::roots.remove(o);
+    Object::collector->remove_root(o);
     Integer *num = get_inbuilt<Integer *>(o);
     out->value += num->value;
   }
@@ -25,13 +26,13 @@ Object *op_plus(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 Object *op_minus(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Integer *out = new Integer(0);
   out->value = get_inbuilt<Integer *>(arg_list.front())->value;
-  Object::roots.remove(arg_list.front());
+  Object::collector->remove_root(arg_list.front());
   arg_list.pop_front();
 
   for (Object *arg : arg_list) {
     Integer *num = get_inbuilt<Integer *>(arg);
     out->value -= num->value;
-    Object::roots.remove(arg);
+    Object::collector->remove_root(arg);
   }
   return out;
 }

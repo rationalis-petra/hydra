@@ -1,7 +1,5 @@
 #ifndef __HYDRA_EXPRESSIONS_HPP
 #define __HYDRA_EXPRESSIONS_HPP
-// TYPES defines the hydra_object, which is the internal representation of a
-// compiled ivy object: the primary purpose of it is 
 
 #include <string>
 #include <map>
@@ -14,11 +12,9 @@
 #include "expressions/handler.hpp"
 #include "expressions/io.hpp"
 #include "expressions/language.hpp"
-#include "expressions/exception.hpp"
 #include "expressions/object.hpp"
 #include "expressions/operation.hpp"
-#include "expressions/user_object.hpp"
-#include "expressions/runtime.hpp"
+#include "expressions/mirror.hpp"
 
 // the 'runtime' contains all global state this includes
 // the root module, the current (or active) module,  

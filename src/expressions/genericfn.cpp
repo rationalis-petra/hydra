@@ -12,6 +12,7 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
 
 // GENERIC FUNCTION
 
@@ -111,7 +112,7 @@ Object *GenericFn::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s
     }
     Object* out = op->call(arg_list, r, s);
     for (Object *obj : arg_list) {
-      roots.remove(obj);
+      collector->remove_root(obj);
     }
     if (uop) {
       uop->scope->map.erase(call_next);

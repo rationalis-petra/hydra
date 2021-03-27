@@ -5,6 +5,8 @@
 #include "types.hpp"
 #include "utils.hpp"
 
+using namespace interp;
+
 using std::string;
 using std::list;
 
@@ -41,7 +43,7 @@ void Fn::mark_node() {
   }
 }
 
-std::string Fn::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+std::string Fn::to_string(LocalRuntime &r, LexicalScope &s) {
   //return string("{type (") + ") -> " + return_type->to_string() + "}";
   string str = "fn (";
   bool once = false;

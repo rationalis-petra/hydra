@@ -10,6 +10,7 @@ using std::string;
 using type::hydra_cast;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_fn(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return (Object *)new UserOperator(arg_list, true, r, s);

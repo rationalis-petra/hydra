@@ -7,7 +7,6 @@
 
 #include "expressions/object.hpp"
 #include "expressions/operation.hpp"
-#include "expressions/user_object.hpp"
 
 namespace type {
 
@@ -20,7 +19,7 @@ public:
 
 struct Symbol : public Type {
   virtual void mark_node();
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
 };
@@ -31,7 +30,7 @@ struct Cons : public Type {
   Cons();
   Cons(Type *tcar, Type *tcdr);
   virtual void mark_node();
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
 
@@ -45,7 +44,7 @@ struct Vector : public Type {
   Vector(Type* t, int i);
 
   virtual void mark_node();
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
 
@@ -55,7 +54,7 @@ struct Vector : public Type {
 struct List : public Type {
   List();
   virtual void mark_node();
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
 
@@ -66,7 +65,7 @@ struct Tuple : public Type {
   Tuple();
   Tuple(std::vector<Type *> types);
   virtual void mark_node();
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   virtual expr::Object *subtype(Type *ty);
 
@@ -75,7 +74,7 @@ struct Tuple : public Type {
 
 struct Union : public Type {
   virtual void mark_node();
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);
   Type *constructor(std::list<expr::Object *> lst);
 
@@ -85,14 +84,14 @@ struct Union : public Type {
 
 struct DerivesConstructor {
   void mark_node();
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   Type *constructor(std::list<expr::Object *> lst);
 };
 
 struct IsConstructor : public expr::Operator {
   void mark_node();
   expr::Object *object;
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   Type *constructor(std::list<expr::Object *> lst);
 };
 
@@ -100,7 +99,7 @@ struct Derives : public Type {
   Derives(Object *obj);
   void mark_node();
   expr::Object *object;
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   virtual expr::Object *subtype(Type *ty);
   virtual expr::Object *check_type(expr::Object *obj);
 };
@@ -109,7 +108,7 @@ struct Is : public Type {
   Is(expr::Object *v);
   void mark_node();
   expr::Object *object;
-  std::string to_string(expr::LocalRuntime &r, expr::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   virtual expr::Object *subtype(Type *ty);
   virtual expr::Object *check_type(expr::Object *obj);
 };

@@ -1,6 +1,6 @@
 # Hydra
-A small interpreted language with a lisp-like syntax
-The goal of hydra is to make a language which is highly customizable, and so it provides many metaprogramming facilities.
+A small interpreted, object-oriented language. Inspired by self & lisp, hydra aims to make development
+fun.
 A [wiki](https://github.com/rationalis-petra/hydra/wiki) is available, but everything is currently quite small.
 
 If you are looking at the source-code, the [readme-source](README_SOURCE.md) should help, being as there are relatively few comments.

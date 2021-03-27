@@ -8,13 +8,14 @@ using std::string;
 using std::list;
 
 using namespace type;
+using namespace interp;
 
 // INPUT-OUTPUT STREAM
 void IOStream::mark_node() {
   Object::mark_node();
 }
 
-string IOStream::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string IOStream::to_string(LocalRuntime &r, LexicalScope &s) {
   return "IOStream";
 }
 
@@ -39,7 +40,7 @@ void Istream::mark_node() {
   marked = true;
 }
 
-string Istream::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Istream::to_string(LocalRuntime &r, LexicalScope &s) {
   return "IStream";
 }
 
@@ -65,7 +66,7 @@ void Ostream::mark_node() {
   marked = true;
 }
 
-string Ostream::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Ostream::to_string(LocalRuntime &r, LexicalScope &s) {
   return "OStream";
 }
 

@@ -1,6 +1,7 @@
 #include "expressions.hpp"
 
 using namespace expr;
+using namespace interp;
 
 // HANDLER BIND
 bind_handler::bind_handler(std::list<Object *> lst, LocalRuntime &run,

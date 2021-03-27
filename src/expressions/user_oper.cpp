@@ -9,6 +9,7 @@
 #include "utils.hpp"
 
 using namespace expr;
+using namespace interp;
 
 using type::hydra_cast;
 
@@ -62,7 +63,7 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
   // EVAL is called when evaluating
   // therefore, we must add ourselves to the root list
   // ASSUME op_def already there
-  Object::roots.insert(this);
+  collector->insert_root(this);
   is_fn = _is_fn;
   rest = nullptr;
   self = nullptr;
@@ -197,7 +198,7 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
   expr = new Cons(car, cdr);
 
   // see beginning of function
-  Object::roots.remove(this);
+  collector->remove_root(this);
 }
 
 Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
@@ -221,7 +222,7 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
   for (Symbol *sym : arg_names) {
     scope->map[sym] = arg_list.front();
     // unroot values as we add them to a scope
-    Object::roots.remove(arg_list.front());
+    collector->remove_root(arg_list.front());
     arg_list.pop_front();
   }
   for (Symbol *s : optionals) {
@@ -229,7 +230,7 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
       scope->map[s] = nil::get();
     } else {
       scope->map[s] = arg_list.front();
-      Object::roots.remove(arg_list.front());
+      collector->remove_root(arg_list.front());
       arg_list.pop_front();
     }
   }
@@ -250,7 +251,7 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
           throw err;
         } else {
           scope->map[keys[sym]] = arg_list.front();
-          Object::roots.remove(arg_list.front());
+          collector->remove_root(arg_list.front());
           arg_list.pop_front();
         }
       } else {
@@ -258,7 +259,7 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
         throw err;
       }
       // we are done with sym, unroot it
-      Object::roots.remove(sym);
+      collector->remove_root(sym);
     }
   }
 
@@ -274,7 +275,7 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
           return (Object *)nil::get();
         } else {
           Object *car = arg_list.front();
-          Object::roots.remove(arg_list.front());
+          collector->remove_root(arg_list.front());
           arg_list.pop_front();
           Object *cdr = gen_rest();
           return (Object *) new Cons(car, cdr);
@@ -293,9 +294,9 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
   } else {
     Object* intermediate = expr->eval(r, *scope);
     if (!macexpand) {
-      Object::roots.insert(intermediate);
+      collector->insert_root(intermediate);
       out = intermediate->eval(r, s);
-      Object::roots.remove(intermediate);
+      collector->remove_root(intermediate);
     } else {
       out = intermediate;
     }

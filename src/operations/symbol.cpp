@@ -7,6 +7,8 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
+
 using type::hydra_cast;
 
 Object *op_lock(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {

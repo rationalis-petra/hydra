@@ -23,4 +23,4 @@ template<typename T> T get_inbuilt(expr::Object* obj) {
   }
 }
 
-std::string hydra_to_string(expr::Object* obj, expr::LocalRuntime &r, expr::LexicalScope &s);
+std::string hydra_to_string(expr::Object* obj, interp::LocalRuntime &r, interp::LexicalScope &s);

@@ -7,6 +7,7 @@
 #include "utils.hpp"
 
 using namespace std::chrono;
+using namespace interp;
 using namespace expr;
 
 using std::list;

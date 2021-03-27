@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace expr;
+using namespace interp;
 
 Parent* Cons::parent;
 
@@ -23,23 +24,23 @@ void Cons::mark_node() {
 
 Object *Cons::eval(LocalRuntime &r, LexicalScope &s) {
   Object *oper = car->eval(r, s);
-  Object::roots.insert(oper);
+  collector->insert_root(oper);
 
   if (oper->invoker) {
     try {
       Operator* op = oper->invoker;
       std::list<Object*> arg_list = op->get_arg_list(cdr, r, s);
       Object *out = op->call(arg_list, r, s);
-      Object::roots.remove(oper);
+      collector->remove_root(oper);
       return out;
     } catch (hydra_exception* e) {
-      roots.remove(oper);
+      collector->remove_root(oper);
       throw e;
     }
   } else {
     string excp = "Attempted to call " + hydra_to_string(oper, r, s) +
                   " which is not an operation!";
-    roots.remove(oper);
+    collector->remove_root(oper);
     throw excp;
   }
 }

@@ -11,7 +11,7 @@ namespace expr {
   // Char, etc.
 struct Parent : public Object {
   Parent(std::string);
-  std::string to_string(LocalRuntime &r, LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   std::string name;
 };
 

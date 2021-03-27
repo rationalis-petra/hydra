@@ -1,6 +1,8 @@
 #include "utils.hpp"
 
 using namespace expr;
+using namespace interp;
+
 using std::list;
 using std::string;
 

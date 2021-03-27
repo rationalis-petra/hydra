@@ -12,6 +12,7 @@ using std::string;
 using std::to_string;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_foreign_lib(list<Object *> arg_list, LocalRuntime &r,
                        LexicalScope &s) {

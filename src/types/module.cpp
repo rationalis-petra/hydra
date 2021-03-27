@@ -8,9 +8,10 @@
 
 using std::string;
 
+using namespace interp;
 using namespace type;
 
-string Module::to_string(expr::LocalRuntime &r, expr::LexicalScope &s) {
+string Module::to_string(LocalRuntime &r, LexicalScope &s) {
   return "Module";
 }
 
@@ -25,6 +26,7 @@ expr::Object *Module::check_type(expr::Object* obj) {
     return expr::nil::get();
   }
 }
+
 expr::Object *Module::subtype(Type* ty) {
   if (dynamic_cast<Module*>(ty)) {
     return expr::t::get();

@@ -6,14 +6,12 @@
 namespace expr {
 
 struct Operator;
-struct LocalRuntime;
-struct LexicalScope;
 
 struct Thread : public Object {
-  Thread(Operator* op, std::list<Object*> args, LocalRuntime& r, LexicalScope& s);
+  Thread(Operator* op, std::list<Object*> args, interp::LocalRuntime& r, interp::LexicalScope& s);
 
   void mark_node();
-  std::string to_string(LocalRuntime &r, LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   std::thread* thread;
 };
 

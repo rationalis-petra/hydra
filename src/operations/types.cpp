@@ -10,6 +10,7 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_typep(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
@@ -168,7 +169,7 @@ Object *op_mk_fn_type(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s)
   }
 
   for (Object *obj : arg_list) {
-    Object::roots.remove(obj);
+    Object::collector->remove_root(obj);
   }
   return fn;
 }

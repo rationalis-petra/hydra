@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace expr;
+using namespace interp;
 
 Parent* HString::parent;
 

@@ -18,7 +18,7 @@ struct ForeignLib : public Object {
   virtual void mark_node();
 
   ForeignLib(lt_dlhandle lib);
-  std::string to_string(LocalRuntime &r, LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
 
   lt_dlhandle lib;
 };
@@ -27,7 +27,7 @@ struct ForeignSymbol : public Object {
   virtual void mark_node();
 
   ForeignSymbol(void *addr);
-  std::string to_string(LocalRuntime &r, LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
 
   void* address;
 };
@@ -35,7 +35,7 @@ struct ForeignSymbol : public Object {
 struct ForeignOperator : public Operator {
   ForeignOperator();
 
-  Object* call(std::list<Object*> arg_list, LocalRuntime& r, LexicalScope &s, bool);
+  Object* call(std::list<Object*> arg_list, interp::LocalRuntime& r, interp::LexicalScope &s, bool);
 
   std::list<foreign_type> arg_types;
   foreign_type return_type;

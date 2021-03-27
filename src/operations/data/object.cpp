@@ -5,6 +5,7 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_obj_get(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
@@ -23,7 +24,7 @@ Object *op_obj_get(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 Object *op_mk_object(list<Object *> arg_list, LocalRuntime &r,
                      LexicalScope &s) {
 
-  UserObject *obj = new UserObject;
+  Object *obj = new Object;
 
   for (Object *kvp : arg_list) {
     Tuple *tup = dynamic_cast<Tuple *>(kvp);
@@ -41,7 +42,7 @@ Object *op_mk_object(list<Object *> arg_list, LocalRuntime &r,
 
 Object *op_obj_set(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  UserObject *obj = dynamic_cast<UserObject *>(arg_list.front());
+  Object *obj = dynamic_cast<Object *>(arg_list.front());
   arg_list.pop_front();
   Symbol *sym = dynamic_cast<Symbol *>(arg_list.front());
   Object *newval = arg_list.back();
@@ -52,8 +53,8 @@ Object *op_obj_set(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_clone(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  UserObject *obj = new UserObject;
-  UserObject *clonee = dynamic_cast<UserObject *>(arg_list.front());
+  Object *obj = new Object;
+  Object *clonee = dynamic_cast<Object *>(arg_list.front());
 
   obj->slots = clonee->slots;
 

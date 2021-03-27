@@ -5,7 +5,9 @@
 using std::string;
 using std::map;
 using std::list;
+
 using namespace expr;
+using namespace interp;
 
 void Module::mark_node() {
   if (marked) return;

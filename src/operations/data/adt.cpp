@@ -7,10 +7,11 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_tuple(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  Object::collect_garbage(r);
+  Object::collector->collect_garbage(r);
 
   Tuple *out = new Tuple();
   for (Object *o : arg_list)

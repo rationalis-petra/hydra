@@ -20,6 +20,7 @@ using std::ofstream;
 using std::ostream;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_print(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   for (Object *obj : arg_list) {
@@ -28,7 +29,7 @@ Object *op_print(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     } else {
       cout << hydra_to_string(obj, r, s);
     }
-    Object::roots.remove(obj);
+    Object::collector->remove_root(obj);
   }
   return arg_list.back();
 }
@@ -83,7 +84,7 @@ Object *op_open_file(list<Object *> arg_list, LocalRuntime &r,
     throw err;
   }
   for (Object *v : arg_list) {
-    Object::roots.remove(v);
+    Object::collector->remove_root(v);
   }
   return out;
 }
@@ -104,7 +105,7 @@ Object *op_next(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   stream->get(ch);
 
   for (Object *v : arg_list) {
-    Object::roots.remove(v);
+    Object::collector->remove_root(v);
   }
 
   return new Char(ch);
@@ -122,7 +123,7 @@ Object *op_peek(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     throw err;
   }
   for (Object *v : arg_list) {
-    Object::roots.remove(v);
+    Object::collector->remove_root(v);
   }
 
   char ch = stream->peek();

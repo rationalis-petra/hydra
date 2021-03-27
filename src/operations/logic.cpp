@@ -7,6 +7,7 @@ using std::list;
 using std::string;
 
 using namespace expr;
+using namespace interp;
 
 Object *op_or(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
