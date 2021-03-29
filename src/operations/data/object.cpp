@@ -30,7 +30,7 @@ Object *op_mk_object(list<Object *> arg_list, LocalRuntime &r,
     Tuple *tup = dynamic_cast<Tuple *>(kvp);
     Symbol *slot = dynamic_cast<Symbol *>(tup->values[0]);
     Object *value = dynamic_cast<Object *>(tup->values[1]);
-    Object *is_parent = dynamic_cast<Object *>(tup->values[1]);
+    Object *is_parent = dynamic_cast<Object *>(tup->values[2]);
     obj->slots[slot] = value;
     if (!is_parent->null()) {
       obj->parents.insert(slot);
@@ -97,16 +97,19 @@ void op::initialize_user_obj() {
   op::obj_get = new InbuiltOperator(
       "get", "Get a slot from an object", op_obj_get,
       type::Fn::with_args({new type::Any, new type::Symbol}), true);
+
   op::mk_obj = new InbuiltOperator(
       "obj", "Create a new object", op_mk_object,
       type::Fn::with_all(
           {}, new type::Tuple({new type::Symbol, new type::Any, new type::Any}),
           new type::Any),
       true);
+
   op::obj_set = new InbuiltOperator(
       "set", "Set a particular slot in an object to a vlue", op_obj_set,
       type::Fn::with_args({new type::Any, new type::Symbol, new type::Any}),
       true);
+
   op::clone =
       new InbuiltOperator("clone", "Derives an object from the provided object",
                           op_clone, type::Fn::with_rest(new type::Any), true);

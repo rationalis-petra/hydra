@@ -11,8 +11,7 @@ using namespace interp;
 
 GarbageCollector* Object::collector;
 
-Object::Object() {
-  collector->register_node(this);
+Object::Object() {collector->register_node(this);
   marked = false;
   invoker = nullptr;
 }
@@ -24,6 +23,10 @@ void Object::mark_node() {
     invoker->mark_node();
   }
   for (auto kvp : slots) {
+    kvp.first->mark_node();
+    kvp.second->mark_node();
+  }
+  for (auto kvp : metadata) {
     kvp.first->mark_node();
     kvp.second->mark_node();
   }
@@ -73,4 +76,77 @@ string Object::to_string(LocalRuntime &r, LexicalScope &s) {
   }
   out += "}";
   return out;
+}
+
+Object *Object::reflect(LocalRuntime& r, LexicalScope &s) {
+  // TODO: check if reflect is implemented??
+  return new Mirror(this);
+}
+
+Object *Object::get_slots(LocalRuntime& r, LexicalScope &s) {
+  Object* cns = nil::get();
+  for (auto kvp : slots) {
+    cns = new Cons(kvp.first, cns);
+  }
+  return cns;
+}
+
+Object *Object::get_slot_value(Symbol* sym, LocalRuntime& r, LexicalScope&s) {
+  auto it = slots.find(sym);
+  if (it != slots.end()) {
+    return it->second;
+  } else {
+    string err = "Cannot find slot value: " + hydra_to_string(sym, r, s);
+    throw err;
+  }
+}
+
+Object *Object::set_slot_value(Symbol* sym,
+                               Object* val,
+                               interp::LocalRuntime &r,
+                               interp::LexicalScope &s) {
+  slots[sym] = val;
+  return val;
+}
+
+Object *Object::delete_slot(Symbol* sym, interp::LocalRuntime &r, interp::LexicalScope &s) {
+  auto it = parents.find(sym);
+  if (it != parents.end()) {
+    parents.erase(it);
+  }
+  slots.erase(sym);
+  return nil::get();
+}
+
+Object *Object::get_meta(interp::LocalRuntime &r, interp::LexicalScope &s) {
+  Object* cns = nil::get();
+  for (auto kvp : metadata) {
+    cns = new Cons(kvp.first, cns);
+  }
+  return cns;
+}
+
+Object *Object::get_meta_value(Symbol* sym,
+                               interp::LocalRuntime &r,
+                               interp::LexicalScope &s) {
+  auto it = metadata.find(sym);
+  if (it != metadata.end()) {
+    return it->second;
+  } else {
+    string err = "Cannot find meta-slot value: " + hydra_to_string(sym, r, s);
+    throw err;
+  }
+}
+
+Object *Object::set_meta_value(Symbol* sym,
+                               Object* val,
+                               interp::LocalRuntime &r,
+                               interp::LexicalScope &s) {
+  metadata[sym] = val;
+  return val;
+}
+
+Object *Object::delete_meta(Symbol* sym, interp::LocalRuntime &r, interp::LexicalScope &s) {
+  metadata.erase(sym);
+  return nil::get();
 }

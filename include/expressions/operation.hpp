@@ -34,7 +34,6 @@ struct Operator : public Object {
 
   // STATE
   type::Fn* type;
-  HString *docstring;
 };
 
 struct UserOperator : public Operator {

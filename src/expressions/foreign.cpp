@@ -3,6 +3,7 @@
 
 #include "ltdl.h"
 #include "expressions.hpp"
+#include "utils.hpp"
 
 using std::string;
 using std::list;
@@ -39,7 +40,8 @@ string ForeignSymbol::to_string(LocalRuntime &r, LexicalScope &s) {
 
 ForeignOperator::ForeignOperator() {
   is_fn = true;
-  docstring = new HString("A foriegn operator");
+  Symbol* dsym = get_keyword("docstring");
+  metadata[dsym] = new HString("A foreign operator");
   invoker = this;
 }
 

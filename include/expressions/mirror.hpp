@@ -9,13 +9,15 @@
 
 namespace expr {
 
-// struct Mirror : public Object {
-//   virtual void mark_node();
-//   static Object* parent;
+struct Mirror : public Object {
+  Mirror(Object* reflectee);
+  virtual void mark_node();
 
-//   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
-//   Object* reflectee;
-// };
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
+  Object* reflectee;
+
+  static Object* parent;
+};
 
 } 
 

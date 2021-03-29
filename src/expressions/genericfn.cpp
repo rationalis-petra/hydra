@@ -32,7 +32,6 @@ void GenericFn::mark_node() {
 
   marked = true;
   type->mark_node();
-  docstring->mark_node();
   for (Operator *o : functions) {
     o->mark_node();
   }

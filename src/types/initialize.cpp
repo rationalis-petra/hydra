@@ -30,5 +30,5 @@ void type::initialize_types() {
   // type::ostream_type = new Derives(expr::OStream::parent);
   //type::iostream_type = new Derives();
   //type::meta_type = new Derives(Type::parent);
-  //type::mirror_type = new Derives(expr::Mirror::parent);
+  type::mirror_type = new Derives(expr::Mirror::parent);
 }

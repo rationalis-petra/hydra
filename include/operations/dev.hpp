@@ -7,10 +7,10 @@ namespace op {
 
   void initialize_dev();
 
-  extern expr::Operator *macexpand;
-  extern expr::Operator *describe;
-  extern expr::Operator *trace;
-  extern expr::Operator *time;
+  extern expr::GenericFn *macexpand;
+  extern expr::GenericFn *describe;
+  extern expr::GenericFn *trace;
+  extern expr::GenericFn *time;
 
 } // namespace op
 

@@ -46,7 +46,7 @@ struct Mac : public Fn {
   Type* constructor(std::list<expr::Object*> lst);
 };
 
-struct GenFn : public Type {
+struct GenFn : public Fn {
   virtual void mark_node();
   virtual expr::Object *subtype(Type *obj);
 
@@ -54,13 +54,6 @@ struct GenFn : public Type {
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   expr::Object* check_type(expr::Object* obj);
   Type* constructor(std::list<expr::Object*> lst);
-
-  Type* return_type;
-  Type* rest_type;
-  std::list<Type*> arg_list;
-  std::list<Type*> optional_list;
-  std::list<expr::Symbol*> keyword_names;
-  std::list<Type*> keyword_list;
 };
 
 }

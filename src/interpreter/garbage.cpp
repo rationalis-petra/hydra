@@ -132,4 +132,6 @@ void STWCollector::remove_root(Object *obj) {
 }
 
 
-STWCollector::STWCollector(Runtime& _r) : r(_r) {}
+STWCollector::STWCollector(Runtime &_r) : r(_r) {
+  counter = 0;
+}

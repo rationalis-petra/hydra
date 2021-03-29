@@ -26,14 +26,14 @@ Object *Operator::operator()(std::list<Object *> arg_list, LocalRuntime &r,
 
 Operator::Operator() {
   type = new type::Fn;
-  docstring = new HString;
+  Symbol* dstring = get_keyword("docstring");
+  metadata[dstring] = new HString;
   invoker = this;
 }
 
 void Operator::mark_node() {
   if (marked) return;
   Object::mark_node();
-  docstring->mark_node();
   type->mark_node();
 }
 
@@ -87,7 +87,8 @@ InbuiltOperator::InbuiltOperator(string _name, string _docstring,
                                  type::Fn *t, bool isfn) {
   name = _name;
   fnc = _fnc;
-  docstring = new HString(_docstring);
+  Symbol* dstring = get_keyword("docstring");
+  metadata[dstring] = new HString(_docstring);
   type = t;
   is_fn = isfn;
 }

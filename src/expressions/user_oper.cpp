@@ -29,7 +29,6 @@ string UserOperator::to_string(LocalRuntime &r, LexicalScope &s) {
 void UserOperator::mark_node() {
   if (marked) return;
   Object::mark_node();
-  docstring->mark_node();
   type->mark_node();
 
   if (rest) {
@@ -182,7 +181,8 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
   // Now, check for a docstring
   op_def.pop_front();
   if (HString *dstring = dynamic_cast<HString *>(op_def.front())) {
-    docstring = dstring;
+    Symbol* dsym = get_keyword("docstring");
+    metadata[dsym] = dstring;
     if (op_def.size() != 1) {
       op_def.pop_front();
     }

@@ -3,6 +3,7 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
 
 using std::list;
 using std::string;
@@ -27,7 +28,8 @@ Object *op_gen(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   arg_list.pop_front();
   if (!arg_list.empty()) {
     if (HString *str = dynamic_cast<HString *>(arg_list.front())) {
-      out->docstring = str;
+      Symbol* dstring = get_keyword("docstring");
+      out->metadata[dstring] = str;
     }
   }
   return out;

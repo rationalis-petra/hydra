@@ -31,6 +31,7 @@ vector<pair<string, Object *>> core;
 vector<pair<string, Object *>> foreign;
 vector<pair<string, Object *>> io;
 vector<pair<string, Object *>> concurrent;
+
 // net
 // concurrent / parallel
 
@@ -50,7 +51,7 @@ int main(int argc, char **argv) {
   Tuple::parent = new Parent("Tuple parent");
   Char::parent = new Parent("Char parent");
   Union::parent = new Parent("Union parent");
-  //Mirror::parent = new Parent("Mirror parent");
+  Mirror::parent = new Parent("Mirror parent");
 
   g.root = new Module("");
   language_module = new Module("hydra");
@@ -68,6 +69,7 @@ int main(int argc, char **argv) {
 
 
   op::mk_arithmetic();
+  op::initialize_mirror();
   op::initialize_user_obj();
   op::initialize_cons();
   op::initialize_string();
@@ -250,7 +252,6 @@ void make_modules() {
     make_pair("/", op::divide),
     make_pair(">", op::greater),
     // data
-    make_pair("object", op::mk_obj),
     make_pair("tuple", op::mk_tuple),
     make_pair("union", op::mk_union),
     make_pair("vector", op::mk_vec),
@@ -262,6 +263,18 @@ void make_modules() {
     make_pair("len", gn_len),
 
     make_pair("to-string", gn_to_string),
+    
+    // OBJECTS & REFLECTION
+    make_pair("object", op::mk_obj),
+    make_pair("reflect", op::get_mirror),
+    make_pair("get-slots", op::get_slots),
+    make_pair("get-slot", op::get_slot_val),
+    make_pair("set-slot", op::set_slot_val),
+    make_pair("remove-slot", op::delete_slot),
+    make_pair("get-meta", op::get_meta),
+    make_pair("get-metaslot", op::get_meta_val),
+    make_pair("set-metaslot", op::set_meta_val),
+    make_pair("remove-metaslot", op::delete_meta),
 
     make_pair("set-invoker", op::set_invoker),
     make_pair("get-invoker", op::get_invoker),
@@ -320,7 +333,6 @@ void make_modules() {
     make_pair("with-restart", op::add_restart),
     make_pair("get-restarts", op::get_restarts),
 
-    make_pair("Integer-Parent", Integer::parent),
 
     // types
     make_pair("Is", op::mk_is),

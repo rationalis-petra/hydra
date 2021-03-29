@@ -11,6 +11,7 @@ add_library(expressions OBJECT
                         data/parent.cpp
 
                         concurrency.cpp
+                        mirror.cpp
                         object.cpp
                         oper.cpp
                         genericfn.cpp
