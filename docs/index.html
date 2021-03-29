@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Hydra</title>
+    
+    <meta charset = "utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </head>
+
+  <body class = "bg-dark">
+
+
+    <div class = "jumbotron">
+      <div class = "row">
+        <img src = "icons/hydra_black.svg"></img>
+        <h1 style = "padding-left: 20px">Hydra</h1>
+      </div>
+    </div>
+
+
+
+
+
+    <div class = "container bg-dark text-white" style="padding-bottom: 150px">
+      <div class = "row">
+        <h2 style = "padding-top: 50px">What is Hydra?</h2>
+      </div>
+      <div class = "row">
+        <div class = "col">
+          <p>
+            Hydra is an experimental interpreted language which
+            explores the intersection of several design concepts: it has a prototype based object-system
+            inspired by the <a href="https://selflanguage.org/">self language</a>, but
+            with a multiple dispatch system inspired by
+            <a href="https://lispcookbook.github.io/cl-cookbook/clos.html">CLOS</a>.
+            When combined with lispy syntax and macros, this leads to interesting metaprogramming
+            and self-modification opportunities.
+          </p>
+        </div>
+      </div>
+      <div class = "row">
+        <h2 style = "padding-top: 50px">Learn</h2>
+      </div>
+      
+      <div class = "row">
+        <div class = "col">
+          <p>
+            I have written a small <a href="https://github.com/rationalis-petra/hydra/wiki">wiki</a>
+            on github, which is generally up-to date, although there are occasional discrepencies
+            between how something is described vs how it actually behaves.
+          </p>
+        </div>
+      </div>
+      <div class = "row">
+        <h2 style = "padding-top: 50px">Get it</h2>
+        <p>
+        </p>
+      </div>
+      <div class = "row">
+        <div class = "col">
+          <h3>Windows</h3>
+          <p>
+            Hydra has no installer, but you can grab the raw binary <a href="bin/hydra.exe">here</a>
+            or follow the build instructions on the <a href="https://github.com/rationalis-petra/hydra">github page</a>.
+            You'll need conan, CMake and the Microsof's visual C++ compiler to build.
+          </p>
+        </div>
+        <div class = "col">
+          <h3>Linux</h3>
+          <p>
+            As with windows, there is no distribution option via package managers or similar, but you can
+            buid from source, following the instructions on the <a href="https://github.com/rationalis-petra/hydra">github page</a>.
+            You'll need CMake to build it. 
+          </p>
+        </div>
+        <div class = "col">
+          <h3>OSX</h3>
+          <p>
+            Hydra has not formally been compiled/tested on OSX, but if you are
+            familiar with C++ compilation on OSX, you might wish to try
+            adapting the build instructions on the <a href="https://github.com/rationalis-petra/hydra">github page</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </body>
+
+</html>
