@@ -30,11 +30,28 @@ Object* list_to_cons(std::list<Object*> lst) {
   }
 }
 
+// <- : no accessors
+// =  : getter, no setter
+// .  : both
+// {[:x <- 30]*
+//  [:y = -10]
+//  [:z . 231]}
+// (object
+//   [:x 3 nil nil t]
+//   [:y -10 t nil t]
+//   [:z 231 t t t])
+
+    
+
+
 Symbol* get_keyword(string str) {
   Object* obj = keyword_module->get(str);
   if (obj->null()) {
     Symbol* sym = keyword_module->intern(str);
     sym->value = (Object*) sym;
+    GenericFn* gfn = new GenericFn;
+    gfn->type = type::Fn::with_all({new type::Any}, new type::Any, new type::Any);
+    sym->invoker = gfn;
     return sym;
   }
   else {

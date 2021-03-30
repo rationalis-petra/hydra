@@ -42,20 +42,6 @@ struct Any : public Type {
   virtual expr::Object *subtype(Type *obj);
 };
 
-struct Module : public Type {
-  virtual void mark_node();
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
-  expr::Object *check_type(expr::Object *obj);
-  virtual expr::Object *subtype(Type *obj);
-};
-
-struct IOStream : public Type {
-  virtual void mark_node();
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
-  expr::Object *check_type(expr::Object *obj);
-  virtual expr::Object *subtype(Type *obj);
-};
-
 struct Istream : public Type {
   virtual void mark_node();
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
@@ -64,6 +50,13 @@ struct Istream : public Type {
 };
 
 struct Ostream : public Type {
+  virtual void mark_node();
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
+  expr::Object *check_type(expr::Object *obj);
+  virtual expr::Object *subtype(Type *obj);
+};
+
+struct IOStream : public Type {
   virtual void mark_node();
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   expr::Object *check_type(expr::Object *obj);

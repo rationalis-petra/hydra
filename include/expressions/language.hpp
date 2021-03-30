@@ -6,6 +6,7 @@
 #include <string>
 
 #include "interpreter/runtime.hpp"
+#include "parent.hpp"
 #include "object.hpp"
 
 namespace expr {
@@ -22,6 +23,9 @@ struct Module : public Object {
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   std::map<std::string, Symbol *> symbols;
   std::map<std::string, Symbol *> exported_symbols;
+  void set_parent();
+
+  static Parent* parent;
 
   std::string name;
 

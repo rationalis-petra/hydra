@@ -192,18 +192,18 @@ void op::initialize_module() {
   op::mk_module = new InbuiltOperator(
       "module", "Generates a new module whose name is the provided string",
       op_mk_module,
-      type::Fn::with_all({type::string_type}, nullptr, new type::Module), true);
+      type::Fn::with_all({type::string_type}, nullptr, type::module_type), true);
   op::in_module = new InbuiltOperator(
       "in-module", "Sets the current (active) module to the provided argument",
       op_in_module,
-      type::Fn::with_all({new type::Module}, nullptr, new type::Module), true);
+      type::Fn::with_all({type::module_type}, nullptr, type::module_type), true);
   op::intern = new InbuiltOperator(
       "intern",
       "Take a module and a string; if a symbol with that name exists\n"
       "then return it, otherwise place a new symbol in the current\n"
       "package with that name and return it",
       op_intern,
-      type::Fn::with_all({new type::Module, type::string_type}, nullptr,
+      type::Fn::with_all({type::module_type, type::string_type}, nullptr,
                          new type::Symbol),
       true);
   op::insert = new InbuiltOperator(
@@ -212,7 +212,7 @@ void op::initialize_module() {
       "or return an error if a symbol with that name already exists in\n"
       "current module",
       op_insert,
-      type::Fn::with_all({new type::Module, new type::Symbol}, nullptr,
+      type::Fn::with_all({type::module_type, new type::Symbol}, nullptr,
                          new type::Symbol),
       true);
 
@@ -228,14 +228,14 @@ void op::initialize_module() {
   op::get_symbols = new InbuiltOperator(
       "get-symbols", "Returns a list of symbols which are exported by a module",
       op_get_symbols,
-      type::Fn::with_all({new type::Module}, nullptr, new type::List), true);
+      type::Fn::with_all({type::module_type}, nullptr, new type::List), true);
   op::remove = new InbuiltOperator(
       "remove", "Removes a symbol from a module, returns the module", op_remove,
-      type::Fn::with_args({new type::Module, type::string_type}), true);
+      type::Fn::with_args({type::module_type, type::string_type}), true);
   op::do_export = new InbuiltOperator(
       "export", "Moves a symbol into a modules' list of exported symbols",
       op_export,
-      type::Fn::with_all({new type::Module, new type::Symbol}, nullptr,
-                         new type::Module),
+      type::Fn::with_all({type::module_type, new type::Symbol}, nullptr,
+                         type::module_type),
       true);
 }

@@ -24,7 +24,7 @@ void type::initialize_types() {
 
   type::integer_type = new Derives(expr::Integer::parent);
   type::character_type = new Derives(expr::Char::parent);
-  //type::module_type = new Derives(expr::Module::parent);
+  type::module_type = new Derives(expr::Module::parent);
   type::string_type = new Derives(expr::HString::parent);
   // type::istream_type = new Derives(expr::IStream::parent);
   // type::ostream_type = new Derives(expr::OStream::parent);

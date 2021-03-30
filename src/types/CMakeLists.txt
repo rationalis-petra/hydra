@@ -9,7 +9,6 @@ add_library(types OBJECT cons.cpp
                          nil.cpp
                          type.cpp
                          gen_fn.cpp
-                         module.cpp
                          stream.cpp
                          is.cpp
                          symbol.cpp

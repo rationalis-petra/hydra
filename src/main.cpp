@@ -16,11 +16,11 @@ using namespace expr;
 
 extern string lang;
 
-Module *expr::language_module;
-Module *expr::keyword_module;
-Module *expr::core_module;
-GenericFn *expr::equal_operator;
-GenericFn *expr::gn_to_string;
+Module *expr::language_module = nullptr;
+Module *expr::keyword_module = nullptr;
+Module *expr::core_module = nullptr;
+GenericFn *expr::equal_operator = nullptr;
+GenericFn *expr::gn_to_string = nullptr;
 
 using type::hydra_cast;
 
@@ -45,6 +45,7 @@ void make_modules();
 int main(int argc, char **argv) {
   Object::collector = new STWCollector(g);
 
+  // set up the "parents" for each major type
   Integer::parent = new Parent("Integer parent");
   HString::parent = new Parent("String parent");
   Cons::parent = new Parent("Cons parent");
@@ -52,15 +53,27 @@ int main(int argc, char **argv) {
   Char::parent = new Parent("Char parent");
   Union::parent = new Parent("Union parent");
   Mirror::parent = new Parent("Mirror parent");
+  Module::parent = new Parent("Module parent");
 
-  g.root = new Module("");
+  // We need to specially setup the root & keyword modules because 
+  // we don't have the "parent" symbol yet!!
+  g.root = new Module();
+  Symbol* sym = g.root->intern("keyword");
+  sym->value = new Module();
+  keyword_module = (Module*) sym->value;
+  keyword_module->name = "keyword";
+
+  // now, we can intern "parent" in keyword_module 
+  // so we can add parent slot to root & keyword module
+  g.root->set_parent();
+  keyword_module->set_parent();
+
+
+
   language_module = new Module("hydra");
-  Symbol *sym = g.root->intern("hydra");
+  sym = g.root->intern("hydra");
   sym->value = language_module;
   r.active_module = language_module;
-  sym = g.root->intern("keyword");
-  sym->value = new Module("keyword");
-  keyword_module = (Module*) sym->value;
 
   // SPECIAL: type initialization
   op::initialize_type_ops();
@@ -346,7 +359,7 @@ void make_modules() {
     make_pair("Tuple", new type::Tuple),
     make_pair("Vector", new type::Vector),
     make_pair("Type", new type::MetaType),
-    make_pair("Module", new type::Module),
+    make_pair("Module", type::module_type),
     make_pair("Symbol", new type::Symbol),
     make_pair("List", new type::List),
     make_pair("IOStream", new type::IOStream),

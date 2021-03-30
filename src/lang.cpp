@@ -249,8 +249,8 @@ std::string lang = R"(
 
 (def ref (val)
   (object
-    [:parent ref-object t]
-    [:value val t]))
+    [:parent ref-object nil nil t]
+    [:value val t t t]))
 
 (def set! ((ref Ref) value)
   (set ref :value value))

@@ -27,13 +27,18 @@ Object *op_mk_object(list<Object *> arg_list, LocalRuntime &r,
   Object *obj = new Object;
 
   for (Object *kvp : arg_list) {
-    Tuple *tup = dynamic_cast<Tuple *>(kvp);
-    Symbol *slot = dynamic_cast<Symbol *>(tup->values[0]);
-    Object *value = dynamic_cast<Object *>(tup->values[1]);
-    Object *is_parent = dynamic_cast<Object *>(tup->values[2]);
+    Tuple *tup = get_inbuilt<Tuple *>(kvp);
+    Symbol *slot = get_inbuilt<Symbol *>(tup->values[0]);
+    Object *value = get_inbuilt<Object *>(tup->values[1]);
+    Object *has_getter = get_inbuilt<Object *>(tup->values[2]);
+    Object *has_setter = get_inbuilt<Object *>(tup->values[3]);
+    Object *is_parent = get_inbuilt<Object *>(tup->values[4]);
+
     obj->slots[slot] = value;
     if (!is_parent->null()) {
       obj->parents.insert(slot);
+    }
+    if (!has_getter->null()) {
     }
   }
 
@@ -85,40 +90,59 @@ Object *op_obj_pset(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-Operator *op::obj_get;
-Operator *op::mk_obj;
-Operator *op::obj_set;
-Operator *op::clone;
-Operator *op::obj_eq;
-Operator *op::obj_pset;
+GenericFn *op::obj_get;
+GenericFn *op::mk_obj;
+GenericFn *op::obj_set;
+GenericFn *op::clone;
+GenericFn *op::obj_eq;
+GenericFn *op::obj_pset;
 
 void op::initialize_user_obj() {
+  op::obj_get = new GenericFn;
+  op::obj_get->type = type::Fn::with_args({new type::Any, new type::Symbol});
+  op::mk_obj = new GenericFn;
+  op::mk_obj->type = type::Fn::with_all(
+      {},
+      new type::Tuple({new type::Symbol, new type::Any, new type::Any,
+                       new type::Any, new type::Any}),
+      new type::Any);
+  op::obj_set = new GenericFn;
+  op::obj_set->type =
+      type::Fn::with_args({new type::Any, new type::Symbol, new type::Any});
+  op::clone = new GenericFn;
+  op::clone->type = type::Fn::with_rest(new type::Any);
+  op::obj_eq = new GenericFn;
+  op::obj_eq->type = type::Fn::with_args({new type::Any, new type::Any});
+  op::obj_pset = new GenericFn;
+  op::obj_pset->type = type::Fn::with_args({new type::Symbol, new type::Any});
 
-  op::obj_get = new InbuiltOperator(
+  op::obj_get->add(new InbuiltOperator(
       "get", "Get a slot from an object", op_obj_get,
-      type::Fn::with_args({new type::Any, new type::Symbol}), true);
+      type::Fn::with_args({new type::Any, new type::Symbol}), true));
 
-  op::mk_obj = new InbuiltOperator(
+  op::mk_obj->add(new InbuiltOperator(
       "obj", "Create a new object", op_mk_object,
       type::Fn::with_all(
-          {}, new type::Tuple({new type::Symbol, new type::Any, new type::Any}),
+          {},
+          new type::Tuple({new type::Symbol, new type::Any, new type::Any,
+                           new type::Any, new type::Any}),
           new type::Any),
-      true);
+      true));
 
-  op::obj_set = new InbuiltOperator(
+  op::obj_set->add(new InbuiltOperator(
       "set", "Set a particular slot in an object to a vlue", op_obj_set,
       type::Fn::with_args({new type::Any, new type::Symbol, new type::Any}),
-      true);
+      true));
 
-  op::clone =
+  op::clone->add(
       new InbuiltOperator("clone", "Derives an object from the provided object",
-                          op_clone, type::Fn::with_rest(new type::Any), true);
+                          op_clone, type::Fn::with_rest(new type::Any), true));
 
-  op::obj_eq = new InbuiltOperator(
+  op::obj_eq->add(new InbuiltOperator(
       "object =", "Equality test for Objects", op_obj_eq,
-      type::Fn::with_args({new type::Any, new type::Any}), true);
+      type::Fn::with_args({new type::Any, new type::Any}), true));
 
-  op::obj_pset = new InbuiltOperator(
+  op::obj_pset->add(new InbuiltOperator(
       "parent-set", "Sets provided slot to a parent slot", op_obj_eq,
-      type::Fn::with_args({new type::Symbol, new type::Any}), true);
+      type::Fn::with_args({new type::Symbol, new type::Any}), true));
 }

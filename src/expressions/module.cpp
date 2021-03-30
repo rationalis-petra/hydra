@@ -9,6 +9,8 @@ using std::list;
 using namespace expr;
 using namespace interp;
 
+Parent* Module::parent;
+
 void Module::mark_node() {
   if (marked) return;
   Object::mark_node();
@@ -19,7 +21,16 @@ void Module::mark_node() {
 
 Module::Module() {}
 
+void Module::set_parent() {
+  Symbol* pt = keyword_module->intern("parent");
+  parents.insert(pt);
+  slots[pt] = parent;
+}
+
 Module::Module(string _name) {
+  Symbol* pt = keyword_module->intern("parent");
+  parents.insert(pt);
+  slots[pt] = parent;
   name = _name;
 }
 
@@ -68,11 +79,11 @@ Symbol *Module::intern(list<string> path) {
 }
 
 Object *Module::get(string str) {
-  map<string, Symbol*>::iterator loc = symbols.find(str);
-  if (loc == symbols.end()) {
+  auto it = symbols.find(str);
+  if (it == symbols.end()) {
     return nil::get();
   } else {
-    return loc->second;
+    return it->second;
   }
 }
 

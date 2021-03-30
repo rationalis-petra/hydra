@@ -45,12 +45,12 @@ namespace op {
 
 // Stirng operations: creation, slot retreival, inheritance (expr::Operator* op,
 // prototyping)
-  extern expr::Operator* mk_obj;
-  extern expr::Operator* obj_get;
-  extern expr::Operator* obj_set;
-  extern expr::Operator* clone;
-  extern expr::Operator* obj_eq;
-  extern expr::Operator* obj_pset;
+  extern expr::GenericFn* mk_obj;
+  extern expr::GenericFn* obj_get;
+  extern expr::GenericFn* obj_set;
+  extern expr::GenericFn* clone;
+  extern expr::GenericFn* obj_eq;
+  extern expr::GenericFn* obj_pset;
 
 // Symbol operations: making mutable/unmutable
   extern expr::Operator* lock;
