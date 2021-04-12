@@ -23,7 +23,12 @@ GenericFn::GenericFn() {
 }
 
 string GenericFn::to_string(LocalRuntime &r, LexicalScope &s) {
-  return "<generic function>";
+  auto iter = slots.find(get_keyword("name"));
+  if (iter != slots.end()) {
+    return "<gfn: " + iter->second->to_string(r, s) + ">";
+  } else {
+    return "<anonymous gfn>";
+  }
 }
 
 void GenericFn::mark_node() {
@@ -97,7 +102,8 @@ Object *GenericFn::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s
   // in addition, we need to introduce the 'call-next' function into
   // the lexical scope
   if (applicables.empty()) {
-    string err = "no applicable method found in generic function";
+    string err = "no applicable method found in generic function" +
+                 hydra_to_string(this, r, s);
     throw err;
   } else {
     Symbol *call_next = core_module->intern("call-next");

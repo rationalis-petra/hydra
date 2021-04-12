@@ -96,7 +96,7 @@ void op::initialize_mirror() {
   get_slot_val = new GenericFn;
   get_slot_val->type = type::Fn::with_args({type::mirror_type, new type::Symbol});
   set_slot_val = new GenericFn;
-  set_slot_val->type = type::Fn::with_args({type::mirror_type, new type::Symbol});
+  set_slot_val->type = type::Fn::with_args({type::mirror_type, new type::Symbol, new type::Any});
   set_slot_parent = new GenericFn;
   delete_slot = new GenericFn;
   delete_slot->type = type::Fn::with_args({type::mirror_type, new type::Symbol});

@@ -5,7 +5,6 @@
 #include "types.hpp"
 
 using std::string;
-using std::list;
 
 using namespace type;
 using namespace interp;

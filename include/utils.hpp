@@ -15,11 +15,12 @@ template<typename T> T get_inbuilt(expr::Object* obj) {
     // is a user-defined type which inherits from it
     std::set<expr::Symbol*> parent_names = obj->parents;
     for (auto sym : parent_names) {
-      try {
-        return get_inbuilt<T>(obj->slots[sym]);
-      } catch (bool b) {}
+      T obj =  get_inbuilt<T>(obj->slots[sym]);
+      if (obj)  {
+        return obj;
+      }
     }
-    throw true;
+    return nullptr;
   }
 }
 

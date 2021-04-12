@@ -10,6 +10,8 @@ using namespace expr;
 using namespace interp;
 
 GarbageCollector* Object::collector;
+Parent* Object::common_behaviour;
+Parent* Object::default_behaviour;
 
 Object::Object() {collector->register_node(this);
   marked = false;

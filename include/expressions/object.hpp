@@ -11,8 +11,14 @@
 namespace expr {
 
 struct Operator;
+struct Parent;
+struct Contract;
 
 struct Object {
+  // PARENTS
+  static Parent* default_behaviour;
+  static Parent* common_behaviour;
+
   // CREATION & DELETION
   Object();
   virtual ~Object();
@@ -25,6 +31,7 @@ struct Object {
   std::set<Symbol *> parents;
   std::map<Symbol *, Object *> slots;
   std::map<Symbol *, Object *> metadata;
+  Contract* contract;
   Operator *invoker;
 
   // STANDARD FUNCTIONS

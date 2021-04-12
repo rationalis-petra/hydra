@@ -10,6 +10,7 @@ namespace expr {
   // Used to represent a parent-class for a datatype, e.g. Integer,
   // Char, etc.
 struct Parent : public Object {
+
   Parent(std::string);
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   std::string name;

@@ -54,6 +54,12 @@ int main(int argc, char **argv) {
   Union::parent = new Parent("Union parent");
   Mirror::parent = new Parent("Mirror parent");
   Module::parent = new Parent("Module parent");
+  //Object::any_parent = new Parent("Any parent");
+  Object::common_behaviour = new Parent("Common Behaviour");
+  Object::default_behaviour = new Parent("Default Behaviour");
+
+  // PARENT
+
 
   // We need to specially setup the root & keyword modules because 
   // we don't have the "parent" symbol yet!!

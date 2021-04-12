@@ -21,28 +21,58 @@ Object *op_obj_get(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
+#include <iostream>
 Object *op_mk_object(list<Object *> arg_list, LocalRuntime &r,
                      LexicalScope &s) {
+  Object *object = new Object;
 
-  Object *obj = new Object;
+  // Default behaviour
+  Symbol* defbeh = get_keyword("default-behaviour");
+  object->slots[defbeh] = Object::default_behaviour;
 
   for (Object *kvp : arg_list) {
-    Tuple *tup = get_inbuilt<Tuple *>(kvp);
-    Symbol *slot = get_inbuilt<Symbol *>(tup->values[0]);
-    Object *value = get_inbuilt<Object *>(tup->values[1]);
-    Object *has_getter = get_inbuilt<Object *>(tup->values[2]);
-    Object *has_setter = get_inbuilt<Object *>(tup->values[3]);
-    Object *is_parent = get_inbuilt<Object *>(tup->values[4]);
+    Cons *cns = get_inbuilt<Cons *>(kvp);
+    list<Object*> slot_descriptor = cons_to_list(cns);
+    Symbol *slot = get_inbuilt<Symbol *>(slot_descriptor.front());
+    slot_descriptor.pop_front();
+    Object *value = get_inbuilt<Object *>(slot_descriptor.front());
+    slot_descriptor.pop_front();
 
-    obj->slots[slot] = value;
-    if (!is_parent->null()) {
-      obj->parents.insert(slot);
+    bool is_parent = false;
+
+    for (Object* obj: slot_descriptor) {
+      if (Cons* cns = get_inbuilt<Cons*>(obj)) {
+        Symbol* sym = get_inbuilt<Symbol*>(cns->car);
+        list<Object*> args = cons_to_list(cns->cdr);
+
+        if (sym == get_keyword("parent")) {
+          is_parent = true;
+        } else if (sym == get_keyword("accessor")) {
+        } else if (sym == get_keyword("reader")) {
+        } else if (sym == get_keyword("writer")) {
+        } else {
+        }
+      } else if (Symbol* sym = get_inbuilt<Symbol*>(obj)) {
+        if (sym == get_keyword("parent")) {
+          is_parent = true;
+        } else if (sym == get_keyword("accessor")) {
+        } else if (sym == get_keyword("reader")) {
+        } else if (sym == get_keyword("writer")) {
+        } else {
+        }
+      } else {
+        string err = "Incorrect argument to mk_object";
+        throw err;
+      }
     }
-    if (!has_getter->null()) {
+
+    object->slots[slot] = value;
+    if (is_parent) {
+      object->parents.insert(slot);
     }
   }
 
-  return obj;
+  return object;
 }
 
 Object *op_obj_set(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
@@ -103,8 +133,7 @@ void op::initialize_user_obj() {
   op::mk_obj = new GenericFn;
   op::mk_obj->type = type::Fn::with_all(
       {},
-      new type::Tuple({new type::Symbol, new type::Any, new type::Any,
-                       new type::Any, new type::Any}),
+      new type::Cons,
       new type::Any);
   op::obj_set = new GenericFn;
   op::obj_set->type =
@@ -124,8 +153,7 @@ void op::initialize_user_obj() {
       "obj", "Create a new object", op_mk_object,
       type::Fn::with_all(
           {},
-          new type::Tuple({new type::Symbol, new type::Any, new type::Any,
-                           new type::Any, new type::Any}),
+          new type::Cons,
           new type::Any),
       true));
 

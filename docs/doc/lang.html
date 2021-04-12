@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Hydra</title>
+    
+    <meta charset = "utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+      .wrapper {
+          display: flex;
+          align-items: stretch;
+          width: 100%;
+      }
+      .content {
+          width: 100%;
+      }
+    </style>
+  </head>
+
+  <body class = "bg-dark">
+    <div class = "wrapper">
+
+      <nav class="navbar bg-dark" style = "align-items: start;">
+        <ul class="navbar-nav" >
+          <a class = "navbar-brand" href = "../index.html">
+            <img src = "../icons/hydra_black.svg" width="40" height="40" class="d-inline-block"></img>
+            Hydra
+          </a>
+          <li class = "nav-item">
+            <a class = "nav-link" href="intro.html">Intro</a>
+          </li>
+          <li class = "nav-item">
+            <a  class = "nav-link" href="#">Lang</a>
+          </li>
+          <li class = "nav-item">
+            <a  class = "nav-link" href="core.html">Core</a>
+          </li>
+          <li class = "nav-item">
+            <a class = "nav-link" href="#Contact">IO</a>
+          </li>
+          <li class = "nav-item">
+            <a class = "nav-link" href="#Contact">Concurrency</a>
+          </li>
+          <li class = "nav-item">
+            <a class = "nav-link" href="#Contact">FFI</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="content">
+        
+
+        <div class = "container bg-dark text-white" style="padding-bottom: 150px">
+
+
+          <div class = "row">
+            <div class = "col justify-content-center">
+              <h1>Language</h1>
+              <p>
+                Here, it is described generally how the language functions internally, referencing
+                the internal structure of objects, inheritance and function-calling. 
+              </p>
+              <h2>Objects</h2>
+              <p>
+                All values in hydra are objects. An object in hydra consists of several parts:
+                <ol>
+                  <li> <b>Slots:</b>
+                    The most important part of an object is it's slots, which are sometimes referred to as fields in other Object
+                    Oriented languages. A slot can be thought of as a (name, value) pair, which relates names - represented internally 
+                    as objects called <i>symbols</i> to values (i.e. other objects). There is a third part of a slot which is optional,
+                    called a <i>contract</i>, which is part of inheritance in Hydra (more on this later). 
+                  <li> <b>Meta:</b>
+                    Objects also have a distinct set of slots called metadata-slots, which store (as the name implies) metadata. This information
+                    is harder to access and modify, and includes information that is useful to either the programmer (e.g. documentation) or
+                    the interpreter (e.g. debug information). 
+                  </li>
+                  <li> <b>Contract:</b>
+                    Hydra is prototype-based, which means that objects can also play the role of /classes/ in other languages, forming the basis
+                    of inheritance hierarchies. A <i>contract</i> allows for more complex, <i>parametric</i> inheritance. 
+                  </li>
+                </ol>
+              </p>
+              <h2>Function Invocation</h2>
+              <p>
+                A function invocation looks like <code>(function arg-1 arg-2 arg-3)</code> when this happens, two operations need to be performed:
+                <ol>
+                  <li>A mapping needs to be established between input values and symbols. Usually this is based on input, but may also include, e.g. keywords</li>
+                  <li>The /body/ of the expression must be evaluated, with this mapping</li>
+                </ol>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+
+</html>

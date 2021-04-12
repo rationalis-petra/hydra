@@ -21,16 +21,16 @@ std::string lang = R"(
 (export (current-module) (quote def))
 (bind (quote def) 
   (mac (symbol val :rest body)
-    (list (quote bind) (list (quote quote) symbol)
-          (if body
-              (if (and (defined? symbol) (type? Gen (eval symbol)))
-                  (list (quote add-fn) 
-                        symbol
-                        (cons (quote fn) (cons val body)))
-                  (cons (quote fn)
-                        (cons :self symbol val)
-                        body))
-              val))))
+      (list (quote bind) (list (quote quote) symbol)
+            (if body
+                (if (and (defined? symbol) (type? Gen (eval symbol)))
+                    (list (quote add-fn) 
+                          symbol
+                          (cons (quote fn) (cons val body)))
+                    (cons (quote fn)
+                          (cons :self symbol val)
+                          body))
+                val))))
 
 "The defn, i.e. define-function"
 (export (current-module) (quote defn))
@@ -53,12 +53,18 @@ std::string lang = R"(
 
 (export (current-module) (quote defimpl))
 (bind (quote defimpl) (mac (name arg-list :rest body)
-  (list (quote bind) (list (quote quote) name)
-    (list (quote add-fn) name
-      (cons (quote fn)
-        (cons
-          (cons (quote :self) (cons name arg-list))
-           body))))))
+  (list
+    (quote progn)
+    (list (quote bind) (list (quote quote) name)
+      (list (quote add-fn) name
+        (cons (quote fn)
+          (cons
+            (cons (quote :self) (cons name arg-list))
+             body))))
+    (list (quote set-slot)
+          (list (quote reflect) symbol)
+          :name
+           symbol))))
 
 (export (current-module) (quote defvar))
 (bind (quote defvar) (mac (name value)
@@ -249,8 +255,8 @@ std::string lang = R"(
 
 (def ref (val)
   (object
-    [:parent ref-object nil nil t]
-    [:value val t t t]))
+    (@l :parent ref-object :parent)
+    (@l :value val :parent :accessor)))
 
 (def set! ((ref Ref) value)
   (set ref :value value))
