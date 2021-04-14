@@ -56,16 +56,18 @@ int main(int argc, char **argv) {
   Object::default_behaviour = new Parent("Default Behaviour");
 
   // Here are the rest of the "normal" types
-  Integer::parent = new Parent("Integer-Parent");
-  HString::parent = new Parent("String-Parent");
-  Cons::parent = new Parent("Cons-Parent");
-  Tuple::parent = new Parent("Tuple-Parent");
-  Char::parent = new Parent("Char-Parent");
-  Union::parent = new Parent("Union-Parent");
-  Mirror::parent = new Parent("Mirror-Parent");
-  Module::parent = new Parent("Module-Parent");
-  Symbol::parent = new Parent("Symbol-Parent");
-  // TODO: streams, functions...
+  Integer::parent = new Parent("integer-parent");
+  HString::parent = new Parent("string-parent");
+  Cons::parent = new Parent("cons-parent");
+  Tuple::parent = new Parent("tuple-parent");
+  Char::parent = new Parent("char-parent");
+  Union::parent = new Parent("union-parent");
+  Mirror::parent = new Parent("mirror-parent");
+  Module::parent = new Parent("module-parent");
+  Symbol::parent = new Parent("symbol-parent");
+  Istream::parent = new Parent("istream-parent");
+  Ostream::parent = new Parent("ostream-parent");
+  IOstream::parent = new Parent("iostream-parent");
 
 
 
@@ -106,6 +108,12 @@ int main(int argc, char **argv) {
   sym = g.root->intern("hydra");
   sym->value = language_module;
   r.active_module = language_module;
+
+
+  // now that keywords are working, we can set the Istream/Ostream as
+  // parents of IOstream
+  IOstream::parent->slots[get_keyword("istream")] = Istream::parent;
+  IOstream::parent->slots[get_keyword("ostream")] = Ostream::parent;
 
   // SETUP Operators
   // we have operators on types, which is required to create some types,
@@ -398,9 +406,9 @@ void make_modules() {
     make_pair("Module", type::module_type),
     make_pair("Symbol", type::symbol_type),
     make_pair("List", new type::List),
-    make_pair("IOStream", new type::IOStream),
-    make_pair("IStream", new type::Istream),
-    make_pair("OStream", new type::Ostream),
+    make_pair("IOStream", type::iostream_type),
+    make_pair("IStream", type::istream_type),
+    make_pair("OStream", type::ostream_type),
     make_pair("Cons", new type::Cons),
     // Mac
     // Op

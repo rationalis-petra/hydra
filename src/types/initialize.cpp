@@ -30,9 +30,9 @@ void type::initialize_types() {
   type::character_type = new Derives(expr::Char::parent);
   type::module_type = new Derives(expr::Module::parent);
   type::string_type = new Derives(expr::HString::parent);
-  // type::istream_type = new Derives(expr::IStream::parent);
-  // type::ostream_type = new Derives(expr::OStream::parent);
-  // type::iostream_type = new Derives();
+  type::istream_type = new Derives(expr::Istream::parent);
+  type::ostream_type = new Derives(expr::Ostream::parent);
+  type::iostream_type = new Derives(expr::IOstream::parent);
   // type::meta_type = new Derives(Type::parent);
   type::mirror_type = new Derives(expr::Mirror::parent);
   type::symbol_type = new Derives(expr::Symbol::parent);

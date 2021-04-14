@@ -218,7 +218,7 @@ void op::initialize_io() {
       "Takes an input stream, advances it one character\n"
       "and returns the character at the 'current' position",
       op_next,
-      type::Fn::with_all({new type::Istream}, nullptr, new type::Istream),
+      type::Fn::with_all({type::istream_type}, nullptr, type::istream_type),
       true);
 
   op::peek = new InbuiltOperator(
@@ -226,7 +226,7 @@ void op::initialize_io() {
       "Takes an input stream, and peeks at the next character\n"
       "but does not advance the input stream",
       op_peek,
-      type::Fn::with_all({new type::Istream}, nullptr, type::character_type),
+      type::Fn::with_all({type::istream_type}, nullptr, type::character_type),
       true);
 
   op::put = new InbuiltOperator(
@@ -234,12 +234,12 @@ void op::initialize_io() {
       "Takes an output stream, a character, and puts the\n"
       "character in the output stream's current position",
       op_put,
-      type::Fn::with_all({new type::Ostream}, nullptr, type::character_type),
+      type::Fn::with_all({type::ostream_type}, nullptr, type::character_type),
       true);
 
   op::endp = new InbuiltOperator(
       "end?",
       "Returns t if a given input stream has reached the\n"
       "end of the file, and nil otherwise",
-      op_endp, type::Fn::with_args({new type::Istream}), true);
+      op_endp, type::Fn::with_args({type::istream_type}), true);
 }

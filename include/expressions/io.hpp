@@ -8,6 +8,8 @@
 namespace expr {
 
 struct Istream : public Object {
+  Istream();
+  static Parent* parent;
   virtual void mark_node();
 
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
@@ -16,6 +18,8 @@ struct Istream : public Object {
 };
 
 struct Ostream : public Object {
+  Ostream();
+  static Parent* parent;
   virtual void mark_node();
 
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
@@ -24,6 +28,8 @@ struct Ostream : public Object {
 };
 
 struct IOstream : public Object {
+  IOstream();
+  static Parent* parent;
   virtual void mark_node();
 
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
