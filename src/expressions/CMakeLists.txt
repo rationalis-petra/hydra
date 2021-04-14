@@ -10,6 +10,7 @@ add_library(expressions OBJECT
                         data/vector.cpp
                         data/parent.cpp
 
+                        accessor.cpp
                         concurrency.cpp
                         mirror.cpp
                         object.cpp

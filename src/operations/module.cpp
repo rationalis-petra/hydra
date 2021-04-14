@@ -188,7 +188,7 @@ void op::initialize_module() {
       "symbol",
       "Generates a new, unique symbol whose name is the provided string",
       op_mk_symbol,
-      type::Fn::with_all({type::string_type}, nullptr, new type::Symbol), true);
+      type::Fn::with_all({type::string_type}, nullptr, type::symbol_type), true);
   op::mk_module = new InbuiltOperator(
       "module", "Generates a new module whose name is the provided string",
       op_mk_module,
@@ -204,7 +204,7 @@ void op::initialize_module() {
       "package with that name and return it",
       op_intern,
       type::Fn::with_all({type::module_type, type::string_type}, nullptr,
-                         new type::Symbol),
+                         type::symbol_type),
       true);
   op::insert = new InbuiltOperator(
       "insert",
@@ -212,8 +212,8 @@ void op::initialize_module() {
       "or return an error if a symbol with that name already exists in\n"
       "current module",
       op_insert,
-      type::Fn::with_all({type::module_type, new type::Symbol}, nullptr,
-                         new type::Symbol),
+      type::Fn::with_all({type::module_type, type::symbol_type}, nullptr,
+                         type::symbol_type),
       true);
 
   op::get = new InbuiltOperator(
@@ -221,7 +221,7 @@ void op::initialize_module() {
       "Takes a module and a string; if a symbol with the name exists in"
       "the module, return it. Otherwise, return nil",
       op_get,
-      type::Fn::with_all({type::string_type}, nullptr, new type::Symbol), true);
+      type::Fn::with_all({type::string_type}, nullptr, type::symbol_type), true);
   op::get_module = new InbuiltOperator("current-module",
                                        "Returns the current (active) module",
                                        op_get_module, new type::Fn, true);
@@ -235,7 +235,7 @@ void op::initialize_module() {
   op::do_export = new InbuiltOperator(
       "export", "Moves a symbol into a modules' list of exported symbols",
       op_export,
-      type::Fn::with_all({type::module_type, new type::Symbol}, nullptr,
+      type::Fn::with_all({type::module_type, type::symbol_type}, nullptr,
                          type::module_type),
       true);
 }

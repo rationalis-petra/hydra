@@ -247,25 +247,25 @@ std::string lang = R"(
                   (get-vals (cdr binding))))))
      arg-list)))
 
-(export (current-module) 'ref)
-(export (current-module) 'get!)
-(export (current-module) 'set!)
-(def ref-object {})
-(def Ref (Derives ref-object)) 
-
-(def ref (val)
-  (object
-    (@l :parent ref-object :parent)
-    (@l :value val :parent :accessor)))
-
-(def set! ((ref Ref) value)
-  (set ref :value value))
-
-(def get! ((ref Ref))
-  (get ref :value)) 
-
-(def to-string ((ref Ref))
-  (concat "<reference: " (to-string (get! ref)) ">"))
+;; (export (current-module) 'ref)
+;; (export (current-module) 'get!)
+;; (export (current-module) 'set!)
+;; (def ref-object {})
+;; (def Ref (Derives ref-object)) 
+;;
+;; (def ref (val)
+;;   (object
+;;     (@l :parent ref-object :parent)
+;;     (@l :value val :parent :accessor)))
+;;
+;; (def set! ((ref Ref) value)
+;;   (set ref :value value))
+;;
+;; (def get! ((ref Ref))
+;;   (get ref :value)) 
+;;
+;; (def to-string ((ref Ref))
+;;   (concat "<reference: " (to-string (get! ref)) ">"))
 
 (insert (current-module) '&:hydra:concurrent:thread)
 
@@ -296,11 +296,11 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 
 ;;; MODULES
 (export (current-module) 'gensym)
-(def gensym-counter (ref 0))
-(def gensym ()
-  (let ((x (get! gensym-counter)))
-     (set! gensym-counter (+ gensym-counter 1))
-     (symbol (to-string x))))
+; (def gensym-counter (ref 0))
+; (def gensym ()
+;   (let ((x (get! gensym-counter)))
+;      (set! gensym-counter (+ gensym-counter 1))
+;      (symbol (to-string x))))
 
 (export (current-module) 'use-module)
 (def use-module (module1 module2)

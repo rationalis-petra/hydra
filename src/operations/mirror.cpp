@@ -94,21 +94,21 @@ void op::initialize_mirror() {
   get_slots = new GenericFn;
   get_slots->type = type::Fn::with_args({type::mirror_type});
   get_slot_val = new GenericFn;
-  get_slot_val->type = type::Fn::with_args({type::mirror_type, new type::Symbol});
+  get_slot_val->type = type::Fn::with_args({type::mirror_type, type::symbol_type});
   set_slot_val = new GenericFn;
-  set_slot_val->type = type::Fn::with_args({type::mirror_type, new type::Symbol, new type::Any});
+  set_slot_val->type = type::Fn::with_args({type::mirror_type, type::symbol_type, new type::Any});
   set_slot_parent = new GenericFn;
   delete_slot = new GenericFn;
-  delete_slot->type = type::Fn::with_args({type::mirror_type, new type::Symbol});
+  delete_slot->type = type::Fn::with_args({type::mirror_type, type::symbol_type});
 
   get_meta = new GenericFn;
   get_meta->type = type::Fn::with_args({type::mirror_type});
   get_meta_val = new GenericFn;
-  get_meta_val->type = type::Fn::with_args({type::mirror_type, new type::Symbol});
+  get_meta_val->type = type::Fn::with_args({type::mirror_type, type::symbol_type});
   set_meta_val = new GenericFn;
-  set_meta_val->type = type::Fn::with_args({type::mirror_type, new type::Symbol, new type::Any});
+  set_meta_val->type = type::Fn::with_args({type::mirror_type, type::symbol_type, new type::Any});
   delete_meta = new GenericFn;
-  delete_meta->type = type::Fn::with_args({type::mirror_type, new type::Symbol});
+  delete_meta->type = type::Fn::with_args({type::mirror_type, type::symbol_type});
 
   get_mirror = new GenericFn;
   get_mirror->type = type::Fn::with_args({new type::Any});
@@ -124,16 +124,16 @@ void op::initialize_mirror() {
 
   get_slot_val->add(new InbuiltOperator(
       "get-slots", "gets the value a slot with a given symbol", op_get_slot_val,
-      type::Fn::with_args({type::mirror_type, new type::Symbol}), true));
+      type::Fn::with_args({type::mirror_type, type::symbol_type}), true));
 
   set_slot_val->add(new InbuiltOperator(
       "set-slot", "sets the value of a given slot", op_set_slot_val,
-      type::Fn::with_args({type::mirror_type, new type::Symbol, new type::Any}),
+      type::Fn::with_args({type::mirror_type, type::symbol_type, new type::Any}),
       true));
 
   delete_slot->add(new InbuiltOperator(
       "remove-slot", "removes a slot from an object", op_delete_slot,
-      type::Fn::with_args({type::mirror_type, new type::Symbol}), true));
+      type::Fn::with_args({type::mirror_type, type::symbol_type}), true));
 
 
 
@@ -145,17 +145,17 @@ void op::initialize_mirror() {
 
   get_meta_val->add(new InbuiltOperator(
       "get-metaslot", "gets the value of a metadata-slot with a given symbol",
-      op_get_meta, type::Fn::with_args({type::mirror_type, new type::Symbol}),
+      op_get_meta, type::Fn::with_args({type::mirror_type, type::symbol_type}),
       true));
 
   set_meta_val->add(new InbuiltOperator(
       "set-metaslot", "sets the value of a given metadata slot",
       op_set_meta_val,
-      type::Fn::with_args({type::mirror_type, new type::Symbol, new type::Any}),
+      type::Fn::with_args({type::mirror_type, type::symbol_type, new type::Any}),
       true));
 
   delete_meta->add(new InbuiltOperator(
       "remove-metaslot", "removes a given metadata slot from an object",
       op_delete_meta,
-      type::Fn::with_args({type::mirror_type, new type::Symbol}), true));
+      type::Fn::with_args({type::mirror_type, type::symbol_type}), true));
 }

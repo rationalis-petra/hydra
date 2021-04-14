@@ -26,6 +26,7 @@ Object *Operator::operator()(std::list<Object *> arg_list, LocalRuntime &r,
 
 Operator::Operator() {
   type = new type::Fn;
+  is_fn = true;
   Symbol* dstring = get_keyword("docstring");
   metadata[dstring] = new HString;
   invoker = this;

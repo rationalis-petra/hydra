@@ -45,35 +45,61 @@ void make_modules();
 int main(int argc, char **argv) {
   Object::collector = new STWCollector(g);
 
-  // set up the "parents" for each major type
-  Integer::parent = new Parent("Integer parent");
-  HString::parent = new Parent("String parent");
-  Cons::parent = new Parent("Cons parent");
-  Tuple::parent = new Parent("Tuple parent");
-  Char::parent = new Parent("Char parent");
-  Union::parent = new Parent("Union parent");
-  Mirror::parent = new Parent("Mirror parent");
-  Module::parent = new Parent("Module parent");
-  //Object::any_parent = new Parent("Any parent");
+  // SETUP PARENTS
+  // As hydra is prototype-based, objects of each "type" (integer, string, ...)
+  // must notionally inherit from some parent object - the "string-parent" or
+  // "integer parent", etc. We create them here.
+
+  // Common-bechaviour and default-behaviour are two special cases:
+  // common-behaviour acts a parent to almost all objects
   Object::common_behaviour = new Parent("Common Behaviour");
   Object::default_behaviour = new Parent("Default Behaviour");
 
-  // PARENT
+  // Here are the rest of the "normal" types
+  Integer::parent = new Parent("Integer-Parent");
+  HString::parent = new Parent("String-Parent");
+  Cons::parent = new Parent("Cons-Parent");
+  Tuple::parent = new Parent("Tuple-Parent");
+  Char::parent = new Parent("Char-Parent");
+  Union::parent = new Parent("Union-Parent");
+  Mirror::parent = new Parent("Mirror-Parent");
+  Module::parent = new Parent("Module-Parent");
+  Symbol::parent = new Parent("Symbol-Parent");
+  // TODO: streams, functions...
 
 
-  // We need to specially setup the root & keyword modules because 
+
+
+  // SETUP MODULES
+  // We need to specially setup the keyword module because 
   // we don't have the "parent" symbol yet!!
+  // so we need to do some special out-of sequence construction to
+  // avoid "parent" attempting to intern itself in an endless loop...
+  keyword_module = new Module();
+  keyword_module->name = "keyword";
+  {
+    // Symbols are descended from the Symbol-Parent object, which lives
+    // in the slot with symbol 'parent'. Hence, we first need to create
+    // the parent symbol, then assign it's slot with symbol parent (i.e. itself)
+    // to the Symbol-Parent object.
+    Symbol *parent_sym = Symbol::symbol_no_parent("parent");
+    keyword_module->symbols["parent"] = parent_sym;
+    parent_sym->slots[parent_sym] = Symbol::parent;
+    parent_sym->parents.insert(parent_sym);
+  }
+
+  // Construct the root module & place keyword within it
   g.root = new Module();
   Symbol* sym = g.root->intern("keyword");
-  sym->value = new Module();
-  keyword_module = (Module*) sym->value;
-  keyword_module->name = "keyword";
+  sym->value = keyword_module;
 
-  // now, we can intern "parent" in keyword_module 
-  // so we can add parent slot to root & keyword module
+  // now, we can set both the root and keyword modules to have their
+  // parent be the Module-Parent object
   g.root->set_parent();
   keyword_module->set_parent();
 
+  // we also setup some parent relations for types
+  Object::default_behaviour->slots[get_keyword("parent")] = Object::common_behaviour;
 
 
   language_module = new Module("hydra");
@@ -81,12 +107,18 @@ int main(int argc, char **argv) {
   sym->value = language_module;
   r.active_module = language_module;
 
-  // SPECIAL: type initialization
+  // SETUP Operators
+  // we have operators on types, which is required to create some types,
+  // but operators need to be annotated with types. Hence, the first three
+  // functions here are special: initialize_type_ops initializes the operators
+  // but does not add type annotations. Once that is done, we can create (initialze)
+  // the types, then add annotations to the operatos which operate on types...
   op::initialize_type_ops();
   type::initialize_types();
   op::type_type_ops();
 
-
+  // this are more simple - simply assigning the operatos like '+' and
+  // 'to-string' to global variables 
   op::mk_arithmetic();
   op::initialize_mirror();
   op::initialize_user_obj();
@@ -107,10 +139,7 @@ int main(int argc, char **argv) {
   // we place read last because it uses other operations
   op::initialize_read();
 
-
   make_modules();
-
-  // Object::r = &r;
 
   // arithmetic
 
@@ -148,6 +177,7 @@ int main(int argc, char **argv) {
   prog->stream = new stringstream(lang);
   Object *ast;
   Object *out;
+
 
   // if argc > 1, assume they are file names
   int count = argc;
@@ -366,7 +396,7 @@ void make_modules() {
     make_pair("Vector", new type::Vector),
     make_pair("Type", new type::MetaType),
     make_pair("Module", type::module_type),
-    make_pair("Symbol", new type::Symbol),
+    make_pair("Symbol", type::symbol_type),
     make_pair("List", new type::List),
     make_pair("IOStream", new type::IOStream),
     make_pair("IStream", new type::Istream),

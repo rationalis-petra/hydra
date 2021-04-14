@@ -37,6 +37,7 @@ struct Module : public Object {
 
 struct Symbol : public Object {
   virtual void mark_node();
+  static Parent* parent;
 
   // mutability
   bool mut;
@@ -46,8 +47,12 @@ struct Symbol : public Object {
   // std::list<hydra_module*> modules;
 
   Symbol(std::string name);
+  static Symbol* symbol_no_parent(std::string name);
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   Object *eval(interp::LocalRuntime &r, interp::LexicalScope &s);
+
+private:
+  Symbol();
 };
 
 struct Pattern : public Object {
@@ -56,13 +61,6 @@ struct Pattern : public Object {
 
   Object* match(Object* o);
   Object *eval(interp::LocalRuntime &r, interp::LexicalScope &s);
-};
-
-struct Ref : public Object {
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
-  virtual void mark_node();
-
-  Object *ptr;
 };
 
 }

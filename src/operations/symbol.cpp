@@ -42,11 +42,11 @@ void op::initialize_symbol() {
                                  "lock",
       "Takes a symbol, and prevents set from being used to modify its' value",
       op_lock,
-      type::Fn::with_all({new type::Symbol}, nullptr, new type::Symbol), true);
+      type::Fn::with_all({type::symbol_type}, nullptr, type::symbol_type), true);
 
   op::unlock = new InbuiltOperator(
                                    "unlock",
       "Takes a symbol, and will allow set to be used to modify it's value",
       op_lock,
-      type::Fn::with_all({new type::Symbol}, nullptr, new type::Symbol), true);
+      type::Fn::with_all({type::symbol_type}, nullptr, type::symbol_type), true);
 }

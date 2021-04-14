@@ -3,6 +3,7 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
 
 using std::list;
 using std::string;
@@ -54,7 +55,7 @@ Object *op_while(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_bind(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  if (Symbol *symbol = dynamic_cast<Symbol *>(arg_list.front())) {
+  if (Symbol *symbol = get_inbuilt<Symbol *>(arg_list.front())) {
     Object *value = arg_list.back();
 
     // if there is a lexical scope with the value
@@ -191,14 +192,14 @@ void op::initialize_language() {
       op_while, type::Fn::with_rest(new type::Any), false);
   op::bind = new InbuiltOperator(
       "bind", "Sets the value symbol (first argument) to the second argument",
-      op_bind, type::Fn::with_args({new type::Symbol, new type::Any}), true);
+      op_bind, type::Fn::with_args({type::symbol_type, new type::Any}), true);
 
   op::unbind = new InbuiltOperator(
       "unbind", "Removes the value from a symbol", op_unbind,
-      type::Fn::with_args({new type::Symbol}), true);
+      type::Fn::with_args({type::symbol_type}), true);
   op::definedp = new InbuiltOperator(
       "defined?", "Returns t if symbol contains a value, and nil otherwise",
-      op_definedp, type::Fn::with_args({new type::Symbol}), true);
+      op_definedp, type::Fn::with_args({type::symbol_type}), true);
   op::quote = new InbuiltOperator(
       "quote", "Prevents evaluation of the argument it is provided", op_quote,
       type::Fn::with_args({new type::Any}), false);

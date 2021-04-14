@@ -18,6 +18,10 @@ namespace type {
   extern Type* iostream_type;
   extern Type* mirror_type;
   extern Type* meta_type;
+  extern Type* symbol_type;
+
+  extern Type* common_type;
+  extern Type* default_type;
 
   void initialize_types();
 

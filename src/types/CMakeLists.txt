@@ -11,6 +11,5 @@ add_library(types OBJECT cons.cpp
                          gen_fn.cpp
                          stream.cpp
                          is.cpp
-                         symbol.cpp
                          fn.cpp
                          vector.cpp)

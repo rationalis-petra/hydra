@@ -9,7 +9,7 @@ using std::string;
 std::list<Object*> cons_to_list(Object* v) {
   list<Object*> out;
   while (!v->null()) {
-    Cons* cns = dynamic_cast<Cons*>(v);
+    Cons* cns = get_inbuilt<Cons*>(v);
     if (!cns) {
       std::string err = "Interperter Error in cons_to_list: provided something that is not a nil or cons";
       throw err;

@@ -210,7 +210,7 @@ void op::initialize_io() {
       "Takes a string (path), and returns an input stream located\n"
       "by the path",
       op_open_file,
-      type::Fn::with_args_optional({type::string_type}, {new type::Symbol}),
+      type::Fn::with_args_optional({type::string_type}, {type::symbol_type}),
       true);
 
   op::next = new InbuiltOperator(

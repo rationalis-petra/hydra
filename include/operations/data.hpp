@@ -34,16 +34,17 @@ namespace op {
   extern expr::Operator* tuple_elt;
   extern expr::Operator* tuple_eq;
 
-// Stirng operations: creation, indexing, length & concatenation
+// String operations: creation, indexing, length & concatenation
   extern expr::Operator* to_str;
   extern expr::Operator* str_elt;
   extern expr::Operator* str_gr;
   extern expr::Operator* str_len;
   extern expr::Operator* str_cat;
   extern expr::Operator* str_eq;
+  // character
   extern expr::Operator* char_eq;
 
-// Stirng operations: creation, slot retreival, inheritance (expr::Operator* op,
+// Object operations: creation, slot retreival, inheritance (expr::Operator* op,
 // prototyping)
   extern expr::GenericFn* mk_obj;
   extern expr::GenericFn* obj_get;
@@ -51,6 +52,8 @@ namespace op {
   extern expr::GenericFn* clone;
   extern expr::GenericFn* obj_eq;
   extern expr::GenericFn* obj_pset;
+
+
 
 // Symbol operations: making mutable/unmutable
   extern expr::Operator* lock;

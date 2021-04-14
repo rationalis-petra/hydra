@@ -1,5 +1,6 @@
 #include <list>
 
+#include <iostream>
 #include "expressions.hpp"
 
 std::list<expr::Object*> cons_to_list(expr::Object* v);
@@ -13,9 +14,11 @@ template<typename T> T get_inbuilt(expr::Object* obj) {
     return x;
   } else {
     // is a user-defined type which inherits from it
-    std::set<expr::Symbol*> parent_names = obj->parents;
-    for (auto sym : parent_names) {
-      T obj =  get_inbuilt<T>(obj->slots[sym]);
+
+    std::set<expr::Symbol *> parent_names = obj->parents;
+    for (expr::Symbol* sym : parent_names) {
+      expr::Object* val = obj->slots[sym];
+      T obj = get_inbuilt<T>(val);
       if (obj)  {
         return obj;
       }

@@ -17,13 +17,6 @@ public:
   virtual expr::Object *equal(Type *ty);
 };
 
-struct Symbol : public Type {
-  virtual void mark_node();
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
-  expr::Object *check_type(expr::Object *obj);
-  virtual expr::Object *subtype(Type *ty);
-};
-
 // TODO: TUPLE, UNION!!!
 
 struct Cons : public Type {

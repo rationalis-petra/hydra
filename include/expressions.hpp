@@ -14,6 +14,7 @@
 #include "expressions/language.hpp"
 #include "expressions/object.hpp"
 #include "expressions/operation.hpp"
+#include "expressions/accessor.hpp"
 #include "expressions/mirror.hpp"
 
 // the 'runtime' contains all global state this includes

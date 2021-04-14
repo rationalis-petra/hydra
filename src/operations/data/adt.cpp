@@ -73,5 +73,5 @@ void op::initialize_tuple() {
 
   op::mk_union = new InbuiltOperator(
       "union", "Will return a tagged value", op_union,
-      type::Fn::with_args({new type::Any, new type::Symbol}), true);
+      type::Fn::with_args({new type::Any, type::symbol_type}), true);
 }

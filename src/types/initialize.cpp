@@ -18,6 +18,10 @@ Type *type::ostream_type;
 Type *type::iostream_type;
 Type *type::mirror_type;
 Type *type::meta_type;
+Type *type::symbol_type;
+
+Type* type::common_type;
+Type* type::default_type;
 
 void type::initialize_types() {
   type::nil_type = new Is(expr::nil::get());
@@ -28,7 +32,11 @@ void type::initialize_types() {
   type::string_type = new Derives(expr::HString::parent);
   // type::istream_type = new Derives(expr::IStream::parent);
   // type::ostream_type = new Derives(expr::OStream::parent);
-  //type::iostream_type = new Derives();
-  //type::meta_type = new Derives(Type::parent);
+  // type::iostream_type = new Derives();
+  // type::meta_type = new Derives(Type::parent);
   type::mirror_type = new Derives(expr::Mirror::parent);
+  type::symbol_type = new Derives(expr::Symbol::parent);
+
+  type::common_type = new Derives(expr::Object::common_behaviour);
+  type::default_type = new Derives(expr::Object::default_behaviour);
 }
