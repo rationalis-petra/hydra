@@ -42,7 +42,6 @@ namespace op {
   extern expr::Operator* str_cat;
   extern expr::Operator* str_eq;
   // character
-  extern expr::Operator* char_eq;
 
 // Object operations: creation, slot retreival, inheritance (expr::Operator* op,
 // prototyping)

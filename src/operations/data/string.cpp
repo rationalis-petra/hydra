@@ -64,7 +64,6 @@ Object *op_str_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return nil::get();
 }
 
-#include <iostream>
 Object *op_char_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   Char *c1 = get_inbuilt<Char *>(arg_list.front());
@@ -77,7 +76,18 @@ Object *op_char_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return nil::get();
 }
 
-#include <iostream>
+Object *op_char_greater(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+
+  Char *c1 = get_inbuilt<Char *>(arg_list.front());
+  Char *c2 = get_inbuilt<Char *>(arg_list.back());
+
+  // TODO: maybe compare slots???
+  if (c1->value > c2->value) {
+    return t::get();
+  }
+  return nil::get();
+}
+
 Object *op_to_str(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return new HString(arg_list.front()->to_string(r, s));
 }
@@ -86,7 +96,6 @@ Operator *op::str_elt;
 Operator *op::str_cat;
 Operator *op::str_gr;
 Operator *op::str_eq;
-Operator *op::char_eq;
 Operator *op::to_str;
 
 void op::initialize_string() {
@@ -115,10 +124,17 @@ void op::initialize_string() {
       "Equality test for Strings", op_str_eq,
       type::Fn::with_args({type::string_type, type::string_type}), true);
 
-  op::char_eq = new InbuiltOperator(
+  Operator* in_char_eq = new InbuiltOperator(
                                     "char =",
       "Equality test for Characters", op_char_eq,
       type::Fn::with_args({type::character_type, type::character_type}), true);
+  op::bin_equal->add(in_char_eq);
+
+  Operator* in_char_gr = new InbuiltOperator(
+                                    "char >",
+      "Greater-than test for Characters", op_char_eq,
+      type::Fn::with_args({type::character_type, type::character_type}), true);
+  op::bin_greater->add(in_char_gr);
 
   op::to_str = new InbuiltOperator("to-string",
       "Converts an object into a string", op_to_str,

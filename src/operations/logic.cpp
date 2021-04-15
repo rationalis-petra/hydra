@@ -9,6 +9,35 @@ using std::string;
 using namespace expr;
 using namespace interp;
 
+Object *op_equal(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+  Object* out = t::get();
+
+  Object* comp = arg_list.front();
+  arg_list.pop_front();
+  for (Object* val : arg_list) {
+    if (op::bin_equal->call({comp, val}, r, s)->null()) {
+      out = nil::get();
+    }
+    comp = val;
+  }
+  return out;
+}
+
+Object *op_greater(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+  Object* out = t::get();
+
+  Object* comp = arg_list.front();
+  arg_list.pop_front();
+  for (Object* val : arg_list) {
+    if (op::bin_greater->call({comp, val}, r, s)->null()) {
+      out = nil::get();
+    }
+    comp = val;
+  }
+  return out;
+}
+
+
 Object *op_or(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   if (arg_list.size() < 2) {
@@ -62,7 +91,36 @@ Operator *op::do_or;
 Operator *op::do_and;
 Operator *op::do_not;
 
+GenericFn *op::equal;
+GenericFn *op::bin_equal;
+GenericFn *op::greater;
+GenericFn *op::bin_greater;
+
 void op::initialize_logic() {
+  Operator* in_op_equal = new InbuiltOperator(
+      "=",
+      "returns t if all arguments are equal, or nil otherwise",
+      op_equal, type::Fn::with_rest(new type::Any), true);
+  Operator* in_op_greater = new InbuiltOperator(
+      ">",
+      "Returns the first nil argument, or the last argument if all are non-nil",
+      op_greater, type::Fn::with_rest(new type::Any), true);
+
+
+
+
+  op::bin_equal = new GenericFn;
+  op::bin_equal->type = type::Fn::with_args({new type::Any, new type::Any});
+  op::bin_greater = new GenericFn;
+  op::bin_greater->type = type::Fn::with_args({new type::Any, new type::Any});
+
+  op::equal = new GenericFn;
+  op::equal->type = type::Fn::with_rest(new type::Any);
+  op::equal->add(in_op_equal);
+  op::greater = new GenericFn;
+  op::greater->type = type::Fn::with_rest(new type::Any);
+  op::greater->add(in_op_greater);
+
   op::do_or = new InbuiltOperator(
       "or",
       "Returns the first non-nil argument, or nil if all arguments are nil",

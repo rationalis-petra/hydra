@@ -19,7 +19,6 @@ Object *op_bin_plus(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 }
 
 Object *op_plus(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-  // ASSUME: all values in arg_list are rooted
   Object *out = arg_list.front();
   arg_list.pop_front();
   for(Object* num : arg_list) {
@@ -85,6 +84,13 @@ Object *op_int_gr(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
+Object *op_sqrt(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+  // we now ASSERT that arg_list is a list of length 2
+  Number *num = get_inbuilt<Number *>(arg_list.front());
+  // so arg_list is a list containing integers!
+  return num->sqrt();
+}
+
 Object *op_int_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   // we now ASSERT that arg_list is a list of length 2
 
@@ -97,22 +103,32 @@ Object *op_int_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     return nil::get();
   }
 }
+Object *op_float_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+  // we now ASSERT that arg_list is a list of length 2
+
+  Float *a1 = get_inbuilt<Float *>(arg_list.front());
+  Float *a2 = get_inbuilt<Float *>(arg_list.back());
+  // so arg_list is a list containing integers!
+  if (a1->value == a2->value) {
+    return t::get();
+  } else {
+    return nil::get();
+  }
+}
 
 GenericFn *op::bin_plus;
 GenericFn *op::bin_minus;
 GenericFn *op::bin_multiply;
 GenericFn *op::bin_divide;
-GenericFn *op::bin_greater;
-GenericFn *op::bin_equal;
 
 GenericFn *op::plus;
 GenericFn *op::minus;
 GenericFn *op::multiply;
 GenericFn *op::divide;
-GenericFn *op::greater;
-GenericFn *op::equal;
 
-void op::mk_arithmetic() {
+GenericFn *op::sqrt;
+
+void op::initialize_arithmetic() {
   // First, do the "binary" versions...
   Operator *in_bin_plus = new InbuiltOperator(
       "Binary Addition (+ x y)",
@@ -154,7 +170,7 @@ void op::mk_arithmetic() {
 
   // Now, we do the "non-binary" versions...
   Operator *in_op_plus = new InbuiltOperator(
-      "Addition (+)",
+      "+",
       "Returns the sum of its arguemnts. When "
       "provided with no arguments, returns 0",
       op_plus, type::Fn::with_rest(type::number_type), true);
@@ -164,7 +180,7 @@ void op::mk_arithmetic() {
   plus->type->rest_type = type::number_type;
 
   Operator *in_op_minus = new InbuiltOperator(
-      "Integer -",
+      "-",
       "Subtract the second and all subsequent"
       "arguments from the first",
       op_minus,
@@ -176,7 +192,7 @@ void op::mk_arithmetic() {
   op::minus->add(in_op_minus);
 
   Operator *in_op_multiply = new InbuiltOperator(
-      "Integer *",
+      "*",
       "Returns the product of all its arguments,\n or "
       "one if no arguments provided",
       op_multiply, type::Fn::with_rest(type::number_type),
@@ -186,7 +202,7 @@ void op::mk_arithmetic() {
   op::multiply->add(in_op_multiply);
 
   Operator *in_op_divide = new InbuiltOperator(
-      "Integer /",
+      "/",
       "Divides the first argument by the second and all subsequent arguments",
       op_divide,
       type::Fn::with_all({type::number_type, type::number_type},
@@ -196,21 +212,30 @@ void op::mk_arithmetic() {
   op::divide->type->rest_type = type::number_type;
   op::divide->add(in_op_divide);
 
+  Operator *in_op_sqrt = new InbuiltOperator(
+      "sqrt",
+      "Returns the square-root of its' argument ",
+      op_sqrt, type::Fn::with_args({type::number_type}),
+      true);
+  op::sqrt = new GenericFn;
+  op::sqrt->type = type::Fn::with_args({type::number_type});
+  op::sqrt->add(in_op_sqrt);
+
   Operator *in_op_int_gr = new InbuiltOperator(
       "Integer >",
       "Returns t iff the first argument is greater "
       "than the second, and nil otherwise",
       op_int_gr, type::Fn::with_args({type::integer_type, type::integer_type}),
       true);
-  op::greater = new GenericFn;
-  op::greater->type = type::Fn::with_args({new type::Any, new type::Any});
-  op::greater->add(in_op_int_gr);
+  op::bin_greater->add(in_op_int_gr);
 
   Operator *in_op_int_eq = new InbuiltOperator(
       "Integer =", "Equality for Integers", op_int_eq,
       type::Fn::with_args({type::integer_type, type::integer_type}), true);
+  Operator *in_op_float_eq = new InbuiltOperator(
+      "Integer =", "Equality for Floats", op_float_eq,
+      type::Fn::with_args({type::float_type, type::float_type}), true);
 
-  op::equal = new GenericFn;
-  op::equal->type = type::Fn::with_args({new type::Any, new type::Any});
-  op::equal->add(in_op_int_eq);
+  op::bin_equal->add(in_op_int_eq);
+  op::bin_equal->add(in_op_float_eq);
 }

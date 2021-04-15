@@ -134,7 +134,8 @@ int main(int argc, char **argv) {
 
   // this are more simple - simply assigning the operatos like '+' and
   // 'to-string' to global variables 
-  op::mk_arithmetic();
+  op::initialize_logic();
+  op::initialize_arithmetic();
   op::initialize_mirror();
   op::initialize_user_obj();
   op::initialize_cons();
@@ -143,7 +144,6 @@ int main(int argc, char **argv) {
   op::initialize_tuple();
   op::initialize_dev();
   op::initialize_conditions();
-  op::initialize_logic();
   op::initialize_language();
   op::initialize_module();
   op::initialize_mkoperator();
@@ -254,15 +254,12 @@ void make_modules() {
     make_pair("macro-expand", op::macexpand),
     make_pair("time", op::time)};
 
-  Operator* op_int_eq = op::equal->functions.front();
-  op::equal->add(op::obj_eq);
-  op::equal->add(op_int_eq);
-  op::equal->add(op::char_eq);
-  op::equal->add(op::tuple_eq);
-  op::equal->add(op::cons_eq);
-  op::equal->add(op::vec_eq);
-  op::equal->add(op::str_eq);
-  op::equal->add(op::type_eq);
+  op::bin_equal->add(op::obj_eq);
+  op::bin_equal->add(op::tuple_eq);
+  op::bin_equal->add(op::cons_eq);
+  op::bin_equal->add(op::vec_eq);
+  op::bin_equal->add(op::str_eq);
+  op::bin_equal->add(op::type_eq);
   equal_operator = op::equal;
 
   GenericFn *gn_elt = new GenericFn;
@@ -313,12 +310,15 @@ void make_modules() {
     make_pair("binary-", op::bin_minus),
     make_pair("binary*", op::bin_multiply),
     make_pair("binary/", op::bin_divide),
+    make_pair("binary>", op::bin_greater),
+    make_pair("sqrt", op::sqrt),
 
     make_pair("+", op::plus),
     make_pair("-", op::minus),
     make_pair("*", op::multiply),
     make_pair("/", op::divide),
     make_pair(">", op::greater),
+
 
     // data
     make_pair("tuple", op::mk_tuple),
@@ -362,6 +362,7 @@ void make_modules() {
     make_pair("set-macro-character", op::set_mac_char),
     // logic
     make_pair("=", op::equal),
+    make_pair("binary=", op::bin_equal),
     make_pair("or", op::do_or),
     make_pair("and", op::do_and),
     make_pair("not", op::do_not),
@@ -395,7 +396,7 @@ void make_modules() {
     make_pair("intern", op::intern),
     make_pair("remove", op::remove),
 
-    // CONDiTIONS
+    // CONDITIONS
     make_pair("signal-condition", op::signal_condition),
     make_pair("handler-case", op::handler_catch),
     make_pair("handler-bind", op::handler_bind),
@@ -403,7 +404,7 @@ void make_modules() {
     make_pair("get-restarts", op::get_restarts),
 
 
-    // types
+    // TYPES
     make_pair("Is", op::mk_is),
     make_pair("Derives", op::mk_derives),
     make_pair("Any", new type::Any),
@@ -423,8 +424,8 @@ void make_modules() {
     make_pair("IStream", type::istream_type),
     make_pair("OStream", type::ostream_type),
     make_pair("Cons", new type::Cons),
-    // Mac
-    // Op
+    // MAC
+    // OP
     make_pair("Fn", new type::Fn),
     make_pair("Gen", new type::GenFn),
 
