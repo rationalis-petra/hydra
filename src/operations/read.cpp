@@ -39,10 +39,14 @@ Object *to_value(string token, LocalRuntime &r) {
     return ch;
   }
   try {
+    if (token.find(".") != string::npos) {
+    double num = stod(token);
+    return new Float(num);
+    } else {
     int num = stoi(token);
     return new Integer(num);
-  } catch (invalid_argument &) {
-  }
+    }
+  } catch (invalid_argument &) {}
   // it is a symbol, first split based on ':'
   list<string> path;
   string current = "";

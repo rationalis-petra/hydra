@@ -6,6 +6,13 @@
 namespace op {
 
   extern void mk_arithmetic();
+  extern expr::GenericFn *bin_plus;
+  extern expr::GenericFn *bin_minus;
+  extern expr::GenericFn *bin_multiply;
+  extern expr::GenericFn *bin_divide;
+  extern expr::GenericFn *bin_greater;
+  extern expr::GenericFn *bin_equal;
+
   extern expr::GenericFn *plus;
   extern expr::GenericFn *minus;
   extern expr::GenericFn *multiply;

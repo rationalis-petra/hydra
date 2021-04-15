@@ -8,7 +8,10 @@
 
 namespace type {
 
+  extern Type* number_type;
   extern Type* integer_type;
+  extern Type* float_type;
+
   extern Type* nil_type;
   extern Type* character_type;
   extern Type* module_type;
@@ -24,13 +27,6 @@ namespace type {
   extern Type* default_type;
 
   void initialize_types();
-
-struct UserObject : public Type {
-  virtual void mark_node();
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
-  virtual expr::Object *check_type(expr::Object *obj);
-  virtual expr::Object *subtype(Type *obj);
-};
 
 struct Nil : public Type {
   virtual void mark_node();

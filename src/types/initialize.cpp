@@ -8,7 +8,10 @@ using std::string;
 //using namespace type;
 using namespace type;
 
+Type *type::number_type;
 Type *type::integer_type;
+Type *type::float_type;
+
 Type *type::nil_type;
 Type *type::character_type;
 Type *type::module_type;
@@ -26,7 +29,10 @@ Type* type::default_type;
 void type::initialize_types() {
   type::nil_type = new Is(expr::nil::get());
 
+  type::number_type = new Derives(expr::Number::parent);
   type::integer_type = new Derives(expr::Integer::parent);
+  type::float_type = new Derives(expr::Float::parent);
+
   type::character_type = new Derives(expr::Char::parent);
   type::module_type = new Derives(expr::Module::parent);
   type::string_type = new Derives(expr::HString::parent);
