@@ -8,6 +8,37 @@ using std::string;
 using namespace expr;
 using namespace interp;
 
+enum accessor_type {accessor, reader, writer};
+
+void mk_accessor(accessor_type atype, Object* object, Symbol* slot, Object* method, LocalRuntime& r, LexicalScope &s) {
+  GenericFn *gfn;
+  type::Type *checker = new type::GenFn;
+
+  if (!method->invoker) {
+    gfn = new GenericFn;
+    method->invoker = gfn;
+    gfn->type = type::Fn::with_args_optional({new type::Any}, {new type::Any});
+  } else if (checker->check_type(method->invoker)) {
+    gfn = get_inbuilt<GenericFn *>(method->invoker);
+  } else {
+    string err = "attempting to add invoker to " + hydra_to_string(method, r, s) +
+                 "failed";
+    throw err;
+  }
+
+  switch (atype) {
+  case accessor:
+    gfn->add(new Reader(object, slot));
+    gfn->add(new Writer(object, slot));
+    break;
+  case reader:
+    gfn->add(new Reader(object, slot));
+    break;
+  case writer:
+    gfn->add(new Writer(object, slot));
+    break;
+  }
+}
 
 Object *op_mk_object(list<Object *> arg_list, LocalRuntime &r,
                      LexicalScope &s) {
@@ -41,31 +72,15 @@ Object *op_mk_object(list<Object *> arg_list, LocalRuntime &r,
         if (sym == get_keyword("parent")) {
           is_parent = true;
 
-        } else if (sym == get_keyword("accessor") ||
-                   sym == get_keyword("reader") ||
-                   sym == get_keyword("writer")) {
-          if (!slot->invoker) {
-            GenericFn *gfn = new GenericFn;
-            slot->invoker = gfn;
-            gfn->type =
-                type::Fn::with_args_optional({new type::Any}, {new type::Any});
-
-            if (sym == get_keyword("accessor")) {
-              gfn->add(new Reader(object, slot));
-              gfn->add(new Writer(object, slot));
-            }
-            else if (sym == get_keyword("reader")) {
-              gfn->add(new Reader(object, slot));
-            }
-            else if (sym == get_keyword("writer")) {
-              gfn->add(new Writer(object, slot));
-            } else {
-              string err = "Incorrect argument to mk_object";
-              throw err;
-            }
-          }
-
+        } else if (sym == get_keyword("accessor")) {
+          mk_accessor(accessor, object, slot, slot, r, s);
+        } else if (sym == get_keyword("reader")) {
+          mk_accessor(reader, object, slot, slot, r, s);
+        } else if (sym == get_keyword("writer")) {
+          mk_accessor(writer, object, slot, slot, r, s);
         } else {
+          string err = "Incorrect argument to mk_object";
+          throw err;
         }
       } else {
         string err = "Incorrect argument to mk_object";
