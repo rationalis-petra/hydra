@@ -12,14 +12,15 @@ add_library(expressions OBJECT
 
                         accessor.cpp
                         concurrency.cpp
-                        mirror.cpp
-                        object.cpp
-                        oper.cpp
+                        foreign.cpp
                         genericfn.cpp
                         handler.cpp
-                        user_oper.cpp
-                        symbol.cpp
                         input_output.cpp
+                        mirror.cpp
                         module.cpp
-                        foreign.cpp)
+                        network.cpp
+                        object.cpp
+                        oper.cpp
+                        symbol.cpp
+                        user_oper.cpp)
 

@@ -37,10 +37,9 @@ expr::Object *Is::check_type(expr::Object* obj) {
   for (auto s : obj->parents) {
     ptypes.insert(obj->slots[s]);
   }
-  return object->derive_check(ptypes);
+  return object->derive_check(ptypes, std::set<Object*>());
 }
 
-#include <iostream>
 
 expr::Object *Is::subtype(Type* ty) {
   // TODO: derives??

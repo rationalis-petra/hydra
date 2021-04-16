@@ -2,6 +2,7 @@
 #include <string>
 
 #include "operations/modules.hpp"
+#include "utils.hpp"
 
 using std::list;
 using std::string;
@@ -9,61 +10,43 @@ using std::string;
 using namespace expr;
 using namespace interp;
 
-using type::hydra_cast;
-
 Object *op_mk_symbol(list<Object *> arg_list, LocalRuntime &r,
                      LexicalScope &s) {
 
-  if (arg_list.size() != 1) {
-    string err = "invalid number of arguments to make-symbol";
-    throw err;
-  }
-  string name = hydra_cast<HString>(arg_list.front())->value;
+  string name = get_inbuilt<HString *>(arg_list.front())->value;
   return new Symbol(name);
 }
 
 Object *op_mk_module(list<Object *> arg_list, LocalRuntime &r,
                      LexicalScope &s) {
 
-  if (arg_list.size() > 1) {
-    string err = "invalid number of arguments to make-module";
-    throw err;
-  }
   if (arg_list.empty()) {
     return new Module;
   }
-  string name = hydra_cast<HString>(arg_list.front())->value;
+  string name = get_inbuilt<HString *>(arg_list.front())->value;
   return new Module(name);
 }
 
 Object *op_in_module(list<Object *> arg_list, LocalRuntime &r,
                      LexicalScope &s) {
 
-  if (arg_list.size() != 1) {
-    string err = "invalid number of arguments to in-module";
-    throw err;
-  }
-  Module *mod = hydra_cast<Module>(arg_list.front());
+  Module *mod = get_inbuilt<Module *>(arg_list.front());
   r.active_module = mod;
   return t::get();
 }
 
 Object *op_intern(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  Module *mod = hydra_cast<Module>(arg_list.front());
-  HString *str = hydra_cast<HString>(arg_list.back());
+  Module *mod = get_inbuilt<Module *>(arg_list.front());
+  HString *str = get_inbuilt<HString *>(arg_list.back());
 
   return mod->intern(str->value);
 }
 
 Object *op_insert(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  if (arg_list.size() != 2) {
-    string err = "invalid number of arguments provided to insert";
-    throw err;
-  }
-  Module *mod = hydra_cast<Module>(arg_list.front());
-  Symbol *sym = hydra_cast<Symbol>(arg_list.back());
+  Module *mod = get_inbuilt<Module *>(arg_list.front());
+  Symbol *sym = get_inbuilt<Symbol *>(arg_list.back());
 
   if (Object *obj = mod->get(sym->name)) {
     if (!obj->null()) {
@@ -81,34 +64,21 @@ Object *op_insert(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_get(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  if (arg_list.size() != 2) {
-    string err = "invalid number of arguments provided to get";
-    throw err;
-  }
-  Module *mod = hydra_cast<Module>(arg_list.front());
-  HString *str = hydra_cast<HString>(arg_list.back());
+  Module *mod = get_inbuilt<Module *>(arg_list.front());
+  HString *str = get_inbuilt<HString *>(arg_list.back());
 
   return mod->get(str->value);
 }
 
 Object *op_get_module(list<Object *> arg_list, LocalRuntime &r,
                       LexicalScope &s) {
-
-  if (arg_list.size() != 0) {
-    string err = "invalid number of arguments provided to current-module";
-    throw err;
-  }
   return r.active_module;
 }
 
 Object *op_get_symbols(list<Object *> arg_list, LocalRuntime &r,
                        LexicalScope &s) {
 
-  if (arg_list.size() != 1) {
-    string err = "invalid number of arguments provided to get-symbols";
-    throw err;
-  }
-  Module *mod = hydra_cast<Module>(arg_list.front());
+  Module *mod = get_inbuilt<Module *>(arg_list.front());
   Object *out = nil::get();
   for (auto sym : mod->exported_symbols) {
     Cons *cns = new Cons(sym.second, out);
@@ -118,13 +88,8 @@ Object *op_get_symbols(list<Object *> arg_list, LocalRuntime &r,
 }
 
 Object *op_remove(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-
-  if (arg_list.size() != 2) {
-    string err = "invalid number of arguments provided to remove";
-    throw err;
-  }
-  Module *mod = hydra_cast<Module>(arg_list.front());
-  Symbol *sym = hydra_cast<Symbol>(arg_list.back());
+  Module *mod = get_inbuilt<Module *>(arg_list.front());
+  Symbol *sym = get_inbuilt<Symbol *>(arg_list.back());
   auto it = mod->symbols.find(sym->name);
   if (it != mod->symbols.end()) {
     mod->symbols.erase(it);
@@ -143,7 +108,7 @@ Object *op_remove(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 //     string err = "invalid number of arguments provided to get-symbols";
 //     throw err;
 //   }
-//   Module* mod = hydra_cast<Module>(arg_list.front());
+//   Module* mod = get_inbuilt<Module>(arg_list.front());
 //   Object* out = new hydra_nil;
 //   for (auto sym : mod->symbols) {
 //     hydra_cons* cns = new hydra_cons(sym.second, out);
@@ -153,13 +118,8 @@ Object *op_remove(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 // }
 
 Object *op_export(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-
-  if (arg_list.size() != 2) {
-    string err = "invalid number of arguments provided to current-module";
-    throw err;
-  }
-  Module *mod = hydra_cast<Module>(arg_list.front());
-  Symbol *sym = hydra_cast<Symbol>(arg_list.back());
+  Module *mod = get_inbuilt<Module *>(arg_list.front());
+  Symbol *sym = get_inbuilt<Symbol *>(arg_list.back());
 
   if (mod->symbols.find(sym->name) == mod->symbols.end()) {
     string err = "trying to export symbol " + sym->name +
@@ -177,7 +137,6 @@ Operator *op::mk_module;
 Operator *op::in_module;
 Operator *op::intern;
 Operator *op::insert;
-Operator *op::get;
 Operator *op::get_module;
 Operator *op::get_symbols;
 Operator *op::remove;
@@ -188,15 +147,18 @@ void op::initialize_module() {
       "symbol",
       "Generates a new, unique symbol whose name is the provided string",
       op_mk_symbol,
-      type::Fn::with_all({type::string_type}, nullptr, type::symbol_type), true);
+      type::Fn::with_all({type::string_type}, nullptr, type::symbol_type),
+      true);
   op::mk_module = new InbuiltOperator(
       "module", "Generates a new module whose name is the provided string",
       op_mk_module,
-      type::Fn::with_all({type::string_type}, nullptr, type::module_type), true);
+      type::Fn::with_all({type::string_type}, nullptr, type::module_type),
+      true);
   op::in_module = new InbuiltOperator(
       "in-module", "Sets the current (active) module to the provided argument",
       op_in_module,
-      type::Fn::with_all({type::module_type}, nullptr, type::module_type), true);
+      type::Fn::with_all({type::module_type}, nullptr, type::module_type),
+      true);
   op::intern = new InbuiltOperator(
       "intern",
       "Take a module and a string; if a symbol with that name exists\n"
@@ -216,12 +178,15 @@ void op::initialize_module() {
                          type::symbol_type),
       true);
 
-  op::get = new InbuiltOperator(
+  Operator *in_get = new InbuiltOperator(
       "get",
       "Takes a module and a string; if a symbol with the name exists in"
       "the module, return it. Otherwise, return nil",
       op_get,
-      type::Fn::with_all({type::string_type}, nullptr, type::symbol_type), true);
+      type::Fn::with_all({type::module_type, type::string_type}, nullptr,
+                         type::symbol_type),
+      true);
+  op::get->add(in_get);
   op::get_module = new InbuiltOperator("current-module",
                                        "Returns the current (active) module",
                                        op_get_module, new type::Fn, true);

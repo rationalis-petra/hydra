@@ -54,8 +54,6 @@ Object *op_union(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 }
 
 Operator *op::mk_tuple;
-Operator *op::tuple_eq;
-Operator *op::tuple_elt;
 Operator *op::mk_union;
 
 void op::initialize_tuple() {
@@ -63,13 +61,17 @@ void op::initialize_tuple() {
   op::mk_tuple = new InbuiltOperator(
       "tuple", "Will return a tuple whose elements are the arg-list", op_tuple,
       type::Fn::with_rest(new type::Any), true);
-  op::tuple_eq = new InbuiltOperator(
+
+  Operator* in_tuple_eq = new InbuiltOperator(
       "tuple =", "Equality test for Tuples", op_tuple_eq,
       type::Fn::with_args({new type::Tuple, new type::Tuple}), true);
+  op::bin_equal->add(in_tuple_eq);
 
-  op::tuple_elt = new InbuiltOperator(
+  Operator* in_tuple_elt = new InbuiltOperator(
       "tuple elt", "Will return the nth element of a tuple", op_tuple_elt,
       type::Fn::with_args({type::integer_type, new type::Tuple}), true);
+  op::set->add(in_tuple_elt);
+   
 
   op::mk_union = new InbuiltOperator(
       "union", "Will return a tagged value", op_union,

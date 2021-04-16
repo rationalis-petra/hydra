@@ -7,14 +7,16 @@ namespace op {
 
   void initialize_io();
 
-  extern expr::Operator* print;
-  extern expr::Operator* open_file;
-  extern expr::Operator* close;
+  extern expr::GenericFn* close;
+  extern expr::GenericFn* next;
+  extern expr::GenericFn* peek;
+  extern expr::GenericFn* put;
+
   extern expr::Operator* endp;
 
-  extern expr::Operator* next;
-  extern expr::Operator* peek;
-  extern expr::Operator* put;
+  extern expr::Operator* print;
+  extern expr::Operator* open_file;
+
 
 } // namespace op
 #endif // __HYDRA_IO_HPP

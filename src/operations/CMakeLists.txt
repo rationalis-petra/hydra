@@ -5,18 +5,19 @@ add_library(operations OBJECT
                        data/vector.cpp
                        data/adt.cpp
 
-                       object.cpp
-                       mirror.cpp
                        arithmetic.cpp
-                       operator.cpp
-                       conditions.cpp
                        concurrency.cpp
+                       conditions.cpp
                        dev.cpp
                        foreign.cpp
                        input_output.cpp
                        language.cpp
                        logic.cpp
+                       mirror.cpp
                        module.cpp
+                       network.cpp
+                       object.cpp
+                       operator.cpp
                        read.cpp
                        symbol.cpp
                        types.cpp)

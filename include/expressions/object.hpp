@@ -41,7 +41,7 @@ struct Object {
   virtual Object *eval(interp::LocalRuntime &r, interp::LexicalScope &s);
 
   // TYPING
-  Object *derive_check(std::set<Object *> ptypes);
+  Object *derive_check(std::set<Object *> ptypes, std::set<Object*> visited);
 
   // REFLECTION
   // the "get" and "set" functions provide hooks that mirror objects

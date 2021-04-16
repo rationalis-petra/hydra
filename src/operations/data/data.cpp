@@ -74,12 +74,36 @@ Object *op_cons_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
+GenericFn *op::set;
+GenericFn *op::get;
+GenericFn *op::len;
+GenericFn *op::cat;
+//GenericFn *op::len;
+
 Operator *op::mk_cons;
 Operator *op::cdr;
 Operator *op::car;
-Operator *op::cons_eq;
+
+
+void op::initialize_data() {
+  op::set = new GenericFn();
+  op::set->type = type::Fn::with_all({new type::Any, new type::Any},
+                                     new type::Any, new type::Any);
+  
+  op::get = new GenericFn();
+  op::get->type = type::Fn::with_all({new type::Any},
+                                     new type::Any, new type::Any);
+
+  op::len = new GenericFn();
+  op::len->type = type::Fn::with_args({new type::Any});
+
+  op::cat = new GenericFn();
+  op::cat->type = type::Fn::with_rest(new type::Any);
+}
 
 void op::initialize_cons() {
+
+
   op::mk_cons =
       new InbuiltOperator("cons",
                           "Creates a new cons cell and places the first "
@@ -96,7 +120,10 @@ void op::initialize_cons() {
   op::car = new InbuiltOperator(
       "car", "Takes a cons cell as input, and returns the car", op_car,
       type::Fn::with_args({new type::Cons}), true);
-  op::cons_eq = new InbuiltOperator(
+  Operator* in_cons_eq = new InbuiltOperator(
       "cons =", "Equality test for Conses", op_cons_eq,
       type::Fn::with_args({new type::Cons, new type::Cons}), true);
+
+  op::bin_equal->add(in_cons_eq);
+
 }

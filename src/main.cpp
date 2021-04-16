@@ -31,6 +31,7 @@ vector<pair<string, Object *>> core;
 vector<pair<string, Object *>> foreign;
 vector<pair<string, Object *>> io;
 vector<pair<string, Object *>> concurrent;
+vector<pair<string, Object *>> network;
 
 // net
 // concurrent / parallel
@@ -68,9 +69,11 @@ int main(int argc, char **argv) {
   Mirror::parent = new Parent("mirror-parent");
   Module::parent = new Parent("module-parent");
   Symbol::parent = new Parent("symbol-parent");
+
   Istream::parent = new Parent("istream-parent");
   Ostream::parent = new Parent("ostream-parent");
   IOstream::parent = new Parent("iostream-parent");
+  Socket::parent = new Parent("socket-parent");
 
 
   // SETUP MODULES
@@ -114,11 +117,15 @@ int main(int argc, char **argv) {
   // SETUP type hierarchy
   IOstream::parent->slots[get_keyword("istream")] = Istream::parent;
   IOstream::parent->slots[get_keyword("ostream")] = Ostream::parent;
+  Socket::parent->slots[get_keyword("parent")] = IOstream::parent;
+
   Integer::parent->slots[get_keyword("parent")] = Number::parent;
   Float::parent->slots[get_keyword("parent")] = Number::parent;
 
   IOstream::parent->parents.insert(get_keyword("istream"));
   IOstream::parent->parents.insert(get_keyword("ostream"));
+  Socket::parent->parents.insert(get_keyword("parent"));
+
   Integer::parent->parents.insert(get_keyword("parent"));
   Float::parent->parents.insert(get_keyword("parent"));
 
@@ -134,7 +141,12 @@ int main(int argc, char **argv) {
 
   // this are more simple - simply assigning the operatos like '+' and
   // 'to-string' to global variables 
+  // these two define generic functions that are inserted into by subsequent
+  // initializations
   op::initialize_logic();
+  op::initialize_data();
+
+  // these define "singleton" functions (generic functions with only one value)
   op::initialize_arithmetic();
   op::initialize_mirror();
   op::initialize_user_obj();
@@ -147,9 +159,13 @@ int main(int argc, char **argv) {
   op::initialize_language();
   op::initialize_module();
   op::initialize_mkoperator();
-  op::initialize_io();
   op::initialize_foreign();
   op::initialize_concurrency();
+
+  // io contains generics needed by other io  
+  // operators, such as netowrking
+  op::initialize_io();
+  op::initialize_network();
 
   // we place read last because it uses other operations
   op::initialize_read();
@@ -158,9 +174,8 @@ int main(int argc, char **argv) {
 
   // arithmetic
 
-  Module *mod = language_module;
   for (auto p : inbuilts) {
-    Symbol *sym = mod->intern(p.first);
+    Symbol *sym = language_module->intern(p.first);
     sym->value = p.second;
   }
 
@@ -169,11 +184,12 @@ int main(int argc, char **argv) {
       make_pair("io", io),
       make_pair("foreign", foreign),
       make_pair("dev", dev),
-      make_pair("concurrent", concurrent)};
+      make_pair("concurrent", concurrent),
+      make_pair("network", network)};
 
   for (auto m : moddefs) {
-    mod = hydra_cast<Module>(
-        hydra_cast<Symbol>(language_module->get(m.first))->value);
+    Module* mod = dynamic_cast<Module*>(
+        dynamic_cast<Symbol*>(language_module->get(m.first))->value);
     for (auto p : m.second) {
       Symbol *sym = mod->intern(p.first);
       mod->exported_symbols[p.first] = sym;
@@ -248,55 +264,15 @@ void make_modules() {
               make_pair("io", new Module("io")),
               make_pair("foreign", new Module("foreign")),
               make_pair("concurrent", new Module("concurrent")),
-              make_pair("dev", new Module("dev"))};
+              make_pair("dev", new Module("dev")),
+              make_pair("network", new Module("network"))};
 
   dev = {make_pair("doc", op::describe),
     make_pair("macro-expand", op::macexpand),
     make_pair("time", op::time)};
 
-  op::bin_equal->add(op::obj_eq);
-  op::bin_equal->add(op::tuple_eq);
-  op::bin_equal->add(op::cons_eq);
-  op::bin_equal->add(op::vec_eq);
-  op::bin_equal->add(op::str_eq);
   op::bin_equal->add(op::type_eq);
   equal_operator = op::equal;
-
-  GenericFn *gn_elt = new GenericFn;
-  gn_elt->is_fn = true;
-  gn_elt->type->rest_type = new type::Any;
-  gn_elt->add(op::vec_elt);
-  gn_elt->add(op::str_elt);
-  gn_elt->add(op::tuple_elt);
-
-  GenericFn *gn_len = new GenericFn;
-  gn_len->is_fn = true;
-  gn_len->type->rest_type = new type::Any;
-  gn_len->add(op::vec_len);
-  // gn_elt->add(op::str_elt);
-
-  GenericFn *gn_concat = new GenericFn;
-  gn_concat->is_fn = true;
-  gn_concat->type->rest_type = new type::Any;
-  gn_concat->add(op::str_cat);
-  gn_concat->add(op::vec_cat);
-
-  op::greater->add(op::str_gr);
-
-  GenericFn *gn_get = new GenericFn;
-  gn_get->is_fn = true;
-  gn_get->type->arg_list.push_back(new type::Any);
-  gn_get->type->arg_list.push_back(new type::Any);
-  gn_get->add(op::obj_get);
-  gn_get->add(op::get);
-
-  GenericFn *gn_set = new GenericFn;
-  gn_set->is_fn = true;
-  gn_set->type->arg_list.push_back(new type::Any);
-  gn_set->type->arg_list.push_back(new type::Any);
-  gn_set->type->arg_list.push_back(new type::Any);
-  gn_set->add(op::obj_set);
-  gn_set->add(op::vec_set);
 
   gn_to_string = new GenericFn;
   gn_to_string->is_fn = true;
@@ -321,15 +297,18 @@ void make_modules() {
 
 
     // data
+    make_pair("get", op::get),
+    make_pair("set", op::set),
+    make_pair("concat", op::cat),
+    make_pair("len", op::len),
+    // constructors
     make_pair("tuple", op::mk_tuple),
     make_pair("union", op::mk_union),
     make_pair("vector", op::mk_vec),
     make_pair("cons", op::mk_cons),
+    // access
     make_pair("car", op::car),
     make_pair("cdr", op::cdr),
-    make_pair("elt", gn_elt),
-    make_pair("concat", gn_concat),
-    make_pair("len", gn_len),
 
     make_pair("to-string", gn_to_string),
     
@@ -347,9 +326,6 @@ void make_modules() {
 
     make_pair("set-invoker", op::set_invoker),
     make_pair("get-invoker", op::get_invoker),
-    make_pair("set", gn_set),
-    make_pair("set-parent", op::obj_pset),
-    make_pair("get", gn_get),
     make_pair("clone", op::clone),
 
     // streams
@@ -420,10 +396,12 @@ void make_modules() {
     make_pair("Module", type::module_type),
     make_pair("Symbol", type::symbol_type),
     make_pair("List", new type::List),
+    make_pair("Cons", new type::Cons),
+
     make_pair("IOStream", type::iostream_type),
     make_pair("IStream", type::istream_type),
     make_pair("OStream", type::ostream_type),
-    make_pair("Cons", new type::Cons),
+    make_pair("Socket", type::socket_type),
     // MAC
     // OP
     make_pair("Fn", new type::Fn),
@@ -442,10 +420,13 @@ void make_modules() {
   io = {// io
         make_pair("print", op::print),
         make_pair("open-file", op::open_file),
-        make_pair("close-file", op::close)};
+        make_pair("close", op::close)};
 
   concurrent = {
     make_pair("thread", op::thread)};
+
+  network = {
+    make_pair("socket", op::mk_socket)};
 }
 
 Object *read(Istream *istm) {

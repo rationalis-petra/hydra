@@ -92,37 +92,37 @@ Object *op_to_str(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return new HString(arg_list.front()->to_string(r, s));
 }
 
-Operator *op::str_elt;
-Operator *op::str_cat;
-Operator *op::str_gr;
-Operator *op::str_eq;
-Operator *op::to_str;
+GenericFn *op::to_str;
 
 void op::initialize_string() {
 
-  op::str_elt = new InbuiltOperator(
+  Operator* in_str_elt = new InbuiltOperator(
                                     "string elt",
       "Takes a string and an index, and returns the character at that index",
       op_str_elt,
       type::Fn::with_all({type::string_type, type::integer_type}, nullptr,
                          type::character_type),
       true);
+  op::get->add(in_str_elt);
 
-  op::str_cat = new InbuiltOperator(
+  Operator* in_str_cat = new InbuiltOperator(
                                     "string cat",
       "Concatenates two strings", op_str_cat,
       type::Fn::with_all({}, type::string_type, type::string_type), true);
+  op::cat->add(in_str_cat);
 
-  op::str_gr = new InbuiltOperator(
+  Operator* in_str_gr = new InbuiltOperator(
                                    "string >",
       "Returns true if the first argument is greater than the second",
       op_str_gr, type::Fn::with_args({type::string_type, type::string_type}),
       true);
+  op::bin_greater->add(in_str_gr);
 
-  op::str_eq = new InbuiltOperator(
+  Operator* in_str_eq = new InbuiltOperator(
                                    "string =",
       "Equality test for Strings", op_str_eq,
       type::Fn::with_args({type::string_type, type::string_type}), true);
+  op::bin_equal->add(in_str_eq);
 
   Operator* in_char_eq = new InbuiltOperator(
                                     "char =",
@@ -136,8 +136,11 @@ void op::initialize_string() {
       type::Fn::with_args({type::character_type, type::character_type}), true);
   op::bin_greater->add(in_char_gr);
 
-  op::to_str = new InbuiltOperator("to-string",
+  Operator* in_to_str = new InbuiltOperator("to-string",
       "Converts an object into a string", op_to_str,
       type::Fn::with_all({new type::Any}, nullptr, type::string_type), true);
+  op::to_str = new GenericFn();
+  op::to_str->type = type::Fn::with_all({new type::Any}, nullptr, type::string_type);
+  op::to_str->add(in_to_str);
 
 }

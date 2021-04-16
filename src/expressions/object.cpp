@@ -45,17 +45,20 @@ Object* Object::eval(LocalRuntime& r, LexicalScope& s) {
   return this;
 }
 
-Object *Object::derive_check(set<expr::Object*> ptypes) {
+Object *Object::derive_check(set<expr::Object*> ptypes, set<expr::Object*> visited) {
   for (auto* proto : ptypes) {
     if (proto == this) {
       return expr::t::get();
-    }
-    std::set<expr::Object*> ptypes2;
-    for (auto s : proto->parents) {
-      ptypes2.insert(proto->slots[s]);
-    }
-    if (!derive_check(ptypes2)->null()) {
-      return expr::t::get();
+    } if (visited.find(proto) == visited.end()) {
+      visited.insert(proto);
+
+      std::set<expr::Object *> ptypes2;
+      for (auto s : proto->parents) {
+        ptypes2.insert(proto->slots[s]);
+      }
+      if (!derive_check(ptypes2, visited)->null()) {
+        return t::get();
+      }
     }
   }
   return expr::nil::get();

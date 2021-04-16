@@ -40,11 +40,6 @@ Object *op_greater(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_or(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  if (arg_list.size() < 2) {
-    string err = "Invalid number of arguments to macro or";
-    throw err;
-  }
-
   for (Object *arg : arg_list) {
     Object *cond = arg->eval(r, s);
     if (!cond->null())
@@ -54,11 +49,6 @@ Object *op_or(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 }
 
 Object *op_and(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-
-  if (arg_list.size() < 2) {
-    string err = "Invalid number of arguments to macro and";
-    throw err;
-  }
 
   Object *out = nullptr;
   for (Object *arg : arg_list) {
@@ -75,11 +65,6 @@ Object *op_and(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 }
 
 Object *op_not(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-
-  if (arg_list.size() != 1) {
-    string err = "Invalid number of arguments to macro not";
-    throw err;
-  }
   if (arg_list.front()->null()) {
     return t::get();
   } else {

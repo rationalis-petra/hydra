@@ -67,7 +67,6 @@ void IOstream::mark_node() {
 string IOstream::to_string(LocalRuntime &r, LexicalScope &s) {
   return "input/output stream";
 }
-
 IOstream::~IOstream() {
   delete stream;
 }

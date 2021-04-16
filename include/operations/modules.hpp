@@ -2,6 +2,7 @@
 #define __HYDRA_OPERATIONS_MODULE_HPP
 
 #include "expressions.hpp"
+#include "data.hpp"
 
 namespace op {
 
@@ -16,7 +17,6 @@ namespace op {
   extern expr::Operator* get_symbols;
   extern expr::Operator* do_export;
   extern expr::Operator* remove;
-  extern expr::Operator* get;
 
 } // namespace op
 #endif // __HYDRA_MODULE_HPP

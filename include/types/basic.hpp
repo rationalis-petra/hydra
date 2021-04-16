@@ -14,14 +14,16 @@ namespace type {
 
   extern Type* nil_type;
   extern Type* character_type;
-  extern Type* module_type;
   extern Type* string_type;
-  extern Type* istream_type;
-  extern Type* ostream_type;
-  extern Type* iostream_type;
+  extern Type* module_type;
   extern Type* mirror_type;
   extern Type* meta_type;
   extern Type* symbol_type;
+
+  extern Type* istream_type;
+  extern Type* ostream_type;
+  extern Type* iostream_type;
+  extern Type* socket_type;
 
   extern Type* common_type;
   extern Type* default_type;

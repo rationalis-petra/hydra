@@ -184,20 +184,29 @@ Object *op_close(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-Operator *op::close;
-Operator *op::print;
+GenericFn *op::peek;
+GenericFn *op::next;
+GenericFn *op::put;
+
 Operator *op::open_file;
-Operator *op::peek;
-Operator *op::next;
-Operator *op::put;
+Operator *op::print;
 Operator *op::endp;
+
+GenericFn *op::close;
 
 // TODO: stream type??
 
 void op::initialize_io() {
-  op::close = new InbuiltOperator(
+  Operator* in_file_closei = new InbuiltOperator(
       "close", "Takes an input stream representing a file, and closes it",
-      op_close, type::Fn::with_args({new type::Any}), true);
+      op_close, type::Fn::with_args({type::istream_type}), true);
+  Operator* in_file_closeo = new InbuiltOperator(
+      "close", "Takes an input stream representing a file, and closes it",
+      op_close, type::Fn::with_args({type::ostream_type}), true);
+  op::close = new GenericFn;
+  op::close->type = type::Fn::with_args({new type::Any});
+  op::close->add(in_file_closei);
+  op::close->add(in_file_closeo);
 
   op::print = new InbuiltOperator(
       "print",
@@ -213,29 +222,41 @@ void op::initialize_io() {
       type::Fn::with_args_optional({type::string_type}, {type::symbol_type}),
       true);
 
-  op::next = new InbuiltOperator(
+  Operator* in_op_next = new InbuiltOperator(
       "next",
       "Takes an input stream, advances it one character\n"
       "and returns the character at the 'current' position",
       op_next,
       type::Fn::with_all({type::istream_type}, nullptr, type::istream_type),
       true);
+  op::next = new GenericFn();
+  op::next->type =
+      type::Fn::with_all({type::istream_type}, nullptr, type::istream_type);
+  op::next->add(in_op_next);
 
-  op::peek = new InbuiltOperator(
+  Operator* in_op_peek = new InbuiltOperator(
       "peek",
       "Takes an input stream, and peeks at the next character\n"
       "but does not advance the input stream",
       op_peek,
       type::Fn::with_all({type::istream_type}, nullptr, type::character_type),
       true);
+  op::peek = new GenericFn;
+  op::peek->type =
+    type::Fn::with_all({type::istream_type}, nullptr, type::character_type);
+  op::peek->add(in_op_peek);
 
-  op::put = new InbuiltOperator(
+  Operator *in_op_put = new InbuiltOperator(
       "put",
       "Takes an output stream, a character, and puts the\n"
       "character in the output stream's current position",
       op_put,
       type::Fn::with_all({type::ostream_type}, nullptr, type::character_type),
       true);
+  op::put = new GenericFn;
+  op::put->type =
+      type::Fn::with_all({type::ostream_type}, nullptr, type::character_type);
+  op::put->add(in_op_put);
 
   op::endp = new InbuiltOperator(
       "end?",

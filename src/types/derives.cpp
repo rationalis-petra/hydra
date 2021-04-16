@@ -31,7 +31,7 @@ expr::Object *Derives::check_type(expr::Object* obj) {
   for (auto s : obj->parents) {
     ptypes.insert(obj->slots[s]);
   }
-  return object->derive_check(ptypes);
+  return object->derive_check(ptypes, set<Object*>());
 }
 
 

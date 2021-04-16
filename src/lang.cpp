@@ -157,10 +157,10 @@ std::string lang = R"(
               (apply concat (cons (cdr (car lists)) (cdr lists))))
          (apply concat (cdr lists)))))
 
-(defimpl elt ((lst List) (idx Integer))
+(defimpl get ((lst List) (idx Integer))
   (if (= 0 idx) 
       (car lst)
-      (elt (cdr lst) (- idx 1))))
+      (get (cdr lst) (- idx 1))))
 
 
 ;;; LOGIC
@@ -347,6 +347,7 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 (use-module &:user &:hydra:dev)
 (use-module &:user &:hydra:foreign)
 (use-module &:user &:hydra:concurrent)
+(use-module &:user &:hydra:network)
 (in-module &:user)
 
 )";

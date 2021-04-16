@@ -6,16 +6,18 @@
 
 #include "ltdl.h"
 
-#include "expressions/data.hpp"
+#include "expressions/accessor.hpp"
 #include "expressions/concurrency.hpp"
+#include "expressions/contract.hpp"
+#include "expressions/data.hpp"
 #include "expressions/foreign.hpp"
 #include "expressions/handler.hpp"
 #include "expressions/io.hpp"
 #include "expressions/language.hpp"
+#include "expressions/mirror.hpp"
+#include "expressions/network.hpp"
 #include "expressions/object.hpp"
 #include "expressions/operation.hpp"
-#include "expressions/accessor.hpp"
-#include "expressions/mirror.hpp"
 
 // the 'runtime' contains all global state this includes
 // the root module, the current (or active) module,  

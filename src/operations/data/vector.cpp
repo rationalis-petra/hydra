@@ -89,32 +89,24 @@ Object *op_vec_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 }
 
 Operator *op::mk_vec;
-Operator *op::vec_cat;
-Operator *op::vec_elt;
-Operator *op::vec_len;
-Operator *op::vec_set;
-Operator *op::vec_eq;
 
 void op::initialize_vector() {
   op::mk_vec = new expr::InbuiltOperator(
       "vector", "Will return an array whose elements are the arg-list", op_vec,
       type::Fn::with_rest(new type::Any), true);
-  op::vec_cat = new InbuiltOperator(
-      "vector concat", "Concatenates two vectors", op_vec_cat,
-      type::Fn::with_all({}, new type::Vector, new type::Vector), true);
-  op::vec_elt = new InbuiltOperator(
+
+
+
+  // GENERIC FUNCTIONS
+  Operator* in_vec_elt = new InbuiltOperator(
       "vector elt",
       "Takes an array and an index, and returns the element at that index",
       op_vec_elt,
       type::Fn::with_all({new type::Vector, type::integer_type}, nullptr,
                          new type::Any),
       true);
-
-  op::vec_len = new InbuiltOperator(
-      "vector len", "Returns the length of a given vector", op_vec_len,
-      type::Fn::with_all({new type::Vector}, nullptr, type::integer_type),
-      true);
-  op::vec_set = new InbuiltOperator(
+  op::get->add(in_vec_elt);
+  Operator* in_vec_set = new InbuiltOperator(
       "vector set",
       "Takes an array, an index, and an element. Sets the value at index to "
       "element ",
@@ -122,7 +114,18 @@ void op::initialize_vector() {
       type::Fn::with_all({new type::Vector, type::integer_type, new type::Any},
                          nullptr, new type::Any),
       true);
-  op::vec_eq = new InbuiltOperator(
+  op::set->add(in_vec_set);
+  Operator* in_vec_len = new InbuiltOperator(
+      "vector len", "Returns the length of a given vector", op_vec_len,
+      type::Fn::with_all({new type::Vector}, nullptr, type::integer_type),
+      true);
+  op::len->add(in_vec_len);
+  Operator* in_vec_cat = new InbuiltOperator(
+      "vector concat", "Concatenates two vectors", op_vec_cat,
+      type::Fn::with_all({}, new type::Vector, new type::Vector), true);
+  op::cat->add(in_vec_cat);
+  Operator* in_vec_eq = new InbuiltOperator(
       "vector =", "Equality test for Vectors", op_vec_eq,
       type::Fn::with_args({new type::Vector, new type::Vector}), true);
+  op::bin_equal->add(in_vec_eq);
 }
