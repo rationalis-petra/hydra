@@ -57,9 +57,11 @@ int main(int argc, char **argv) {
   Object::default_behaviour = new Parent("Default Behaviour");
 
   // Here are the rest of the "normal" types
+  Number::parent = new Parent("number-parent");
+  Complex::parent = new Parent("complex-parent");
+  Real::parent = new Parent("real-parent");
   Integer::parent = new Parent("integer-parent");
   Float::parent = new Parent("float-parent");
-  Number::parent = new Parent("number-parent");
 
   HString::parent = new Parent("string-parent");
   Cons::parent = new Parent("cons-parent");
@@ -115,19 +117,15 @@ int main(int argc, char **argv) {
 
 
   // SETUP type hierarchy
-  IOstream::parent->slots[get_keyword("istream")] = Istream::parent;
-  IOstream::parent->slots[get_keyword("ostream")] = Ostream::parent;
-  Socket::parent->slots[get_keyword("parent")] = IOstream::parent;
+  IOstream::parent->set_parent("istream", Istream::parent);
+  IOstream::parent->set_parent("ostream", Ostream::parent);
+  Socket::parent->set_parent("parent", IOstream::parent);
 
-  Integer::parent->slots[get_keyword("parent")] = Number::parent;
-  Float::parent->slots[get_keyword("parent")] = Number::parent;
-
-  IOstream::parent->parents.insert(get_keyword("istream"));
-  IOstream::parent->parents.insert(get_keyword("ostream"));
-  Socket::parent->parents.insert(get_keyword("parent"));
-
-  Integer::parent->parents.insert(get_keyword("parent"));
-  Float::parent->parents.insert(get_keyword("parent"));
+  Number::parent->set_parent("parent", Object::common_behaviour);
+  Complex::parent->set_parent("parent", Number::parent);
+  Real::parent->set_parent("parent", Number::parent);
+  Integer::parent->set_parent("parent", Real::parent);
+  Float::parent->set_parent("parent", Real::parent);
 
   // SETUP Operators
   // we have operators on types, which is required to create some types,
@@ -302,6 +300,7 @@ void make_modules() {
     make_pair("concat", op::cat),
     make_pair("len", op::len),
     // constructors
+    make_pair("cmplx", op::mk_cmplx),
     make_pair("tuple", op::mk_tuple),
     make_pair("union", op::mk_union),
     make_pair("vector", op::mk_vec),
@@ -384,9 +383,6 @@ void make_modules() {
     make_pair("Is", op::mk_is),
     make_pair("Derives", op::mk_derives),
     make_pair("Any", new type::Any),
-    make_pair("Number", type::number_type),
-    make_pair("Integer", type::integer_type),
-    make_pair("Float", type::float_type),
     make_pair("Nil", type::nil_type),
     make_pair("String", type::string_type),
     make_pair("Char", type::character_type),
@@ -397,6 +393,12 @@ void make_modules() {
     make_pair("Symbol", type::symbol_type),
     make_pair("List", new type::List),
     make_pair("Cons", new type::Cons),
+
+    make_pair("Number", type::number_type),
+    make_pair("Complex", type::complex_type),
+    make_pair("Real", type::real_type),
+    make_pair("Integer", type::integer_type),
+    make_pair("Float", type::float_type),
 
     make_pair("IOStream", type::iostream_type),
     make_pair("IStream", type::istream_type),

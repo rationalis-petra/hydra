@@ -6,6 +6,7 @@
 namespace op {
 
   extern void initialize_arithmetic();
+  extern expr::Operator *mk_cmplx;
   extern expr::GenericFn *bin_plus;
   extern expr::GenericFn *bin_minus;
   extern expr::GenericFn *bin_multiply;

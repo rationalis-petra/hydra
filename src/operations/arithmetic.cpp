@@ -11,6 +11,13 @@ using std::string;
 using namespace expr;
 using namespace interp;
 
+Object *op_mk_complex(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+  Number* num1 = get_inbuilt<Number*>(arg_list.front());
+  arg_list.pop_front();
+  Number* num2 = get_inbuilt<Number*>(arg_list.front());
+  return new Complex(num1, num2);
+}
+
 Object *op_bin_plus(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Number* num1 = get_inbuilt<Number*>(arg_list.front());
   arg_list.pop_front();
@@ -86,7 +93,7 @@ Object *op_int_gr(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_sqrt(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   // we now ASSERT that arg_list is a list of length 2
-  Number *num = get_inbuilt<Number *>(arg_list.front());
+  Real *num = get_inbuilt<Real *>(arg_list.front());
   // so arg_list is a list containing integers!
   return num->sqrt();
 }
@@ -116,6 +123,8 @@ Object *op_float_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
+Operator *op::mk_cmplx;
+
 GenericFn *op::bin_plus;
 GenericFn *op::bin_minus;
 GenericFn *op::bin_multiply;
@@ -130,6 +139,11 @@ GenericFn *op::sqrt;
 
 void op::initialize_arithmetic() {
   // First, do the "binary" versions...
+  op::mk_cmplx = new InbuiltOperator(
+      "Makes a complex number",
+      "Creates a complex number from two reals",
+      op_mk_complex, type::Fn::with_args({type::real_type, type::real_type}), true);
+
   Operator *in_bin_plus = new InbuiltOperator(
       "Binary Addition (+ x y)",
       "Returns the sum of its arguemnts",
@@ -215,10 +229,10 @@ void op::initialize_arithmetic() {
   Operator *in_op_sqrt = new InbuiltOperator(
       "sqrt",
       "Returns the square-root of its' argument ",
-      op_sqrt, type::Fn::with_args({type::number_type}),
+      op_sqrt, type::Fn::with_args({type::real_type}),
       true);
   op::sqrt = new GenericFn;
-  op::sqrt->type = type::Fn::with_args({type::number_type});
+  op::sqrt->type = type::Fn::with_args({type::real_type});
   op::sqrt->add(in_op_sqrt);
 
   Operator *in_op_int_gr = new InbuiltOperator(

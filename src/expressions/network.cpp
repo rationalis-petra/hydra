@@ -7,7 +7,7 @@
 
 using namespace expr;
 
-Object *Socket::parent;
+Parent *Socket::parent;
 
 Socket::Socket(boost::asio::ip::tcp::socket *socket)
   : isocket(socket), index(0), size(0) {

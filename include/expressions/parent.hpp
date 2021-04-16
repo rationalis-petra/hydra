@@ -14,6 +14,7 @@ struct Parent : public Object {
   Parent(std::string);
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
   std::string name;
+  void set_parent(std::string name, Object* value);
 };
 
 }

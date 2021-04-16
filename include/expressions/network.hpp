@@ -22,7 +22,7 @@ struct Socket : public Object {
 
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
 
-  static Object* parent;
+  static Parent* parent;
 
   boost::asio::ip::tcp::socket* isocket;
   boost::array<char, 128> buff;

@@ -9,6 +9,8 @@
 namespace type {
 
   extern Type* number_type;
+  extern Type* complex_type;
+  extern Type* real_type;
   extern Type* integer_type;
   extern Type* float_type;
 

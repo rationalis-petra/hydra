@@ -9,6 +9,8 @@ using std::string;
 using namespace type;
 
 Type *type::number_type;
+Type *type::complex_type;
+Type *type::real_type;
 Type *type::integer_type;
 Type *type::float_type;
 
@@ -32,6 +34,8 @@ void type::initialize_types() {
   type::nil_type = new Is(expr::nil::get());
 
   type::number_type = new Derives(expr::Number::parent);
+  type::complex_type = new Derives(expr::Complex::parent);
+  type::real_type = new Derives(expr::Real::parent);
   type::integer_type = new Derives(expr::Integer::parent);
   type::float_type = new Derives(expr::Float::parent);
 
