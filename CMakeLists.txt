@@ -23,9 +23,16 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/include/ ${PROJECT_SOURCE_DIR}/include/libs)
 
 if (UseConan)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lglapi")
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 endif()
+
+# This prevents linking errors when compiling with MSVC: 
+# maybe use non-boost ASIO??
+IF(MSVC)
+    ADD_DEFINITIONS("/EHsc")
+ENDIF(MSVC)
 
 add_subdirectory(src)
 
