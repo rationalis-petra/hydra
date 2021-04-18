@@ -41,8 +41,8 @@ namespace op {
   extern expr::GenericFn* clone;
 
 // Symbol operations: making mutable/unmutable
-  extern expr::Operator* lock;
-  extern expr::Operator* unlock;
+  extern expr::Operator* mk_mutable;
+  extern expr::Operator* mk_const;
 
 } 
 

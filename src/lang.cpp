@@ -268,10 +268,10 @@ std::string lang = R"(
     (@l :value val :parent :accessor)))
 
 (def set! ((ref Ref) value)
-  (set ref :value value))
+  (:value ref value))
 
 (def get! ((ref Ref))
-  (get ref :value)) 
+  (:value ref)) 
 
 (def to-string ((ref Ref))
   (concat "<reference: " (to-string (get! ref)) ">"))

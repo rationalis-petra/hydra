@@ -10,7 +10,11 @@ namespace op {
   extern expr::Operator* thread;
   extern expr::Operator* thread_join;
   extern expr::Operator* thread_id;
-  extern expr::Operator* make_mutex;
+  extern expr::Operator* mk_mutex;
+
+  extern expr::GenericFn* lock_mutex;
+  extern expr::GenericFn* unlock_mutex;
+
   extern expr::Operator* make_semaphore;
   extern expr::Operator* get_all_threads;
 

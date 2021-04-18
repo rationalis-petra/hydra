@@ -10,15 +10,18 @@ add_library(expressions OBJECT
                         data/vector.cpp
                         data/parent.cpp
 
+                        concurrency/thread.cpp
+                        concurrency/mutex.cpp
+
+                        io/input_output.cpp
+                        io/network.cpp
+
                         accessor.cpp
-                        concurrency.cpp
                         foreign.cpp
                         genericfn.cpp
                         handler.cpp
-                        input_output.cpp
                         mirror.cpp
                         module.cpp
-                        network.cpp
                         object.cpp
                         oper.cpp
                         symbol.cpp

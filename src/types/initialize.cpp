@@ -21,6 +21,7 @@ Type *type::string_type;
 Type *type::mirror_type;
 Type *type::meta_type;
 Type *type::symbol_type;
+Type *type::mutex_type;
 
 Type *type::istream_type;
 Type *type::ostream_type;
@@ -39,6 +40,7 @@ void type::initialize_types() {
   type::integer_type = new Derives(expr::Integer::parent);
   type::float_type = new Derives(expr::Float::parent);
 
+  type::mutex_type = new Derives(expr::Mutex::parent);
   type::character_type = new Derives(expr::Char::parent);
   type::module_type = new Derives(expr::Module::parent);
   type::string_type = new Derives(expr::HString::parent);

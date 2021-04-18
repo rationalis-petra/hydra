@@ -11,7 +11,7 @@
 #include "utils.hpp"
 
 using namespace std;
-using namespace interp;
+
 using namespace expr;
 
 extern string lang;
@@ -36,15 +36,14 @@ vector<pair<string, Object *>> network;
 // net
 // concurrent / parallel
 
-
-Runtime g;
-LocalRuntime r(g);
+interp::Runtime g;
+interp::LocalRuntime r(g);
 
 Object *read(Istream *istm);
 void make_modules();
 
 int main(int argc, char **argv) {
-  Object::collector = new STWCollector(g);
+  Object::collector = new interp::STWCollector(g);
 
   // SETUP PARENTS
   // As hydra is prototype-based, objects of each "type" (integer, string, ...)
@@ -64,6 +63,7 @@ int main(int argc, char **argv) {
   Float::parent = new Parent("float-parent");
 
   HString::parent = new Parent("string-parent");
+  Mutex::parent = new Parent("mutex-parent");
   Cons::parent = new Parent("cons-parent");
   Tuple::parent = new Parent("tuple-parent");
   Char::parent = new Parent("char-parent");
@@ -213,7 +213,7 @@ int main(int argc, char **argv) {
   while (count > 0) {
     try {
       while (!prog->stream->eof()) {
-        LexicalScope s;
+        interp::LexicalScope s;
         ast = read(prog);
         out = ast->eval(r, s);
       }
@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
   }
 
   while (true) {
-    LexicalScope s;
+    interp::LexicalScope s;
     try {
       cout << r.active_module->name << "> ";
       ast = read(stm);
@@ -347,8 +347,8 @@ void make_modules() {
     make_pair("defined?", op::definedp),
     make_pair("bind", op::bind),
     make_pair("unbind", op::unbind),
-    make_pair("lock", op::lock),
-    make_pair("unlock", op::unlock),
+    make_pair("mutable", op::mk_mutable),
+    make_pair("const", op::mk_const),
 
     // language/control-flow
     make_pair("if", op::do_if),
@@ -425,7 +425,10 @@ void make_modules() {
         make_pair("close", op::close)};
 
   concurrent = {
-    make_pair("thread", op::thread)};
+    make_pair("thread", op::thread),
+    make_pair("mutex", op::mk_mutex),
+    make_pair("lock", op::lock_mutex),
+    make_pair("unlock", op::unlock_mutex)};
 
   network = {
     make_pair("socket", op::mk_socket)};
@@ -433,7 +436,7 @@ void make_modules() {
 
 Object *read(Istream *istm) {
   // blank scope
-  LexicalScope scope;
+  interp::LexicalScope scope;
   Symbol *cores = language_module->intern("core");
   Module *corem = hydra_cast<Module>(cores->eval(r, scope));
   core_module = corem;
