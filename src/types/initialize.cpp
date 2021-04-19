@@ -27,6 +27,7 @@ Type *type::istream_type;
 Type *type::ostream_type;
 Type *type::iostream_type;
 Type *type::socket_type;
+Type *type::acceptor_type;
 
 Type* type::common_type;
 Type* type::default_type;
@@ -52,6 +53,7 @@ void type::initialize_types() {
   type::ostream_type = new Derives(expr::Ostream::parent);
   type::iostream_type = new Derives(expr::IOstream::parent);
   type::socket_type = new Derives(expr::Socket::parent);
+  type::acceptor_type = new Derives(expr::Acceptor::parent);
 
   type::common_type = new Derives(expr::Object::common_behaviour);
   type::default_type = new Derives(expr::Object::default_behaviour);

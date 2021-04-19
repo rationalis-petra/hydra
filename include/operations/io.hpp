@@ -7,6 +7,8 @@ namespace op {
 
   void initialize_io();
 
+  extern expr::GenericFn* write;
+
   extern expr::GenericFn* close;
   extern expr::GenericFn* next;
   extern expr::GenericFn* peek;

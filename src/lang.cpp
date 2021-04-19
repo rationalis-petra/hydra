@@ -324,6 +324,7 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 (in-module &:hydra:io)
 
 (export (current-module) '+cin+)
+(export (current-module) '+cout+)
 (export (current-module) 'load)
 
 (def load (filename)
@@ -331,7 +332,7 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
         (module (current-module)))
    (while (not (end? fstream))
      (eval (read fstream)))
-   (close-file fstream)
+   (close fstream)
    (in-module module)))
 
 (export (current-module) 'println)

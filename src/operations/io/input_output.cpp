@@ -184,9 +184,24 @@ Object *op_close(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
+Object *op_write_ostream(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+  std::ostream* stream = nullptr;
+  if (Ostream* ost = get_inbuilt<Ostream*>(arg_list.front())) {
+    stream = ost->stream;
+  } else if (IOstream* iost = get_inbuilt<IOstream*>(arg_list.front())) {
+    stream = iost->stream;
+  } 
+  arg_list.pop_front();
+  for (Object* obj : arg_list) {
+    *stream << hydra_to_string(obj, r, s);
+  }
+  return arg_list.back();
+}
+
 GenericFn *op::peek;
 GenericFn *op::next;
 GenericFn *op::put;
+GenericFn *op::write;
 
 Operator *op::open_file;
 Operator *op::print;
@@ -251,11 +266,11 @@ void op::initialize_io() {
       "Takes an output stream, a character, and puts the\n"
       "character in the output stream's current position",
       op_put,
-      type::Fn::with_all({type::ostream_type}, nullptr, type::character_type),
+      type::Fn::with_all({type::ostream_type}, type::character_type, type::character_type),
       true);
   op::put = new GenericFn;
   op::put->type =
-      type::Fn::with_all({type::ostream_type}, nullptr, type::character_type);
+    type::Fn::with_all({type::ostream_type}, type::character_type, type::character_type);
   op::put->add(in_op_put);
 
   op::endp = new InbuiltOperator(
@@ -263,4 +278,20 @@ void op::initialize_io() {
       "Returns t if a given input stream has reached the\n"
       "end of the file, and nil otherwise",
       op_endp, type::Fn::with_args({type::istream_type}), true);
+
+
+
+  Operator *in_op_write = new InbuiltOperator(
+      "write",
+      "Takes an output stream, an object(s), and puts the\n"
+      "object(s) in the output stream's current position",
+      op_write_ostream,
+      type::Fn::with_all({type::ostream_type}, new type::Any, new type::Any),
+      true);
+
+  op::write = new GenericFn;
+  op::write->type =
+    type::Fn::with_all({type::ostream_type}, new type::Any, new type::Any);
+  op::write->add(in_op_write);
+
 }

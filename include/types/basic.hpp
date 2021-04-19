@@ -26,6 +26,7 @@ namespace type {
   extern Type* ostream_type;
   extern Type* iostream_type;
   extern Type* socket_type;
+  extern Type* acceptor_type;
 
   extern Type* mutex_type;
   //extern Type* thread_type;

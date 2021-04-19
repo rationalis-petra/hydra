@@ -76,6 +76,7 @@ int main(int argc, char **argv) {
   Ostream::parent = new Parent("ostream-parent");
   IOstream::parent = new Parent("iostream-parent");
   Socket::parent = new Parent("socket-parent");
+  Acceptor::parent = new Parent("acceptor-parent");
 
 
   // SETUP MODULES
@@ -195,11 +196,16 @@ int main(int argc, char **argv) {
     }
   }
 
-  Istream *stm = new Istream();
-  stm->stream = &cin;
+  Istream *hydra_cin = new Istream();
+  hydra_cin->stream = &cin;
   sym =
       hydra_cast<Module>(language_module->intern("io")->value)->intern("+cin+");
-  sym->value = stm;
+  sym->value = hydra_cin;
+  Ostream* hydra_cout = new Ostream();
+  hydra_cout->stream = &cout;
+  sym =
+      hydra_cast<Module>(language_module->intern("io")->value)->intern("+cout+");
+  sym->value = hydra_cout;
 
   string in;
   Istream *prog = new Istream();
@@ -234,7 +240,7 @@ int main(int argc, char **argv) {
     interp::LexicalScope s;
     try {
       cout << r.active_module->name << "> ";
-      ast = read(stm);
+      ast = read(hydra_cin);
       Object::collector->insert_root(ast);
       out = ast->eval(r, s);
       cout << "* ";
@@ -328,6 +334,7 @@ void make_modules() {
     make_pair("clone", op::clone),
 
     // streams
+    make_pair("write", op::write),
     make_pair("peek", op::peek),
     make_pair("put", op::put),
     make_pair("next", op::next),
@@ -431,7 +438,9 @@ void make_modules() {
     make_pair("unlock", op::unlock_mutex)};
 
   network = {
-    make_pair("socket", op::mk_socket)};
+    make_pair("tcp-socket", op::mk_tcp_socket),
+    make_pair("tcp-acceptor", op::mk_tcp_acceptor),
+    make_pair("accept", op::accept)};
 }
 
 Object *read(Istream *istm) {
