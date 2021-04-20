@@ -9,6 +9,7 @@
 #include "expressions.hpp"
 #include "operations.hpp"
 #include "utils.hpp"
+#include "vals.hpp"
 
 using namespace std;
 
@@ -32,6 +33,7 @@ vector<pair<string, Object *>> foreign;
 vector<pair<string, Object *>> io;
 vector<pair<string, Object *>> concurrent;
 vector<pair<string, Object *>> network;
+vector<pair<string, Object *>> sys_module;
 
 // net
 // concurrent / parallel
@@ -160,6 +162,7 @@ int main(int argc, char **argv) {
   op::initialize_mkoperator();
   op::initialize_foreign();
   op::initialize_concurrency();
+  op::initialize_system();
 
   // io contains generics needed by other io  
   // operators, such as netowrking
@@ -168,6 +171,15 @@ int main(int argc, char **argv) {
 
   // we place read last because it uses other operations
   op::initialize_read();
+
+  // initialize global values so they can be palced in modules
+  {
+    std::list<Object*> args;
+    for (int i = 1; i < argc; i++) {
+      args.push_back(new HString(argv[i]));
+    }
+    vals::args = list_to_cons(args);
+  }
 
   make_modules();
 
@@ -184,7 +196,9 @@ int main(int argc, char **argv) {
       make_pair("foreign", foreign),
       make_pair("dev", dev),
       make_pair("concurrent", concurrent),
-      make_pair("network", network)};
+      make_pair("network", network),
+      // system already declared in c++, so we use sys_module
+      make_pair("system", sys_module)};
 
   for (auto m : moddefs) {
     Module* mod = dynamic_cast<Module*>(
@@ -213,10 +227,25 @@ int main(int argc, char **argv) {
   Object *ast;
   Object *out;
 
+  // execute string in lang.cpp
+  try {
+    while (!prog->stream->eof()) {
+      interp::LexicalScope s;
+      ast = read(prog);
+      out = ast->eval(r, s);
+    }
+  } catch (string e) {
+    cout << e << endl;
+  } catch (const char *err) {
+    cout << err << endl;
+  }
 
-  // if argc > 1, assume they are file names
-  int count = argc;
-  while (count > 0) {
+  // if argc > 1, assume that the first argument
+  // is a file name (the rest are placed in system:args)
+  if (argc > 1) {
+    delete prog->stream;
+    prog->stream = new stringstream("(eval (load \"" +
+                                    string(argv[1]) + "\"))");
     try {
       while (!prog->stream->eof()) {
         interp::LexicalScope s;
@@ -228,13 +257,8 @@ int main(int argc, char **argv) {
     } catch (const char *err) {
       cout << err << endl;
     }
-    count--;
-    if (count != 0) {
-      delete prog->stream;
-      prog->stream = new stringstream("(eval (load \"" +
-                                      string(argv[argc - count]) + "\"))");
-    }
   }
+  delete prog->stream;
 
   while (true) {
     interp::LexicalScope s;
@@ -268,6 +292,7 @@ void make_modules() {
               make_pair("io", new Module("io")),
               make_pair("foreign", new Module("foreign")),
               make_pair("concurrent", new Module("concurrent")),
+              make_pair("system", new Module("system")),
               make_pair("dev", new Module("dev")),
               make_pair("network", new Module("network"))};
 
@@ -441,6 +466,14 @@ void make_modules() {
     make_pair("tcp-socket", op::mk_tcp_socket),
     make_pair("tcp-acceptor", op::mk_tcp_acceptor),
     make_pair("accept", op::accept)};
+
+  sys_module = {
+    make_pair("args", vals::args),
+    make_pair("get-dir", op::get_dir),
+    make_pair("set-dir", op::set_dir),
+    make_pair("mk-dir", op::mk_dir),
+    make_pair("remove", op::fs_remove),
+    make_pair("remove-all", op::fs_remove_all)};
 }
 
 Object *read(Istream *istm) {

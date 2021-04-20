@@ -4,7 +4,7 @@ add_subdirectory(operations)
 add_subdirectory(expressions)
 add_subdirectory(types)
 
-add_executable(hydra main.cpp lang.cpp utils.cpp)
+add_executable(hydra main.cpp lang.cpp utils.cpp vals.cpp)
 
 target_link_libraries(hydra interpreter
                             expressions
@@ -16,5 +16,17 @@ target_link_libraries(hydra interpreter
 if (UseConan)
 target_link_libraries(hydra ${CONAN_LIBS})
 else ()
-target_link_libraries(hydra ffi ltdl pthread)
+find_package(Boost
+  1.75.0      
+  # asio is header-only??
+  COMPONENTS filesystem 
+  REQUIRED)    
+
+target_link_libraries(hydra ffi ltdl pthread ${Boost_LIBRARIES})
 endif()
+
+
+
+# Installation
+set(install_dest "bin")
+install(TARGETS hydra DESTINATION "${install_dest}")

@@ -21,5 +21,6 @@ add_library(operations OBJECT
                        operator.cpp
                        read.cpp
                        symbol.cpp
+                       system.cpp
                        types.cpp)
                        

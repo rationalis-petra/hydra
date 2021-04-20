@@ -346,9 +346,14 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 (use-module &:user &:hydra:core)
 (use-module &:user &:hydra:io)
 (use-module &:user &:hydra:dev)
-(use-module &:user &:hydra:foreign)
-(use-module &:user &:hydra:concurrent)
-(use-module &:user &:hydra:network)
 (in-module &:user)
+
+;; some moduels we set as global variables
+;; in user
+
+(def conc &:hydra:concurrent)
+(def ffi &:hydra:foreign)
+(def net &:hydra:network)
+(def sys &:hydra:system)
 
 )";

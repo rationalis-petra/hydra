@@ -16,6 +16,7 @@
 #include "operations/modules.hpp"
 #include "operations/network.hpp"
 #include "operations/operator.hpp"
+#include "operations/system.hpp"
 #include "operations/types.hpp"
 
 #endif // __EXPRESSIONS_HPP
