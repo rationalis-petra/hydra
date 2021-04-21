@@ -1,5 +1,4 @@
 #include <functional>
-#include <iostream>
 #include <map>
 #include <string>
 #include <typeinfo>
@@ -16,6 +15,9 @@ using type::hydra_cast;
 using std::list;
 using std::string;
 using std::function;
+
+// helper function
+void get_type_default(LocalRuntime &r, LexicalScope &s, Object* obj, type::Type*&, Object*&);
 
 string UserOperator::to_string(LocalRuntime &r, LexicalScope &s) {
   string type = is_fn ? "function" : "macro";
@@ -42,9 +44,15 @@ void UserOperator::mark_node() {
   for (Symbol * s : optionals) {
     s->mark_node();
   }
+  for (Object* o : optional_defaults) {
+    o->mark_node();
+  }
   for (auto pair : keys) {
     pair.first->mark_node();
     pair.second->mark_node();
+  }
+  for (Object* o : key_defaults) {
+    o->mark_node();
   }
 
   expr->mark_node();
@@ -54,6 +62,7 @@ void UserOperator::mark_node() {
     pair.second->mark_node();
   }
 }
+
 
 UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
                            LocalRuntime &r, LexicalScope &s)
@@ -105,15 +114,24 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
 
   for (auto it = lambda_list.begin(); it != lambda_list.end(); it++) {
     Symbol *name;
-    type::Type *t_type;
-    if (Cons *symdef = dynamic_cast<Cons *>(*it)) {
-      name = hydra_cast<Symbol>(symdef->car);
-      // type
-      t_type = hydra_cast<type::Type>(
-          hydra_cast<Cons>(symdef->cdr)->car->eval(r, s));
+    type::Type *t_type = nullptr;
+    Object* default_value = nullptr;
+    if (Cons *symdef = get_inbuilt<Cons *>(*it)) {
+      name = get_inbuilt<Symbol*>(symdef->car);
+      // see helper function @ end of file
+      get_type_default(r, s, symdef->cdr, t_type, default_value);
+      if (t_type == nullptr) {
+        string err = "t_type is null";
+        throw err;
+      }
+      if (default_value == nullptr) {
+        string err = "def is null";
+        throw err;
+      }
     } else {
       name = hydra_cast<Symbol>(*it);
       t_type = new type::Any;
+      default_value = nil::get();
     }
     // :self keyword
     if (name == get_keyword("self")) {
@@ -130,11 +148,11 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
     else if (name == get_keyword("rest")) {
       if (++it != lambda_list.end()) {
         if (Cons *cns = dynamic_cast<Cons *>(*it)) {
-          rest = hydra_cast<Symbol>(cns->car);
-          type->rest_type = hydra_cast<type::Type>(
-              hydra_cast<Cons>(cns->cdr)->car->eval(r, s));
+          rest = get_inbuilt<Symbol*>(cns->car);
+          type->rest_type = get_inbuilt<type::Type*>(
+              get_inbuilt<Cons*>(cns->cdr)->car->eval(r, s));
         } else {
-          rest = hydra_cast<Symbol>(*it);
+          rest = get_inbuilt<Symbol*>(*it);
           type->rest_type = new type::Any;
         }
       } else {
@@ -163,10 +181,11 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
         Symbol *keyword = get_keyword(name->name);
         keys[keyword] = name;
         keyword->value = keyword;
-        type->keyword_list.push_back(t_type);
-        type->keyword_names.push_back(name);
+        key_defaults.push_back(default_value);
+        type->keywords[keyword] = t_type;
 
       } else if (optional) {
+        optional_defaults.push_back(default_value);
         optionals.push_back(name);
         type->optional_list.push_back(t_type);
 
@@ -225,9 +244,10 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
     collector->remove_root(arg_list.front());
     arg_list.pop_front();
   }
+  auto it = optional_defaults.begin();
   for (Symbol *s : optionals) {
     if (arg_list.empty()) {
-      scope->map[s] = nil::get();
+      scope->map[s] = *(it++);
     } else {
       scope->map[s] = arg_list.front();
       collector->remove_root(arg_list.front());
@@ -236,14 +256,15 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
   }
 
   // set all keys to nil
+  it = key_defaults.begin();
   for (auto s : keys) {
-    scope->map[s.second] = nil::get();
+    scope->map[s.second] = *(it++);
   }
 
   int keycounter = keys.size();
   while (keycounter--) {
     if (!arg_list.empty()) {
-      Symbol *sym = hydra_cast<Symbol>(arg_list.front());
+      Symbol *sym = get_inbuilt<Symbol*>(arg_list.front());
       arg_list.pop_front();
       if (keys.find(sym) != keys.end()) {
         if (arg_list.empty()) {
@@ -308,4 +329,83 @@ Object *UserOperator::call(list<Object*> arg_list, LocalRuntime &r,
 
 UserOperator::~UserOperator() {
   delete scope;
+}
+
+void get_type_default(LocalRuntime&r, LexicalScope &s, Object* obj, type::Type*& t, Object*& def) {
+  std::list<Object*> arg_list = cons_to_list(obj);
+  if (arg_list.size() == 0) {
+    t = new type::Any;
+    def = nil::get();
+  } else if (arg_list.size() == 1) {
+    Object* obj = arg_list.front()->eval(r, s);
+    if (type::Type* test_t = get_inbuilt<type::Type*>(obj)) {
+      t = test_t;
+      def = nil::get();
+    } else {
+      t = new type::Any;
+      def = obj;
+    }
+  } else if (arg_list.size() == 2) {
+    Object* obj = arg_list.front()->eval(r, s);
+    if (obj == get_keyword("default")) {
+      def = arg_list.back()->eval(r, s);
+      t = new type::Any;
+    } else if (obj == get_keyword("type")) {
+      if (type::Type* test_t = get_inbuilt<type::Type*>(arg_list.back()->eval(r, s))) {
+        def = nil::get();
+        t = test_t;
+      } else {
+        string err = "kwarg type provided to type-list, but non-type provided";
+        throw err;
+      }
+    } else {
+      def = obj;
+      if (type::Type* test_t = get_inbuilt<type::Type*>(arg_list.back()->eval(r, s))) {
+        t = test_t;
+      } else {
+        string err = "second arg in non-keyworded argument sepcifier is not a type";
+        throw err;
+      }
+    }
+  } else if (arg_list.size() == 3) {
+    string err = "bad number of arguments (3) provided to argument specifier";
+    throw err;
+    // TODO: we do not check for non-default/type keyword values...
+    // also we don't check for repeated type/default values
+  } else if (arg_list.size() == 4) {
+    Object* obj = arg_list.front()->eval(r, s);
+    arg_list.pop_front();
+    if (obj == get_keyword("default")) {
+      def = arg_list.front()->eval(r, s);
+    } else if (obj == get_keyword("type")) {
+      if (type::Type* test_t = get_inbuilt<type::Type*>(arg_list.front()->eval(r, s))) {
+        t = test_t;
+      } else {
+        string err = "kwarg type provided to type-list, but non-type provided";
+        throw err;
+      }
+    } else {
+      string err = "non type/default provided...";
+      throw err;
+    }
+    arg_list.pop_front();
+    obj = arg_list.front()->eval(r, s);
+    arg_list.pop_front();
+    if (obj == get_keyword("default")) {
+      def = arg_list.front()->eval(r, s);
+    } else if (obj == get_keyword("type")) {
+      if (type::Type* test_t = get_inbuilt<type::Type*>(arg_list.front()->eval(r, s))) {
+        t = test_t;
+      } else {
+        string err = "kwarg type provided to type-list, but non-type provided";
+        throw err;
+      }
+    } else {
+      string err = "non type/default provided...";
+      throw err;
+    }
+  } else {
+    string err = "too many arguments provided to argument specifier";
+    throw err;
+  }
 }

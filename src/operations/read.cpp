@@ -132,7 +132,7 @@ Object *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
       break;
     case ']': {
       is->stream->read(&c, 1);
-      return new Cons(op::mk_tuple, to_cons(list));
+      return new Cons(op::mk_cons, to_cons(list));
       break;
     } break;
     default:

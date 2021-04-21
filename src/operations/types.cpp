@@ -131,7 +131,7 @@ Object *op_mk_fn_type(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s)
       if (obj == rest) {
         mode = Rest;
       } else if (Symbol* s = dynamic_cast<Symbol *>(obj)) {
-        active_key = keyword_module->intern(s->name);
+        active_key = get_keyword(s->name);
         mode = Key2;
       } else {
         string err = "non-symbol provided to key in fn type constructor";
@@ -140,8 +140,7 @@ Object *op_mk_fn_type(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s)
     } break;
     case Key2: {
       if (type::Type* t = dynamic_cast<type::Type *>(obj)) {
-        fn->keyword_names.push_back(active_key);
-        fn->keyword_list.push_back(t);
+        fn->keywords[active_key] = t;
 
         active_key = nullptr;
         mode = Key1;

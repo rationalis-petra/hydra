@@ -24,11 +24,9 @@ void Mac::mark_node() {
   for (Type* t : optional_list) {
     t->mark_node();
   }
-  for (Type* t : keyword_list) {
-    t->mark_node();
-  }
-  for (expr::Symbol* t : keyword_names) {
-    t->mark_node();
+  for (auto it : keywords) {
+    it.second->mark_node();
+    it.first->mark_node();
   }
   if (rest_type) {
     rest_type->mark_node();

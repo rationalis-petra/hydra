@@ -27,13 +27,13 @@ using type::hydra_cast;
 
 vector<pair<string, Object *>> inbuilts;
 
-vector<pair<string, Object *>> dev;
-vector<pair<string, Object *>> core;
-vector<pair<string, Object *>> foreign;
-vector<pair<string, Object *>> io;
-vector<pair<string, Object *>> concurrent;
-vector<pair<string, Object *>> network;
-vector<pair<string, Object *>> sys_module;
+vector<pair<string, Object *>> dev_setup;
+vector<pair<string, Object *>> core_setup;
+vector<pair<string, Object *>> foreign_setup;
+vector<pair<string, Object *>> io_setup;
+vector<pair<string, Object *>> concurrent_setup;
+vector<pair<string, Object *>> network_setup;
+vector<pair<string, Object *>> sys_setup;
 
 // net
 // concurrent / parallel
@@ -191,14 +191,14 @@ int main(int argc, char **argv) {
   }
 
   vector<pair<string, vector<pair<string, Object *>>>> moddefs = {
-      make_pair("core", core),
-      make_pair("io", io),
-      make_pair("foreign", foreign),
-      make_pair("dev", dev),
-      make_pair("concurrent", concurrent),
-      make_pair("network", network),
+      make_pair("core", core_setup),
+      make_pair("io", io_setup),
+      make_pair("foreign", foreign_setup),
+      make_pair("dev", dev_setup),
+      make_pair("concurrent", concurrent_setup),
+      make_pair("network", network_setup),
       // system already declared in c++, so we use sys_module
-      make_pair("system", sys_module)};
+      make_pair("system", sys_setup)};
 
   for (auto m : moddefs) {
     Module* mod = dynamic_cast<Module*>(
@@ -296,7 +296,7 @@ void make_modules() {
               make_pair("dev", new Module("dev")),
               make_pair("network", new Module("network"))};
 
-  dev = {make_pair("doc", op::describe),
+  dev_setup = {make_pair("doc", op::describe),
     make_pair("macro-expand", op::macexpand),
     make_pair("time", op::time)};
 
@@ -309,7 +309,7 @@ void make_modules() {
   gn_to_string->type->return_type = type::string_type;
   gn_to_string->add(op::to_str);
 
-  core = {
+  core_setup = {
     // arithmetic
     make_pair("binary+", op::bin_plus),
     make_pair("binary-", op::bin_minus),
@@ -446,28 +446,28 @@ void make_modules() {
     make_pair("subtype?", op::subtype)
   };
 
-  foreign = {// ffi
+  foreign_setup = {// ffi
              make_pair("load-c-library", op::foreign_lib),
              make_pair("get-c-symbol", op::foreign_sym),
              make_pair("internalize", op::internalize)};
 
-  io = {// io
+  io_setup = {// io
         make_pair("print", op::print),
         make_pair("open-file", op::open_file),
         make_pair("close", op::close)};
 
-  concurrent = {
+  concurrent_setup = {
     make_pair("thread", op::thread),
     make_pair("mutex", op::mk_mutex),
     make_pair("lock", op::lock_mutex),
     make_pair("unlock", op::unlock_mutex)};
 
-  network = {
+  network_setup = {
     make_pair("tcp-socket", op::mk_tcp_socket),
     make_pair("tcp-acceptor", op::mk_tcp_acceptor),
     make_pair("accept", op::accept)};
 
-  sys_module = {
+  sys_setup = {
     make_pair("args", vals::args),
     make_pair("get-dir", op::get_dir),
     make_pair("set-dir", op::set_dir),

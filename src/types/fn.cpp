@@ -29,11 +29,9 @@ void Fn::mark_node() {
   for (Type* t : optional_list) {
     t->mark_node();
   }
-  for (Type* t : keyword_list) {
-    t->mark_node();
-  }
-  for (expr::Symbol* t : keyword_names) {
-    t->mark_node();
+  for (auto it : keywords) {
+    it.first->mark_node();
+    it.second->mark_node();
   }
   if (rest_type) {
     rest_type->mark_node();
@@ -51,6 +49,24 @@ std::string Fn::to_string(LocalRuntime &r, LexicalScope &s) {
     str += once ? " " : (once = true, "");
     str += hydra_to_string(t, r, s);
   }
+  if (optional_list.size() > 0) {
+    str += once ? " " : (once = true, "");
+    str += ":optional";
+  }
+  for (Type* t : optional_list) {
+    str += once ? " " : (once = true, "");
+    str += hydra_to_string(t, r, s);
+  }
+  if (keywords.size() > 0) {
+    str += once ? " " : (once = true, "");
+    str += ":key";
+  }
+  for (auto it : keywords) {
+    str += once ? " " : (once = true, "");
+    str += hydra_to_string(it.first, r, s);
+    str += " ";
+    str += hydra_to_string(it.second, r, s);
+  }
   if (rest_type) {
     str += once ? " " : (once = true, "");
     str += ":rest " + hydra_to_string(rest_type, r, s);
@@ -67,6 +83,7 @@ Object *Fn::check_type(Object *obj) {
 }
 
 
+#include <iostream>
 Object *Fn::check_args(list<Object*> alist) {
   for (auto type : arg_list) {
     if (alist.empty()) {
@@ -87,6 +104,31 @@ Object *Fn::check_args(list<Object*> alist) {
     }
     alist.pop_front();
   }
+  // now, we check keyword argumnets
+  // TODO: check for duplicate keywords..
+  // we kinda to this (with the cap variable), but an explicit
+  // warning would be good...
+  int cap = keywords.size();
+  while (cap-- > 0 && !alist.empty()) {
+    if (expr::Symbol *sym = get_inbuilt<expr::Symbol *>(alist.front())) {
+      auto it = keywords.find(sym);
+      if (it != keywords.end()) {
+        alist.pop_front();
+        if (alist.empty()) {
+          string err = "odd number of keyword arguments";
+          throw err;
+        }
+        if (it->second->check_type(alist.front())->null()) {
+          return expr::nil::get();
+        }
+        alist.pop_front();
+      } else {
+        cap = 0;
+      }
+    } else {
+      cap = 0;
+    }
+  }
 
   if (rest_type) {
     for (Object* obj : alist) {
@@ -99,7 +141,6 @@ Object *Fn::check_args(list<Object*> alist) {
   if (alist.size() != 0) {
     throw new TooManyException;
   }
-  // now, we check keyword argumnets
   return expr::t::get();
 }
 
@@ -132,7 +173,6 @@ Fn *Fn::with_args_optional(std::vector<Type *> args, std::vector<Type *> opts) {
   return tfn;
 }
 
-#include <iostream>
 expr::Object* Fn::subtype(Type* other) {
   if (Fn* tfn = dynamic_cast<Fn*>(other)) {
     if (arg_list.size() == tfn->arg_list.size()) {

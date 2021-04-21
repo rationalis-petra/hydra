@@ -32,8 +32,7 @@ namespace type {
   Type* rest_type;
   std::vector<Type*> arg_list;
   std::vector<Type*> optional_list;
-  std::list<expr::Symbol*> keyword_names;
-  std::list<Type*> keyword_list;
+  std::unordered_map<expr::Symbol*, Type*> keywords;
 };
 
 struct Mac : public Fn {

@@ -57,6 +57,7 @@ list<Object *> Operator::get_arg_list(Object *arg_list, LocalRuntime &r,
       Object::collector->insert_root(arg);
     }
   }
+
   try {
     if (type->check_args(out_list)->null()) {
       string ierr = "type check failed! for arg_list: " +

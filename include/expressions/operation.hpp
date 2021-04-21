@@ -46,7 +46,9 @@ struct UserOperator : public Operator {
   Symbol *rest; // for accepting variable arguments
   Symbol *self; // name of function within function's scope
   std::list<Symbol *> optionals;
+  std::list<Object *> optional_defaults;
   std::map<Symbol *, Symbol*> keys;
+  std::list<Object *> key_defaults;
 
   std::list<Symbol *> arg_names;
   Object *expr;

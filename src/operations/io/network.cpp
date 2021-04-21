@@ -20,22 +20,18 @@ boost::asio::io_context context;
 
 Object *op_mk_tcp_socket(list<Object *> arg_list, LocalRuntime &r,
                          LexicalScope &s) {
-
   tcp::resolver resolver(context);
   tcp::socket *socket;
 
-  if (arg_list.size() < 2) {
-    socket = new tcp::socket(context);
-  } else {
-    HString *place = get_inbuilt<HString *>(arg_list.front());
-    HString *port = get_inbuilt<HString *>(arg_list.back());
+  HString *place = get_inbuilt<HString *>(arg_list.front());
+  HString *port = get_inbuilt<HString *>(arg_list.back());
 
-    tcp::resolver::results_type endpoints =
-        resolver.resolve(place->value, port->value);
+  tcp::resolver::results_type endpoints =
+      resolver.resolve(place->value, port->value);
 
-    socket = new tcp::socket(context);
-    boost::asio::connect(*socket, endpoints);
-  }
+  socket = new tcp::socket(context);
+  boost::asio::connect(*socket, endpoints);
+
   return new Socket(socket);
 }
 
@@ -72,16 +68,22 @@ Object *op_write_socket(list<Object *> arg_list, LocalRuntime &r,
 Object *op_mk_tcp_acceptor(list<Object *> arg_list, LocalRuntime &r,
                            LexicalScope &s) {
   tcp::acceptor *acceptor;
-  Symbol *sym = get_inbuilt<Symbol *>(arg_list.front());
-  Integer *num = get_inbuilt<Integer *>(arg_list.back());
-
-  if (sym == get_keyword("v6")) {
-    acceptor = new tcp::acceptor(context, tcp::endpoint(tcp::v6(), num->value));
-  } else if (sym == get_keyword("v4")) {
-    acceptor = new tcp::acceptor(context, tcp::endpoint(tcp::v4(), num->value));
+  tcp::endpoint point;
+  Integer *num = get_inbuilt<Integer *>(arg_list.front());
+  if (arg_list.size() == 2) {
+    Symbol *sym = get_inbuilt<Symbol *>(arg_list.back());
+    if (sym == get_keyword("v6")) {
+      point = tcp::endpoint(tcp::v6(), num->value);
+    } else if (sym == get_keyword("v4")) {
+      point = tcp::endpoint(tcp::v6(), num->value);
+    } else {
+      return expr::nil::get();
+    }
   } else {
-    return expr::nil::get();
+    point = tcp::endpoint(tcp::v6(), num->value);
   }
+
+  acceptor = new tcp::acceptor(context, point);
 
   return new Acceptor(acceptor);
 }
@@ -89,7 +91,8 @@ Object *op_mk_tcp_acceptor(list<Object *> arg_list, LocalRuntime &r,
 Object *op_tcp_accept(list<Object *> arg_list, LocalRuntime &r,
                       LexicalScope &s) {
   Acceptor *acceptor = get_inbuilt<Acceptor *>(arg_list.front());
-  Socket *sock = get_inbuilt<Socket *>(arg_list.back());
+  tcp::socket* socket = new tcp::socket(context);
+  Socket* sock = new Socket(socket);
 
   acceptor->accept(sock);
   return sock;
@@ -104,7 +107,7 @@ void op::initialize_network() {
 
   op::mk_tcp_socket = new InbuiltOperator(
       "tcp-socket", "creates a new network socket", op_mk_tcp_socket,
-      type::Fn::with_args_optional({}, {type::string_type, type::string_type}),
+      type::Fn::with_args({type::string_type, type::string_type}),
       true);
   Operator *in_op_peek_socket = new InbuiltOperator(
       "close-socket", "closes a netowrk socket", op_peek_socket,
@@ -129,11 +132,11 @@ void op::initialize_network() {
       // ACCETPTOR
       op::mk_tcp_acceptor = new InbuiltOperator(
       "tcp-acceptor", "creates a new tcp acceptor", op_mk_tcp_acceptor,
-      type::Fn::with_args({type::symbol_type, type::integer_type}), true);
+      type::Fn::with_args_optional({type::integer_type}, {type::symbol_type}), true);
 
   op::accept = new GenericFn;
   op::accept->type =
-      type::Fn::with_args({type::acceptor_type, type::socket_type});
+      type::Fn::with_args({type::acceptor_type});
 
   Operator *in_op_tcp_accept = new InbuiltOperator(
       "accept (tcp)", "accepts a connection & attaches it to a socket",
