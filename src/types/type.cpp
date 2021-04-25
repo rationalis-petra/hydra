@@ -9,6 +9,7 @@ using std::string;
 using namespace type;
 using namespace interp;
 
+
 expr::Object* Type::equal(Type* other) {
   if (this == other) {
     return expr::t::get();

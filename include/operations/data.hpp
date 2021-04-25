@@ -6,7 +6,6 @@
 namespace op {
 
   void initialize_data();
-
   void initialize_symbol();
   void initialize_string();
   void initialize_vector();
@@ -25,9 +24,10 @@ namespace op {
   // character
 
 // Cons-Cell creation, Car, Cdr
+  extern expr::Operator* mk_list;
   extern expr::Operator* mk_cons;
-  extern expr::Operator* car;
-  extern expr::Operator* cdr;
+  extern expr::GenericFn* car;
+  extern expr::GenericFn* cdr;
 
 // Vector operations: creation, indexing, length & concatenation
   extern expr::Operator* mk_vec;

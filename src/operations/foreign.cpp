@@ -119,6 +119,7 @@ Object *op_internalize(list<Object *> arg_list, LocalRuntime &r,
   ffi_type **arg_types = new ffi_type *[op->arg_types.size()];
   unsigned i = 0;
   for (foreign_type t : op->arg_types) {
+    // arg_types[i] = t->get_ffi_type();
     switch (t) {
     case Int32:
       arg_types[i] = &ffi_type_sint;
@@ -201,3 +202,5 @@ void op::initialize_foreign() {
       op_internalize, type::Fn::with_args({new type::Any, new type::Any}),
       true);
 };
+
+

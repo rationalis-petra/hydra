@@ -8,6 +8,9 @@ using std::string;
 //using namespace type;
 using namespace type;
 
+Type* type::c_type_type;
+Type* type::c_typemod_type;
+
 Type *type::number_type;
 Type *type::complex_type;
 Type *type::real_type;
@@ -33,6 +36,10 @@ Type* type::common_type;
 Type* type::default_type;
 
 void type::initialize_types() {
+
+  type::c_type_type = new Derives(expr::CType::parent);
+  type::c_typemod_type = new Derives(expr::CType::modifier_parent);
+
   type::nil_type = new Is(expr::nil::get());
 
   type::number_type = new Derives(expr::Number::parent);

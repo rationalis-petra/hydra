@@ -10,13 +10,6 @@ std::string lang = R"(
 "Hence, I use strings as makeshift comments!"
 "We start by defining extremely useful functions: and macros"
 
-"The list function"
-(export (current-module) (quote list))
-(bind (quote list) 
-  (fn (:rest args)
-   "Makes a list from its' args" 
-    args))
-
 "The def function: like setq in common lisp"
 (export (current-module) (quote def))
 (bind (quote def) 

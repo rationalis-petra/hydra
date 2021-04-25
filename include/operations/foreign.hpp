@@ -9,6 +9,7 @@
 namespace op {
 
   void initialize_foreign();
+  void initialize_foreign_proxy();
 
   // Find a foreign library on disk & return handle
   extern expr::Operator* foreign_lib;
@@ -18,6 +19,11 @@ namespace op {
   extern expr::Operator* internalize;
   // get a foreign variable as an internal variable
   extern expr::Operator* foreign_get;
+
+  extern expr::Operator* mk_short;
+  extern expr::Operator* mk_long;
+  extern expr::Operator* mk_signed;
+  extern expr::Operator* mk_unsigned;
 
 }; // namespace op
 

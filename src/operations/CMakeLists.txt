@@ -11,6 +11,7 @@ add_library(operations OBJECT
                        arithmetic.cpp
                        concurrency.cpp
                        conditions.cpp
+                       cvals.cpp
                        dev.cpp
                        foreign.cpp
                        language.cpp

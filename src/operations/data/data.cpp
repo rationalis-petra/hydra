@@ -26,6 +26,11 @@ Object *make_list(list<Object *> objects) {
   }
 }
 
+Object *op_mk_list(list<Object *> alist, LocalRuntime &r, LexicalScope &s) {
+  alist.push_back(nil::get());
+  return make_list(alist);
+}
+
 Object *op_cons(list<Object *> alist, LocalRuntime &r, LexicalScope &s) {
   return make_list(alist);
 }
@@ -78,11 +83,11 @@ GenericFn *op::set;
 GenericFn *op::get;
 GenericFn *op::len;
 GenericFn *op::cat;
-//GenericFn *op::len;
 
+Operator *op::mk_list;
 Operator *op::mk_cons;
-Operator *op::cdr;
-Operator *op::car;
+GenericFn *op::cdr;
+GenericFn *op::car;
 
 
 void op::initialize_data() {
@@ -113,17 +118,28 @@ void op::initialize_cons() {
                           type::Fn::with_all({new type::Any, new type::Any},
                                              new type::Any, new type::Cons),
                           true);
-  op::cdr = new InbuiltOperator(
+  Operator* in_op_cdr = new InbuiltOperator(
       "cdr", "Takes a cons cell as input, and returns the cdr", op_cdr,
       type::Fn::with_args({new type::Cons}), true);
+  op::cdr = new GenericFn;
+  op::cdr->type = type::Fn::with_args({new type::Cons});
+  op::cdr->add(in_op_cdr);
 
-  op::car = new InbuiltOperator(
+  Operator* in_op_car = new InbuiltOperator(
       "car", "Takes a cons cell as input, and returns the car", op_car,
       type::Fn::with_args({new type::Cons}), true);
+  op::car = new GenericFn;
+  op::car->type = type::Fn::with_args({new type::Cons});
+  op::car->add(in_op_car);
+
   Operator* in_cons_eq = new InbuiltOperator(
       "cons =", "Equality test for Conses", op_cons_eq,
       type::Fn::with_args({new type::Cons, new type::Cons}), true);
 
   op::bin_equal->add(in_cons_eq);
+
+  op::mk_list = new InbuiltOperator(
+      "list", "List constructor", op_mk_list,
+      type::Fn::with_rest(new type::Any), true);
 
 }

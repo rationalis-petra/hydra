@@ -7,6 +7,7 @@
 
 #include "interpreter/garbage.hpp"
 #include "interpreter/runtime.hpp"
+#include "interpreter/continuation.hpp"
 
 namespace expr {
 

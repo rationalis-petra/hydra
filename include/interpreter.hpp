@@ -4,5 +4,6 @@
 #include "interpreter/exception.hpp"
 #include "interpreter/garbage.hpp"
 #include "interpreter/runtime.hpp"
+#include "interpreter/continuation.hpp"
 
 #endif 

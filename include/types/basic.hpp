@@ -34,6 +34,9 @@ namespace type {
   extern Type* common_type;
   extern Type* default_type;
 
+  extern Type* c_type_type;
+  extern Type* c_typemod_type;
+
   void initialize_types();
 
 struct Nil : public Type {

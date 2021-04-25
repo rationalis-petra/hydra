@@ -1,8 +1,11 @@
+add_subdirectory(data)
 
 add_library(expressions OBJECT
                         data/bool.cpp
                         data/char.cpp
                         data/cons.cpp
+                        data/ctypes.cpp
+                        data/cvals.cpp
                         data/number.cpp
                         data/string.cpp
                         data/tuple.cpp

@@ -1,12 +1,14 @@
 
+add_subdirectory(init)
 add_subdirectory(interpreter)
 add_subdirectory(operations)
 add_subdirectory(expressions)
 add_subdirectory(types)
 
-add_executable(hydra main.cpp lang.cpp utils.cpp vals.cpp)
+add_executable(hydra main.cpp utils.cpp vals.cpp)
 
-target_link_libraries(hydra interpreter
+target_link_libraries(hydra init
+                            interpreter
                             expressions
                             operations
                             types)

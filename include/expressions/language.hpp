@@ -49,7 +49,7 @@ struct Symbol : public Object {
   Symbol(std::string name);
   static Symbol* symbol_no_parent(std::string name);
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
-  Object *eval(interp::LocalRuntime &r, interp::LexicalScope &s);
+  Object* eval(interp::LocalRuntime &r, interp::LexicalScope &s);
 
 private:
   Symbol();

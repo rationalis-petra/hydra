@@ -57,6 +57,9 @@ int main(int argc, char **argv) {
   Object::common_behaviour = new Parent("Common Behaviour");
   Object::default_behaviour = new Parent("Default Behaviour");
 
+  CType::parent = new Parent("ctype-parent");
+  CType::modifier_parent = new Parent("ctypemod-parent");
+
   // Here are the rest of the "normal" types
   Number::parent = new Parent("number-parent");
   Complex::parent = new Parent("complex-parent");
@@ -120,6 +123,8 @@ int main(int argc, char **argv) {
 
 
   // SETUP type hierarchy
+  CType::modifier_parent->set_parent("parent", CType::parent);
+
   IOstream::parent->set_parent("istream", Istream::parent);
   IOstream::parent->set_parent("ostream", Ostream::parent);
   Socket::parent->set_parent("parent", IOstream::parent);
@@ -161,6 +166,7 @@ int main(int argc, char **argv) {
   op::initialize_module();
   op::initialize_mkoperator();
   op::initialize_foreign();
+  op::initialize_foreign_proxy();
   op::initialize_concurrency();
   op::initialize_system();
 
@@ -336,6 +342,8 @@ void make_modules() {
     make_pair("union", op::mk_union),
     make_pair("vector", op::mk_vec),
     make_pair("cons", op::mk_cons),
+    make_pair("list", op::mk_list),
+
     // access
     make_pair("car", op::car),
     make_pair("cdr", op::cdr),
@@ -446,10 +454,32 @@ void make_modules() {
     make_pair("subtype?", op::subtype)
   };
 
+  Symbol *invoker = get_keyword("invoker");
+  Object* cshortobj = new Object();
+  cshortobj->invoker = op::mk_short;
+  cshortobj->slots[invoker] = op::mk_long;
+  cshortobj->parents.insert(invoker);
+  Object* clongobj = new Object();
+  clongobj->invoker = op::mk_long;
+  clongobj->slots[invoker] = op::mk_long;
+  clongobj->parents.insert(invoker);
+
+
   foreign_setup = {// ffi
              make_pair("load-c-library", op::foreign_lib),
              make_pair("get-c-symbol", op::foreign_sym),
-             make_pair("internalize", op::internalize)};
+             make_pair("internalize", op::internalize),
+
+             make_pair("int", new CBasicType(tint)),
+             make_pair("char", new CBasicType(tchar)),
+             make_pair("float", new CBasicType(tfloat)),
+             make_pair("double", new CBasicType(tdouble)),
+
+             make_pair("short", cshortobj),
+             make_pair("long", clongobj),
+             make_pair("signed", op::mk_signed),
+             make_pair("unsigned", op::mk_unsigned)
+  };
 
   io_setup = {// io
         make_pair("print", op::print),
