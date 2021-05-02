@@ -33,12 +33,22 @@ Object *op_set_slot_val(list<Object *> args, LocalRuntime &r, LexicalScope &s) {
   return mirr->reflectee->set_slot_value(sym, val, r, s);
 }
 
-// Object *op_set_slot_parent(list<Object *> args, LocalRuntime &r, LexicalScope &s) {
-//   mirror* mirr = get_inbuilt<mirror*>(args.front());
-//   args.pop_front();
-//   symbol* sym = get_inbuilt<symbol*>(args.front());
-//   return mirr->reflectee->set_slot_parent(sym, val, r, s);
-// }
+Object *op_set_slot_parent(list<Object *> args, LocalRuntime &r, LexicalScope &s) {
+  Mirror* mirr = get_inbuilt<Mirror*>(args.front());
+  args.pop_front();
+  Symbol* sym = get_inbuilt<Symbol*>(args.front());
+  mirr->reflectee->parents.insert(sym);
+  args.pop_front();
+  Object* bl = args.front();
+
+  if (bl->null()) {
+    mirr->reflectee->parents.erase(sym);
+  } else {
+    mirr->reflectee->parents.insert(sym);
+  }
+
+  return mirr;
+}
 
 Object *op_delete_slot(list<Object *> args, LocalRuntime &r, LexicalScope &s) {
   Mirror* mirr = get_inbuilt<Mirror*>(args.front());
@@ -158,4 +168,10 @@ void op::initialize_mirror() {
       "remove-metaslot", "removes a given metadata slot from an object",
       op_delete_meta,
       type::Fn::with_args({type::mirror_type, type::symbol_type}), true));
+
+  set_slot_parent->add(new InbuiltOperator(
+      "set-parent", "sets a slot to be a parent or not", op_set_slot_parent,
+      type::Fn::with_args(
+          {type::mirror_type, type::symbol_type, new type::Any}),
+      true));
 }

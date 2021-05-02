@@ -262,14 +262,14 @@ void make_modules() {
     make_pair("get-slots", op::get_slots),
     make_pair("get-slot", op::get_slot_val),
     make_pair("set-slot", op::set_slot_val),
+    make_pair("set-parent", op::set_slot_parent),
     make_pair("remove-slot", op::delete_slot),
+
     make_pair("get-meta", op::get_meta),
     make_pair("get-metaslot", op::get_meta_val),
     make_pair("set-metaslot", op::set_meta_val),
     make_pair("remove-metaslot", op::delete_meta),
 
-    make_pair("set-invoker", op::set_invoker),
-    make_pair("get-invoker", op::get_invoker),
     make_pair("clone", op::clone),
 
     // streams

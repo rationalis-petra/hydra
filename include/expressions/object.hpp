@@ -61,6 +61,7 @@ struct Object {
                                  interp::LexicalScope &s);
   virtual Object *delete_meta(Symbol *sym, interp::LocalRuntime &r,
                               interp::LexicalScope &s);
+
 };
 
 } // namespace expr

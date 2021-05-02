@@ -1,5 +1,6 @@
 #include "utils.hpp"
-#include <expressions/data/struct.hpp>
+#include <expressions/data/ctypes.hpp>
+#include <expressions/data/cvals.hpp>
 
 using namespace interp;
 using namespace expr;

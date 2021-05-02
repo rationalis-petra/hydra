@@ -1,4 +1,5 @@
-#include <expressions/data/struct.hpp>
+#include <expressions/data/cvals.hpp>
+#include <expressions/data/ctypes.hpp>
 #include "utils.hpp"
 
 using namespace interp;

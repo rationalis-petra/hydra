@@ -21,7 +21,6 @@ void Cons::mark_node() {
   cdr->mark_node();
 }
 
-
 Object* Cons::eval(LocalRuntime &r, LexicalScope &s) {
   Object *oper = car->eval(r, s);
   collector->insert_root(oper);
@@ -37,14 +36,19 @@ Object* Cons::eval(LocalRuntime &r, LexicalScope &s) {
       collector->remove_root(oper);
       throw e;
     }
-  } else if (oper->slots.find(get_keyword("invoker")) != oper->slots.end()) {
-    Cons* cns = new Cons(oper->slots[get_keyword("invoker")], cdr);
-    return cns->eval(r, s);
+  } else if (Operator* op = get_inbuilt<Operator*>(oper)) {
+    try {
+      std::list<Object*> arg_list = op->get_arg_list(cdr, r, s);
+      Object* out = op->call(arg_list, r, s);
+      collector->remove_root(oper);
+      return out;
+    } catch (hydra_exception* e) {
+      collector->remove_root(oper);
+      throw e;
+    }
   } else {
-    string excp = "Attempted to call " + hydra_to_string(oper, r, s) +
-                  " which is not an operation!";
-    collector->remove_root(oper);
-    throw excp;
+    string err = "car is not an operator";
+    throw err;
   }
 }
 

@@ -12,6 +12,7 @@
 namespace expr {
 
 struct CType;
+struct CStructType;
 
 struct CProxy : Object {
   virtual CType* get_type() = 0;
