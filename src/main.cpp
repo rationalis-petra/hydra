@@ -10,6 +10,7 @@
 #include "operations.hpp"
 #include "utils.hpp"
 #include "vals.hpp"
+#include "init.hpp"
 
 using namespace std;
 
@@ -47,42 +48,12 @@ void make_modules();
 int main(int argc, char **argv) {
   Object::collector = new interp::STWCollector(g);
 
-  // SETUP PARENTS
-  // As hydra is prototype-based, objects of each "type" (integer, string, ...)
-  // must notionally inherit from some parent object - the "string-parent" or
-  // "integer parent", etc. We create them here.
+  // We call many functions defined in init.hpp,
+  // so the broad strokes of initialization are
+  // init();
 
-  // Common-bechaviour and default-behaviour are two special cases:
-  // common-behaviour acts a parent to almost all objects
-  Object::common_behaviour = new Parent("Common Behaviour");
-  Object::default_behaviour = new Parent("Default Behaviour");
-
-  CType::parent = new Parent("ctype-parent");
-  CType::modifier_parent = new Parent("ctypemod-parent");
-
-  // Here are the rest of the "normal" types
-  Number::parent = new Parent("number-parent");
-  Complex::parent = new Parent("complex-parent");
-  Real::parent = new Parent("real-parent");
-  Integer::parent = new Parent("integer-parent");
-  Float::parent = new Parent("float-parent");
-
-  HString::parent = new Parent("string-parent");
-  Mutex::parent = new Parent("mutex-parent");
-  Cons::parent = new Parent("cons-parent");
-  Tuple::parent = new Parent("tuple-parent");
-  Char::parent = new Parent("char-parent");
-  Union::parent = new Parent("union-parent");
-  Mirror::parent = new Parent("mirror-parent");
-  Module::parent = new Parent("module-parent");
-  Symbol::parent = new Parent("symbol-parent");
-
-  Istream::parent = new Parent("istream-parent");
-  Ostream::parent = new Parent("ostream-parent");
-  IOstream::parent = new Parent("iostream-parent");
-  Socket::parent = new Parent("socket-parent");
-  Acceptor::parent = new Parent("acceptor-parent");
-
+  // ASSING values to Object::parent, Float::parent, etc.
+  init_parents();
 
   // SETUP MODULES
   // We need to specially setup the keyword module because 
@@ -135,48 +106,10 @@ int main(int argc, char **argv) {
   Integer::parent->set_parent("parent", Real::parent);
   Float::parent->set_parent("parent", Real::parent);
 
-  // SETUP Operators
-  // we have operators on types, which is required to create some types,
-  // but operators need to be annotated with types. Hence, the first three
-  // functions here are special: initialize_type_ops initializes the operators
-  // but does not add type annotations. Once that is done, we can create (initialze)
-  // the types, then add annotations to the operatos which operate on types...
-  op::initialize_type_ops();
-  type::initialize_types();
-  op::type_type_ops();
 
-  // this are more simple - simply assigning the operatos like '+' and
-  // 'to-string' to global variables 
-  // these two define generic functions that are inserted into by subsequent
-  // initializations
-  op::initialize_logic();
-  op::initialize_data();
+  // SETUP operators
+  init_operators();
 
-  // these define "singleton" functions (generic functions with only one value)
-  op::initialize_arithmetic();
-  op::initialize_mirror();
-  op::initialize_user_obj();
-  op::initialize_cons();
-  op::initialize_string();
-  op::initialize_vector();
-  op::initialize_tuple();
-  op::initialize_dev();
-  op::initialize_conditions();
-  op::initialize_language();
-  op::initialize_module();
-  op::initialize_mkoperator();
-  op::initialize_foreign();
-  op::initialize_foreign_proxy();
-  op::initialize_concurrency();
-  op::initialize_system();
-
-  // io contains generics needed by other io  
-  // operators, such as netowrking
-  op::initialize_io();
-  op::initialize_network();
-
-  // we place read last because it uses other operations
-  op::initialize_read();
 
   // initialize global values so they can be palced in modules
   {
@@ -188,33 +121,6 @@ int main(int argc, char **argv) {
   }
 
   make_modules();
-
-  // arithmetic
-
-  for (auto p : inbuilts) {
-    Symbol *sym = language_module->intern(p.first);
-    sym->value = p.second;
-  }
-
-  vector<pair<string, vector<pair<string, Object *>>>> moddefs = {
-      make_pair("core", core_setup),
-      make_pair("io", io_setup),
-      make_pair("foreign", foreign_setup),
-      make_pair("dev", dev_setup),
-      make_pair("concurrent", concurrent_setup),
-      make_pair("network", network_setup),
-      // system already declared in c++, so we use sys_module
-      make_pair("system", sys_setup)};
-
-  for (auto m : moddefs) {
-    Module* mod = dynamic_cast<Module*>(
-        dynamic_cast<Symbol*>(language_module->get(m.first))->value);
-    for (auto p : m.second) {
-      Symbol *sym = mod->intern(p.first);
-      mod->exported_symbols[p.first] = sym;
-      sym->value = p.second;
-    }
-  }
 
   Istream *hydra_cin = new Istream();
   hydra_cin->stream = &cin;
@@ -334,7 +240,7 @@ void make_modules() {
     // data
     make_pair("get", op::get),
     make_pair("set", op::set),
-    make_pair("concat", op::cat),
+    make_pair("append", op::cat),
     make_pair("len", op::len),
     // constructors
     make_pair("cmplx", op::mk_cmplx),
@@ -440,6 +346,7 @@ void make_modules() {
     make_pair("Integer", type::integer_type),
     make_pair("Float", type::float_type),
 
+
     make_pair("IOStream", type::iostream_type),
     make_pair("IStream", type::istream_type),
     make_pair("OStream", type::ostream_type),
@@ -455,30 +362,53 @@ void make_modules() {
   };
 
   Symbol *invoker = get_keyword("invoker");
+  Symbol *typesym = get_keyword("type");
   Object* cshortobj = new Object();
+  CBasicType* shortctype = new CBasicType(tint);
+  shortctype->size = size_short;
   cshortobj->invoker = op::mk_short;
   cshortobj->slots[invoker] = op::mk_long;
+  cshortobj->slots[typesym] = shortctype;
   cshortobj->parents.insert(invoker);
+  cshortobj->parents.insert(typesym);
   Object* clongobj = new Object();
+  CBasicType* longctype = new CBasicType(tint);
+  longctype->size = size_long;
   clongobj->invoker = op::mk_long;
   clongobj->slots[invoker] = op::mk_long;
+  clongobj->slots[typesym] = longctype;
   clongobj->parents.insert(invoker);
+  cshortobj->parents.insert(typesym);
 
+  foreign_setup = {
+      // ffi
+      make_pair("load-c-library", op::foreign_lib),
+      make_pair("get-c-symbol", op::foreign_sym),
+      make_pair("internalize", op::internalize),
 
-  foreign_setup = {// ffi
-             make_pair("load-c-library", op::foreign_lib),
-             make_pair("get-c-symbol", op::foreign_sym),
-             make_pair("internalize", op::internalize),
+      // simple types
+      make_pair("int", new CBasicType(tint)),
+      make_pair("char", new CBasicType(tchar)),
+      make_pair("float", new CBasicType(tfloat)),
+      make_pair("double", new CBasicType(tdouble)),
+      make_pair("void", new CVoidType()),
 
-             make_pair("int", new CBasicType(tint)),
-             make_pair("char", new CBasicType(tchar)),
-             make_pair("float", new CBasicType(tfloat)),
-             make_pair("double", new CBasicType(tdouble)),
+      // type modifiers
+      make_pair("short", cshortobj),
+      make_pair("long", clongobj),
+      make_pair("signed", op::mk_signed),
+      make_pair("unsigned", op::mk_unsigned),
 
-             make_pair("short", cshortobj),
-             make_pair("long", clongobj),
-             make_pair("signed", op::mk_signed),
-             make_pair("unsigned", op::mk_unsigned)
+      // composite types
+      make_pair("fn", op::mk_cfntype),
+      make_pair("ptr", op::mk_ptrtype),
+
+      // proxy
+      make_pair("proxy", op::mk_proxy),
+
+      // the C metatype
+      make_pair("CType", type::c_type_type)
+      // make_pair("CProxy", type::c_proxy_type),
   };
 
   io_setup = {// io
@@ -504,6 +434,34 @@ void make_modules() {
     make_pair("mk-dir", op::mk_dir),
     make_pair("remove", op::fs_remove),
     make_pair("remove-all", op::fs_remove_all)};
+
+
+  // arithmetic
+
+  for (auto p : inbuilts) {
+    Symbol *sym = language_module->intern(p.first);
+    sym->value = p.second;
+  }
+
+  vector<pair<string, vector<pair<string, Object *>>>> moddefs = {
+      make_pair("core", core_setup),
+      make_pair("io", io_setup),
+      make_pair("foreign", foreign_setup),
+      make_pair("dev", dev_setup),
+      make_pair("concurrent", concurrent_setup),
+      make_pair("network", network_setup),
+      make_pair("system", sys_setup)};
+
+  for (auto m : moddefs) {
+    Module* mod = dynamic_cast<Module*>(
+        dynamic_cast<Symbol*>(language_module->get(m.first))->value);
+    for (auto p : m.second) {
+      Symbol *sym = mod->intern(p.first);
+      mod->exported_symbols[p.first] = sym;
+      sym->value = p.second;
+    }
+  }
+
 }
 
 Object *read(Istream *istm) {

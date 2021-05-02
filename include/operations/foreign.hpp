@@ -25,6 +25,11 @@ namespace op {
   extern expr::Operator* mk_signed;
   extern expr::Operator* mk_unsigned;
 
+  extern expr::Operator* mk_cfntype;
+  extern expr::Operator* mk_ptrtype;
+
+  extern expr::Operator* mk_proxy;
+
 }; // namespace op
 
 #endif // __HYDRA_FFI_HPP

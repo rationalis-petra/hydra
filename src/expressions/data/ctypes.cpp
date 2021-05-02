@@ -127,6 +127,7 @@ ffi_type *CBasicType::get_ffi_type() {
     }
   }
   }
+  throw err;
 }
 
 CProxy *CBasicType::get_from_bits(unsigned char *arr, int idx, int len) {
@@ -235,9 +236,14 @@ CProxy *CBasicType::get_from_bits(unsigned char *arr, int idx, int len) {
     }
   }
   }
+  throw err;
 }
 
 CProxy *CBasicType::get_from_object(Object *obj) {
+  if (CProxy* cpx = get_inbuilt<CProxy*>(obj)) {
+    if (cpx->get_type()) {
+    }
+  }
   switch (mod) {
   case sign_none: {
     switch (size) {
@@ -507,11 +513,56 @@ CPtrType::CPtrType(CType *_points_to) : points_to(_points_to) {
   parents.insert(sym);
 }
 
+CProxy *CPtrType::get_from_object(Object* obj) {
+  // only works for CProxy
+  if (CProxy *pxy = get_inbuilt<CProxy*>(obj)) {
+    return new CPtr(pxy->get_type(), pxy->get_ref());
+  }
+  // special case: character arrays!
+  if (CBasicType* bsc = dynamic_cast<CBasicType*>(points_to)) {
+    if (bsc->type == tchar) {
+      if (HString* str = get_inbuilt<HString*>(obj)) {
+        return new CPtr(bsc, (void*) str->value.c_str());
+      }
+    }
+  }
+  
+  string err = "Can't get pointer for object";
+  throw err;
+}
+
+CProxy *CPtrType::get_from_bits(unsigned char* arr, int idx, int len) {
+  union {
+    unsigned char arr[sizeof(void*)];
+    void* val;
+  } ptr;
+  for (int i = 0; i < sizeof(void*); i++) {
+    if (i+idx > len) {
+      string err = "bit overrun in CPtrType::get_from_bits";
+      throw err;
+    }
+    ptr.arr[i] = arr[i+idx];
+  }
+  return new CPtr(new CVoidType, ptr.val);
+}
+
 ffi_type *CPtrType::get_ffi_type() { return &ffi_type_pointer; }
 
 string CPtrType::to_string(LocalRuntime &r, LexicalScope &s) {
   return "<CPointer Type>";
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 // CSTRUCT TYPE
 
@@ -582,4 +633,55 @@ CModifierSign::CModifierSign(string _name, string _docstring,
   slots[sym] = CType::modifier_parent;
   parents.insert(sym);
   sign_mod = sign;
+}
+
+CVoidType::CVoidType() {
+  Symbol *sym = get_keyword("parent");
+  slots[sym] = CType::modifier_parent;
+  parents.insert(sym);
+}
+
+CProxy *CVoidType::get_from_object(Object *obj) {
+  string err = "cannot get_from_object on cvoidtype";
+  throw err;
+}
+CProxy *CVoidType::get_from_bits(unsigned char *arr, int idx, int len) {
+  string err = "cannot get_from_bits on cvoidtype";
+  throw err;
+}
+
+ffi_type* CVoidType::get_ffi_type() {
+  return &ffi_type_void;
+}
+
+std::string CVoidType::to_string(interp::LocalRuntime &r, interp::LexicalScope& s) {
+  return "<CType: void>";
+}
+
+
+CFnType::CFnType(CType *rettype, std::list<CType *> _argtypes)
+    : return_type(rettype), argtypes(_argtypes) {
+  Symbol *sym = get_keyword("parent");
+  slots[sym] = CType::modifier_parent;
+  parents.insert(sym);
+}
+
+ffi_type* CFnType::get_ffi_type() {
+  string err = "TODO: implement get_ffi_type for functions...";
+  throw err;
+}
+
+CProxy *CFnType::get_from_object(Object *obj) {
+  string err = "TODO: implement get_from_object for functions...";
+  throw err;
+}
+
+CProxy *CFnType::get_from_bits(unsigned char *arr, int idx, int len) {
+  string err = "TODO: implement get_from_bits for functions...";
+  throw err;
+}
+
+std::string CFnType::to_string(interp::LocalRuntime &r,
+                               interp::LexicalScope &s) {
+  return "<CFnType>";
 }

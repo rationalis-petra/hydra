@@ -92,6 +92,11 @@ Object *op_to_str(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return new HString(arg_list.front()->to_string(r, s));
 }
 
+Object *op_str_len(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+  HString *str = get_inbuilt<HString *>(arg_list.front());
+  return new Integer(str->value.size());
+}
+
 GenericFn *op::to_str;
 
 void op::initialize_string() {
@@ -143,4 +148,10 @@ void op::initialize_string() {
   op::to_str->type = type::Fn::with_all({new type::Any}, nullptr, type::string_type);
   op::to_str->add(in_to_str);
 
+  Operator* in_str_len = new InbuiltOperator("string len",
+      "Length of String", op_str_len,
+      type::Fn::with_args({type::string_type}), true);
+  op::len->add(in_str_len);
+
 }
+

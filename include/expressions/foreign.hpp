@@ -4,21 +4,21 @@
 #include <list>
 #include <string>
 
-#include "ltdl.h"
 #include "ffi.h"
+#include "ltdl.h"
 
-#include "types.hpp"
 #include "object.hpp"
+#include "types.hpp"
 
 namespace expr {
 
-enum foreign_type { Int32, Pointer, String, Void };
+struct CFnType;
 
 struct ForeignLib : public Object {
   virtual void mark_node();
 
   ForeignLib(lt_dlhandle lib);
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope &s);
 
   lt_dlhandle lib;
 };
@@ -27,21 +27,21 @@ struct ForeignSymbol : public Object {
   virtual void mark_node();
 
   ForeignSymbol(void *addr);
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope &s);
 
-  void* address;
+  void *address;
 };
 
 struct ForeignOperator : public Operator {
-  ForeignOperator();
+  ForeignOperator(CFnType* type);
 
-  Object* call(std::list<Object*> arg_list, interp::LocalRuntime& r, interp::LexicalScope &s, bool);
+  Object *call(std::list<Object *> arg_list, interp::LocalRuntime &r,
+               interp::LexicalScope &s, bool);
 
-  std::list<foreign_type> arg_types;
-  foreign_type return_type;
+  CFnType* type;
   ffi_cif fn_def;
-  void(*fn_address)(void);
+  void (*fn_address)(void);
 };
 
-}
+} // namespace expr
 #endif // __HYDRA_FOREIGN_HPP

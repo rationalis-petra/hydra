@@ -5,6 +5,10 @@ expr::Operator* op::mk_short;
 expr::Operator* op::mk_long;
 expr::Operator* op::mk_signed;
 expr::Operator* op::mk_unsigned;
+expr::Operator *op::mk_cfntype;
+
+expr::Operator* op::mk_proxy;
+expr::Operator* op::mk_ptrtype;
 
 using namespace expr;
 using namespace interp;
@@ -92,6 +96,37 @@ Object* op_mk_unsigned(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s)
   return get_ctype(arg_list, r, s, inter);
 }
 
+Object* op_mk_proxy(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s) {
+  CType* ctype = get_inbuilt<CType*>(arg_list.front());
+  arg_list.pop_front();
+  Object* obj = arg_list.front();
+
+  if (!ctype) {
+    return new HString("bad ctype!");
+  }
+
+  return ctype->get_from_object(obj);
+}
+
+Object* op_mk_cfntype(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s) {
+  CType* rettype = get_inbuilt<CType*>(arg_list.front());
+  arg_list.pop_front();
+  list<Object*> args = cons_to_list(arg_list.front());
+  list<CType*> typeargs;
+  for (auto arg : args) {
+    typeargs.push_back(get_inbuilt<CType*>(arg));
+
+  }
+
+  return new CFnType(rettype, typeargs);
+}
+
+
+Object* op_mk_cptrtype(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s) {
+  CType* type = get_inbuilt<CType*>(arg_list.front());
+  return new CPtrType(type);
+}
+
 void op::initialize_foreign_proxy() {
   op::mk_short = new CModifierSize("short",
                                    "short modifier",
@@ -110,4 +145,22 @@ void op::initialize_foreign_proxy() {
 
   op::mk_unsigned = new CModifierSign("unsigned", "unsigned c modifier",
                                       op_mk_unsigned, sign_no);
+
+  op::mk_proxy = new InbuiltOperator(
+      "proxy", "make a C proxy object",
+      op_mk_proxy,
+      type::Fn::with_args({type::c_type_type, new type::Any}),
+      true);
+
+  op::mk_cfntype = new InbuiltOperator(
+      "fn", "make a C function type",
+      op_mk_cfntype,
+      type::Fn::with_args({type::c_type_type, new type::List()}),
+      true);
+
+  op::mk_ptrtype = new InbuiltOperator(
+      "ptr", "make a C pointer type",
+      op_mk_cptrtype,
+      type::Fn::with_args({type::c_type_type}),
+      true);
 }

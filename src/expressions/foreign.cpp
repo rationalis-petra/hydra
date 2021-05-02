@@ -38,62 +38,39 @@ string ForeignSymbol::to_string(LocalRuntime &r, LexicalScope &s) {
 }
 
 
-ForeignOperator::ForeignOperator() {
+ForeignOperator::ForeignOperator(CFnType* _type) {
+  type = _type;
+  for (auto a : _type->argtypes) {
+    Operator::type->arg_list.push_back(new type::Any);
+  }
   is_fn = true;
   Symbol* dsym = get_keyword("docstring");
   metadata[dsym] = new HString("A foreign operator");
   invoker = this;
 }
 
-Object *ForeignOperator::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s, bool) {
-  if (arg_list.size() != arg_types.size()) {
+Object *ForeignOperator::call(list<Object *> arg_list, LocalRuntime &r,
+                              LexicalScope &s, bool) {
+  if (arg_list.size() != type->argtypes.size()) {
     string err =
         "Error in foreign function call: arg list is not of expected size";
     throw err;
   }
 
-  void *mynull = nullptr;
   void **arg_values = new void *[arg_list.size()];
 
   list<Object *>::iterator vals = arg_list.begin();
-  list<foreign_type>::iterator types = arg_types.begin();
+  list<CType*>::iterator types = type->argtypes.begin();
   for (unsigned i = 0; i < arg_list.size(); i++) {
     Object *val = *vals;
-    foreign_type type = *types;
+    CType* type = *types;
 
-    switch (type) {
-    case Int32: {
-      Integer *num = dynamic_cast<Integer *>(val);
-      if (num == nullptr) {
-        string err = "Provided non-num type to function!";
-        throw err;
-      }
-      arg_values[i] = &num->value;
-    } break;
-    case Pointer:
-      if (val->null()) {
-        arg_values[i] = &mynull;
-      } else if (ForeignSymbol* ptr = dynamic_cast<ForeignSymbol*>(val)) {
-        arg_values[i] = &ptr->address;
-      } else {
-        string err = "Haven't properly implemented pointers yet...";
-        throw err;
-      }
-      break;
-    case String: {
-      HString *str = dynamic_cast<HString *>(val);
-      if (str == nullptr) {
-        string err = "Provided non-num type to function!";
-        throw err;
-      } else {
-        const char* cstr = str->value.c_str();
-        arg_values[i] = &cstr;
-      }
-    } break;
-    case Void:
-      string err = "Void in arg_list?";
+    CProxy *pxy = type->get_from_object(val);
+    if (pxy) {
+      arg_values[i] = pxy->get_ref();
+    } else {
+      string err = "could not construct CProxy for object...";
       throw err;
-      break;
     }
 
     vals++;
@@ -103,24 +80,12 @@ Object *ForeignOperator::call(list<Object*> arg_list, LocalRuntime &r, LexicalSc
   ffi_arg result;
 
   ffi_call(&fn_def, fn_address, &result, arg_values);
-  switch (return_type) {
-  case Void:
-    return nil::get();
-    break;
-  case Int32:
-    return new Integer((int) result);
-    break;
-  case String: {
-    const char *str = (const char *)result;
-    HString *out = new HString();
-    out->value = str;
-    return out;
-  } break;
-  case Pointer: {
-    return new ForeignSymbol((void*) result);
-  } break;
-  }
-  string err = "reached end of foreign call??";
-  throw err;
-}
 
+  if (dynamic_cast<CVoidType*>(type->return_type)) {
+    return nil::get();
+  } else {
+    CProxy *out = type->return_type->get_from_bits((unsigned char *)result, 0,
+                                                   sizeof(result));
+    return out;
+  }
+}

@@ -142,13 +142,13 @@ std::string lang = R"(
                (cons (car lst) acc))
        acc))
 
-(export (current-module) 'concat)
-(defimpl concat (:rest (lists List))
+(export (current-module) 'append)
+(defimpl append (:rest (lists List))
   (when lists
     (if (car lists)
         (cons (car (car lists))
-              (apply concat (cons (cdr (car lists)) (cdr lists))))
-         (apply concat (cdr lists)))))
+              (apply append (cons (cdr (car lists)) (cdr lists))))
+         (apply append (cdr lists)))))
 
 (defimpl get ((lst List) (idx Integer))
   (if (= 0 idx) 
@@ -243,7 +243,7 @@ std::string lang = R"(
           ((>= (len (car binding)) 3)
             (cons (cons 'fn 
                     ;; argument list
-                    (cons (concat (@l :self (car (car binding)))
+                    (cons (append (@l :self (car (car binding)))
                                   (car (cdr (car binding))))
                           (cdr (cdr (car binding))))) ;; the body
                   (get-vals (cdr binding))))))
@@ -267,7 +267,7 @@ std::string lang = R"(
   (:value ref)) 
 
 (def to-string ((ref Ref))
-  (concat "<reference: " (to-string (get! ref)) ">"))
+  (append "<reference: " (to-string (get! ref)) ">"))
 
 (insert (current-module) '&:hydra:concurrent:thread)
 
