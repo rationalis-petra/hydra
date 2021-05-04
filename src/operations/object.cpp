@@ -1,5 +1,5 @@
-#include "operations/logic.hpp"
 #include "operations/data.hpp"
+#include "operations/logic.hpp"
 #include "utils.hpp"
 
 using std::list;
@@ -8,21 +8,22 @@ using std::string;
 using namespace expr;
 using namespace interp;
 
-enum accessor_type {accessor, reader, writer};
+#include <iostream>
+enum accessor_type { accessor, reader, writer };
 
-void mk_accessor(accessor_type atype, Object* object, Symbol* slot, Object* method, LocalRuntime& r, LexicalScope &s) {
+void mk_accessor(accessor_type atype, Object *object, Symbol *slot,
+                 Object *method, LocalRuntime &r, LexicalScope &s) {
   GenericFn *gfn;
-  type::Type *checker = new type::GenFn;
 
-  if (!method->invoker) {
+  if (!get_inbuilt<Operator *>(method)) {
     gfn = new GenericFn;
-    method->invoker = gfn;
+    method->set_invoker(gfn);
     gfn->type = type::Fn::with_args_optional({new type::Any}, {new type::Any});
-  } else if (checker->check_type(method->invoker)) {
-    gfn = get_inbuilt<GenericFn *>(method->invoker);
+  } else if (get_inbuilt<GenericFn *>(method)) {
+    gfn = get_inbuilt<GenericFn *>(method);
   } else {
-    string err = "attempting to add invoker to " + hydra_to_string(method, r, s) +
-                 "failed";
+    string err = "attempting to add invoker to " +
+                 hydra_to_string(method, r, s) + "failed";
     throw err;
   }
 
@@ -97,7 +98,6 @@ Object *op_mk_object(list<Object *> arg_list, LocalRuntime &r,
   return object;
 }
 
-
 Object *op_clone(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   Object *obj = new Object;
@@ -119,8 +119,6 @@ Object *op_obj_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return nil::get();
 }
 
-
-
 GenericFn *op::mk_obj;
 GenericFn *op::clone;
 
@@ -133,7 +131,6 @@ void op::initialize_user_obj() {
   op::mk_obj->add(new InbuiltOperator(
       "obj", "Create a new object", op_mk_object,
       type::Fn::with_all({}, new type::Cons, new type::Any), true));
-
 
   op::clone->add(
       new InbuiltOperator("clone", "Derives an object from the provided object",

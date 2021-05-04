@@ -46,7 +46,6 @@ ForeignOperator::ForeignOperator(CFnType* _type) {
   is_fn = true;
   Symbol* dsym = get_keyword("docstring");
   metadata[dsym] = new HString("A foreign operator");
-  invoker = this;
 }
 
 Object *ForeignOperator::call(list<Object *> arg_list, LocalRuntime &r,

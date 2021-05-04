@@ -29,7 +29,6 @@ Operator::Operator() {
   is_fn = true;
   Symbol* dstring = get_keyword("docstring");
   metadata[dstring] = new HString;
-  invoker = this;
 }
 
 void Operator::mark_node() {

@@ -32,8 +32,8 @@ struct Object {
   std::set<Symbol *> parents;
   std::map<Symbol *, Object *> slots;
   std::map<Symbol *, Object *> metadata;
+  void set_invoker(Operator* invoker);
   Contract* contract;
-  Operator *invoker;
 
   // STANDARD FUNCTIONS
   virtual bool null() const;
@@ -61,7 +61,6 @@ struct Object {
                                  interp::LexicalScope &s);
   virtual Object *delete_meta(Symbol *sym, interp::LocalRuntime &r,
                               interp::LexicalScope &s);
-
 };
 
 } // namespace expr

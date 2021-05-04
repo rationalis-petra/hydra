@@ -15,15 +15,11 @@ Parent* Object::default_behaviour;
 
 Object::Object() {collector->register_node(this);
   marked = false;
-  invoker = nullptr;
 }
 
 void Object::mark_node() {
   if (marked) return;
   marked = true;
-  if (invoker) {
-    invoker->mark_node();
-  }
   for (auto kvp : slots) {
     kvp.first->mark_node();
     kvp.second->mark_node();
@@ -66,8 +62,6 @@ Object *Object::derive_check(set<expr::Object*> ptypes, set<expr::Object*> visit
 
 string Object::to_string(LocalRuntime &r, LexicalScope &s) {
   string out = "\n{";
-  if (invoker) 
-    out += "invoker " + hydra_to_string(invoker, r, s);
   for (auto x : slots) {
     out += "[";
     out += hydra_to_string(x.first, r, s);
@@ -154,4 +148,12 @@ Object *Object::set_meta_value(Symbol* sym,
 Object *Object::delete_meta(Symbol* sym, interp::LocalRuntime &r, interp::LexicalScope &s) {
   metadata.erase(sym);
   return nil::get();
+}
+
+
+
+void Object::set_invoker(Operator* op) {
+  Symbol* insym = get_keyword("invoker");
+  slots[insym] = op;
+  parents.insert(insym);
 }

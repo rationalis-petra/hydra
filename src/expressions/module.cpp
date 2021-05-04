@@ -11,7 +11,7 @@ using namespace interp;
 
 Parent* Module::parent;
 
-void Module::mark_node() {
+void ModuleImpl::mark_node() {
   if (marked) return;
   Object::mark_node();
   for (auto pair : symbols) {
@@ -19,22 +19,28 @@ void Module::mark_node() {
   }
 }
 
-Module::Module() {}
+ModuleImpl::ModuleImpl() {}
 
-void Module::set_parent() {
+ModuleImpl* ModuleImpl::no_parent(string name) {
+  ModuleImpl* mod = new ModuleImpl;
+  mod->name = name;
+  return mod;
+}
+
+void ModuleImpl::set_parent() {
   Symbol* pt = keyword_module->intern("parent");
   parents.insert(pt);
   slots[pt] = parent;
 }
 
-Module::Module(string _name) {
+ModuleImpl::ModuleImpl(string _name) {
   Symbol* pt = keyword_module->intern("parent");
   parents.insert(pt);
   slots[pt] = parent;
   name = _name;
 }
 
-string Module::to_string(LocalRuntime &r, LexicalScope &s) {
+string ModuleImpl::to_string(LocalRuntime &r, LexicalScope &s) {
   if (name == "") {
     return "<anonymous module>";
   } else {
@@ -42,7 +48,7 @@ string Module::to_string(LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-Symbol *Module::intern(string str) {
+Symbol *ModuleImpl::intern(string str) {
   Object* out = get(str);
   if (out->null()) {
       Symbol *sym = new Symbol(str);
@@ -53,7 +59,7 @@ Symbol *Module::intern(string str) {
   }
 }
 
-Symbol *Module::intern(list<string> path) {
+Symbol *ModuleImpl::intern(list<string> path) {
   string str = path.front();
   Object* out = get(str);
   path.pop_front();
@@ -72,13 +78,13 @@ Symbol *Module::intern(list<string> path) {
     if (path.empty()) {
       return sym;
     } else {
-      Module* mod = type::hydra_cast<Module>(sym->value);
+      ModuleImpl* mod = type::hydra_cast<ModuleImpl>(sym->value);
       return mod->intern(path);
     }
   }
 }
 
-Object *Module::get(string str) {
+Object *ModuleImpl::get(string str) {
   auto it = symbols.find(str);
   if (it == symbols.end()) {
     return nil::get();
@@ -87,7 +93,7 @@ Object *Module::get(string str) {
   }
 }
 
-Object *Module::get(list<string> path) {
+Object *ModuleImpl::get(list<string> path) {
   map<string, Symbol*>::iterator loc = symbols.find(path.front());
   if (loc == symbols.end()) {
     return nil::get();
@@ -96,7 +102,7 @@ Object *Module::get(list<string> path) {
     if (path.empty()) {
       return loc->second;
     } else {
-      if (Module *mod = dynamic_cast<Module*>(loc->second)) {
+      if (ModuleImpl *mod = dynamic_cast<ModuleImpl*>(loc->second)) {
         return mod->get(path);
       } else {
         string err = "Symbol: " + loc->first + " does not name a module in module " + name;  
@@ -106,3 +112,29 @@ Object *Module::get(list<string> path) {
   }
 }
 
+
+
+void ModuleImpl::insert(Symbol* sym) {
+  symbols[sym->name] = sym;
+}
+
+void ModuleImpl::remove(std::string str) {
+  exported_symbols.erase(str);
+  symbols.erase(str);
+}
+
+void ModuleImpl::export_sym(std::string str) {
+  exported_symbols[str] = symbols[str];
+}
+
+Object* ModuleImpl::get_exported_symbols() {
+  Object* list = nil::get();
+  for (auto p : exported_symbols) {
+    list = new Cons(p.second, list);
+  }
+  return list;
+}
+
+std::string ModuleImpl::get_name() {
+  return name;
+}

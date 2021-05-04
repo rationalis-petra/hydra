@@ -21,10 +21,10 @@ Object *op_mk_module(list<Object *> arg_list, LocalRuntime &r,
                      LexicalScope &s) {
 
   if (arg_list.empty()) {
-    return new Module;
+    return new ModuleImpl("");
   }
   string name = get_inbuilt<HString *>(arg_list.front())->value;
-  return new Module(name);
+  return new ModuleImpl(name);
 }
 
 Object *op_in_module(list<Object *> arg_list, LocalRuntime &r,
@@ -58,7 +58,7 @@ Object *op_insert(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
       }
     }
   }
-  mod->symbols[sym->name] = sym;
+  mod->insert(sym);
   return sym;
 }
 
@@ -79,25 +79,13 @@ Object *op_get_symbols(list<Object *> arg_list, LocalRuntime &r,
                        LexicalScope &s) {
 
   Module *mod = get_inbuilt<Module *>(arg_list.front());
-  Object *out = nil::get();
-  for (auto sym : mod->exported_symbols) {
-    Cons *cns = new Cons(sym.second, out);
-    out = cns;
-  }
-  return out;
+  return mod->get_exported_symbols();
 }
 
 Object *op_remove(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Module *mod = get_inbuilt<Module *>(arg_list.front());
   Symbol *sym = get_inbuilt<Symbol *>(arg_list.back());
-  auto it = mod->symbols.find(sym->name);
-  if (it != mod->symbols.end()) {
-    mod->symbols.erase(it);
-  }
-  it = mod->exported_symbols.find(sym->name);
-  if (it != mod->exported_symbols.end()) {
-    mod->exported_symbols.erase(it);
-  }
+  mod->remove(sym->name);
   return mod;
 }
 
@@ -121,12 +109,12 @@ Object *op_export(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Module *mod = get_inbuilt<Module *>(arg_list.front());
   Symbol *sym = get_inbuilt<Symbol *>(arg_list.back());
 
-  if (mod->symbols.find(sym->name) == mod->symbols.end()) {
-    string err = "trying to export symbol " + sym->name +
-                 " which is not in package " + mod->name;
+  if (mod->get(sym->name)->null()) {
+    string err = "trying to export symbol " + hydra_to_string(sym, r, s) +
+      " which is not in package " + hydra_to_string(mod, r, s);
     throw err;
   } else {
-    mod->exported_symbols[sym->name] = sym;
+    mod->export_sym(sym->name);
   }
 
   return mod;

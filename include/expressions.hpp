@@ -15,6 +15,7 @@
 #include "expressions/io.hpp"
 #include "expressions/language.hpp"
 #include "expressions/mirror.hpp"
+#include "expressions/module.hpp"
 #include "expressions/network.hpp"
 #include "expressions/object.hpp"
 #include "expressions/operation.hpp"

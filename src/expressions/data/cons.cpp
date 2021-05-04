@@ -25,18 +25,7 @@ Object* Cons::eval(LocalRuntime &r, LexicalScope &s) {
   Object *oper = car->eval(r, s);
   collector->insert_root(oper);
 
-  if (oper->invoker) {
-    try {
-      Operator* op = oper->invoker;
-      std::list<Object*> arg_list = op->get_arg_list(cdr, r, s);
-      Object* out = op->call(arg_list, r, s);
-      collector->remove_root(oper);
-      return out;
-    } catch (hydra_exception* e) {
-      collector->remove_root(oper);
-      throw e;
-    }
-  } else if (Operator* op = get_inbuilt<Operator*>(oper)) {
+  if (Operator* op = get_inbuilt<Operator*>(oper)) {
     try {
       std::list<Object*> arg_list = op->get_arg_list(cdr, r, s);
       Object* out = op->call(arg_list, r, s);
@@ -47,7 +36,7 @@ Object* Cons::eval(LocalRuntime &r, LexicalScope &s) {
       throw e;
     }
   } else {
-    string err = "car is not an operator";
+    string err = hydra_to_string(car, r, s) + "is not an operator";
     throw err;
   }
 }

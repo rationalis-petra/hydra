@@ -13,11 +13,8 @@ namespace op {
   extern expr::Operator* do_while;
   extern expr::Operator* bind;
   extern expr::Operator* unbind;
+  extern expr::Operator* boundp;
   extern expr::Operator* progn;
-  extern expr::Operator* definedp;
-
-  extern expr::Operator* set_invoker;
-  extern expr::Operator* get_invoker;
 
   extern expr::Operator* quote;
   extern expr::Operator* read;

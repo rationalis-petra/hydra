@@ -12,11 +12,11 @@ using namespace type;
 using namespace interp;
 
 Tuple::Tuple() {
-  invoker = op::mk_tuple_type;
+  set_invoker(op::mk_tuple_type);
 }
 
 Tuple::Tuple(std::vector<Type *> _types) : types(_types) {
-  invoker = op::mk_tuple_type;
+  set_invoker(op::mk_tuple_type);
 }
   
 

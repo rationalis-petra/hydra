@@ -15,25 +15,6 @@ struct Symbol;
 struct Vector;
 
 // modules are like packages or namepsaces in other languages
-struct Module : public Object {
-  virtual void mark_node();
-
-  Module();
-  Module(std::string name);
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
-  std::map<std::string, Symbol *> symbols;
-  std::map<std::string, Symbol *> exported_symbols;
-  void set_parent();
-
-  static Parent* parent;
-
-  std::string name;
-
-  Object *get(std::string str);
-  Object *get(std::list<std::string> str);
-  Symbol *intern(std::string str);
-  Symbol *intern(std::list<std::string> str);
-};
 
 struct Symbol : public Object {
   virtual void mark_node();

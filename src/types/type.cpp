@@ -51,8 +51,7 @@ string MetaConstructor::to_string(LocalRuntime &r, LexicalScope &s) {
 }
 
 expr::Object *MetaConstructor::check_type(expr::Object* obj) {
-  Type* t;
-  if ((t = dynamic_cast<Type*>(obj)) && t->invoker) {
+  if (dynamic_cast<Type*>(obj)) {
     return expr::t::get();
   } else {
     return expr::nil::get();

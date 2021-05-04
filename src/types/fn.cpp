@@ -17,7 +17,7 @@ using type::Type;
 Fn::Fn() {
   rest_type = nullptr;
   return_type = new type::Any;
-  invoker = op::mk_fn_type;
+  set_invoker(op::mk_fn_type);
 }
 
 void Fn::mark_node() {

@@ -13,13 +13,13 @@ using namespace interp;
 Cons::Cons() {
   type_car = new Any;
   type_cdr = new Any;
-  invoker = op::mk_cons_type;
+  set_invoker(op::mk_cons_type);
 }
 
 Cons::Cons(Type* tcar, Type* tcdr) {
   type_car = tcar;
   type_cdr = tcdr;
-  invoker = op::mk_cons_type;
+  set_invoker(op::mk_cons_type);
 }
 
 void Cons::mark_node() {

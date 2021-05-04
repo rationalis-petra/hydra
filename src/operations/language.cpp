@@ -93,7 +93,7 @@ Object *op_unbind(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   return symbol;
 }
 
-Object *op_definedp(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+Object *op_boundp(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   Symbol *sym = hydra_cast<Symbol>(arg_list.front());
   auto loc = s.map.find(sym);
@@ -141,41 +141,16 @@ Object *op_exit(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   exit(0);
 }
 
-Object *op_set_invoker(list<Object *> arg_list, LocalRuntime &r,
-                       LexicalScope &s) {
-  if (Operator *op = dynamic_cast<Operator *>(arg_list.back())) {
-    arg_list.front()->invoker = op;
-    return op;
-  } else {
-    // type
-    string err = "type error in op-set-invoker";
-    throw err;
-  }
-}
-
-Object *op_get_invoker(list<Object *> arg_list, LocalRuntime &r,
-                       LexicalScope &s) {
-  if (Operator *op = dynamic_cast<Operator *>(arg_list.back())) {
-    arg_list.front()->invoker = op;
-    return op;
-  } else {
-    // type
-    string err = "type error in op-set-invoker";
-    throw err;
-  }
-}
 
 Operator *op::do_if;
 Operator *op::do_while;
 Operator *op::bind;
 Operator *op::unbind;
-Operator *op::definedp;
+Operator *op::boundp;
 Operator *op::quote;
 Operator *op::eval;
 Operator *op::progn;
 Operator *op::exit;
-Operator *op::set_invoker;
-Operator *op::get_invoker;
 
 void op::initialize_language() {
   op::do_if = new InbuiltOperator(
@@ -197,9 +172,9 @@ void op::initialize_language() {
   op::unbind = new InbuiltOperator(
       "unbind", "Removes the value from a symbol", op_unbind,
       type::Fn::with_args({type::symbol_type}), true);
-  op::definedp = new InbuiltOperator(
+  op::boundp = new InbuiltOperator(
       "defined?", "Returns t if symbol contains a value, and nil otherwise",
-      op_definedp, type::Fn::with_args({type::symbol_type}), true);
+      op_boundp, type::Fn::with_args({type::symbol_type}), true);
   op::quote = new InbuiltOperator(
       "quote", "Prevents evaluation of the argument it is provided", op_quote,
       type::Fn::with_args({new type::Any}), false);
@@ -214,12 +189,4 @@ void op::initialize_language() {
   op::exit =
       new InbuiltOperator("exit", "Exits the current running application",
                           op_exit, type::Fn::with_args({}), true);
-  op::set_invoker = new InbuiltOperator(
-      "set-invoker",
-      "Sets the invoker: an object which is used when this object\n"
-      "is called, allowing it to act as a function.",
-      op_set_invoker, type::Fn::with_args({new type::Any, new type::Fn}), true);
-  op::get_invoker = new InbuiltOperator(
-      "get-invoker", "Retrieves the invoker for this obejct.", op_get_invoker,
-      type::Fn::with_all({new type::Any}, nullptr, new type::Fn), true);
 }

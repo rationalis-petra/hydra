@@ -16,7 +16,7 @@ std::string lang = R"(
   (mac (symbol val :rest body)
       (list (quote bind) (list (quote quote) symbol)
             (if body
-                (if (and (defined? symbol) (type? Gen (eval symbol)))
+                (if (and (bound? symbol) (type? Gen (eval symbol)))
                     (list (quote add-fn) 
                           symbol
                           (cons (quote fn) (cons val body)))
@@ -345,7 +345,7 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 ;; in user
 
 (def conc &:hydra:concurrent)
-(def ffi &:hydra:foreign)
+(def cffi &:hydra:foreign)
 (def net &:hydra:network)
 (def sys &:hydra:system)
 

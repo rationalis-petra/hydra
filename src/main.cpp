@@ -60,35 +60,36 @@ int main(int argc, char **argv) {
   // we don't have the "parent" symbol yet!!
   // so we need to do some special out-of sequence construction to
   // avoid "parent" attempting to intern itself in an endless loop...
-  keyword_module = new Module();
-  keyword_module->name = "keyword";
   {
+    ModuleImpl *key = ModuleImpl::no_parent("keyword");
+    keyword_module = key;
     // Symbols are descended from the Symbol-Parent object, which lives
     // in the slot with symbol 'parent'. Hence, we first need to create
     // the parent symbol, then assign it's slot with symbol parent (i.e. itself)
     // to the Symbol-Parent object.
     Symbol *parent_sym = Symbol::symbol_no_parent("parent");
-    keyword_module->symbols["parent"] = parent_sym;
+    keyword_module->insert(parent_sym);
     parent_sym->slots[parent_sym] = Symbol::parent;
     parent_sym->parents.insert(parent_sym);
+
+
+    ModuleImpl *root = ModuleImpl::no_parent("");
+    g.root = root;
+    Symbol *sym = g.root->intern("keyword");
+    sym->value = keyword_module;
+
+    // now, we can set both the root and keyword modules to have their
+    // parent be the Module-Parent object
+    root->set_parent();
+    key->set_parent();
   }
-
-  // Construct the root module & place keyword within it
-  g.root = new Module();
-  Symbol* sym = g.root->intern("keyword");
-  sym->value = keyword_module;
-
-  // now, we can set both the root and keyword modules to have their
-  // parent be the Module-Parent object
-  g.root->set_parent();
-  keyword_module->set_parent();
 
   // we also setup some parent relations for types
   Object::default_behaviour->slots[get_keyword("parent")] = Object::common_behaviour;
 
 
-  language_module = new Module("hydra");
-  sym = g.root->intern("hydra");
+  language_module = new ModuleImpl("hydra");
+  Symbol* sym = g.root->intern("hydra");
   sym->value = language_module;
   r.active_module = language_module;
 
@@ -175,7 +176,7 @@ int main(int argc, char **argv) {
   while (true) {
     interp::LexicalScope s;
     try {
-      cout << r.active_module->name << "> ";
+      cout << r.active_module->get_name() << "> ";
       ast = read(hydra_cin);
       Object::collector->insert_root(ast);
       out = ast->eval(r, s);
@@ -200,13 +201,13 @@ int main(int argc, char **argv) {
 
 void make_modules() {
   inbuilts = {// other modules
-              make_pair("core", new Module("core")),
-              make_pair("io", new Module("io")),
-              make_pair("foreign", new Module("foreign")),
-              make_pair("concurrent", new Module("concurrent")),
-              make_pair("system", new Module("system")),
-              make_pair("dev", new Module("dev")),
-              make_pair("network", new Module("network"))};
+              make_pair("core", new ModuleImpl("core")),
+              make_pair("io", new ModuleImpl("io")),
+              make_pair("foreign", new ModuleImpl("foreign")),
+              make_pair("concurrent", new ModuleImpl("concurrent")),
+              make_pair("system", new ModuleImpl("system")),
+              make_pair("dev", new ModuleImpl("dev")),
+              make_pair("network", new ModuleImpl("network"))};
 
   dev_setup = {make_pair("doc", op::describe),
     make_pair("macro-expand", op::macexpand),
@@ -290,7 +291,7 @@ void make_modules() {
 
     // symbols
 
-    make_pair("defined?", op::definedp),
+    make_pair("bound?", op::boundp),
     make_pair("bind", op::bind),
     make_pair("unbind", op::unbind),
     make_pair("mutable", op::mk_mutable),
@@ -361,23 +362,19 @@ void make_modules() {
     make_pair("subtype?", op::subtype)
   };
 
-  Symbol *invoker = get_keyword("invoker");
   Symbol *typesym = get_keyword("type");
   Object* cshortobj = new Object();
   CBasicType* shortctype = new CBasicType(tint);
   shortctype->size = size_short;
-  cshortobj->invoker = op::mk_short;
-  cshortobj->slots[invoker] = op::mk_long;
-  cshortobj->slots[typesym] = shortctype;
-  cshortobj->parents.insert(invoker);
+  cshortobj->set_invoker(op::mk_short);
   cshortobj->parents.insert(typesym);
+  cshortobj->slots[typesym] = shortctype;
+
   Object* clongobj = new Object();
   CBasicType* longctype = new CBasicType(tint);
   longctype->size = size_long;
-  clongobj->invoker = op::mk_long;
-  clongobj->slots[invoker] = op::mk_long;
+  clongobj->set_invoker(op::mk_long);
   clongobj->slots[typesym] = longctype;
-  clongobj->parents.insert(invoker);
   cshortobj->parents.insert(typesym);
 
   foreign_setup = {
@@ -457,7 +454,7 @@ void make_modules() {
         dynamic_cast<Symbol*>(language_module->get(m.first))->value);
     for (auto p : m.second) {
       Symbol *sym = mod->intern(p.first);
-      mod->exported_symbols[p.first] = sym;
+      mod->export_sym(sym->name);
       sym->value = p.second;
     }
   }
