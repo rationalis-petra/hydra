@@ -1,5 +1,5 @@
-#ifndef __HYDRA_EXPRESSIONS_LANGUAGE
-#define __HYDRA_EXPRESSIONS_LANGUAGE
+#ifndef __HYDRA_EXPRESSIONS_SYMBOL
+#define __HYDRA_EXPRESSIONS_SYMBOL
 
 #include <map>
 #include <set>
@@ -11,8 +11,6 @@
 
 namespace expr {
 
-struct Symbol;
-struct Vector;
 
 // modules are like packages or namepsaces in other languages
 
@@ -34,14 +32,6 @@ struct Symbol : public Object {
 
 private:
   Symbol();
-};
-
-struct Pattern : public Object {
-  virtual void mark_node();
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
-
-  Object* match(Object* o);
-  Object *eval(interp::LocalRuntime &r, interp::LexicalScope &s);
 };
 
 }

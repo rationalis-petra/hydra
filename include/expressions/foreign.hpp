@@ -1,6 +1,8 @@
 #ifndef __HYDRA_EXPRESSIONS_FOREIGN_HPP
 #define __HYDRA_EXPRESSIONS_FOREIGN_HPP
 
+#include "expressions/module.hpp"
+
 #include <list>
 #include <string>
 
@@ -14,22 +16,29 @@ namespace expr {
 
 struct CFnType;
 
-struct ForeignLib : public Object {
+struct ForeignLib : public Module {
   virtual void mark_node();
+
+  std::unordered_map<std::string, Symbol*> symbols;
+  std::set<Symbol*> exports;
+  std::string name;
+
+  Object *get(std::string str);
+  Object *get(std::list<std::string> str);
+  Symbol *intern(std::string str);
+  Symbol *intern(std::list<std::string> str);
+
+  void insert(Symbol* sym);
+  void remove(std::string);
+  void export_sym(std::string);
+  Object *get_exported_symbols();
+
+  std::string get_name();
 
   ForeignLib(lt_dlhandle lib);
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope &s);
 
   lt_dlhandle lib;
-};
-
-struct ForeignSymbol : public Object {
-  virtual void mark_node();
-
-  ForeignSymbol(void *addr);
-  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope &s);
-
-  void *address;
 };
 
 struct ForeignOperator : public Operator {

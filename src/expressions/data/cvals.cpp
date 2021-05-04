@@ -111,3 +111,20 @@ template <> CType *CBasic<long double>::get_type() {
   t->size = size_long;
   return t;
 }
+
+
+
+// SYMBOLS
+void UntypedProxy::mark_node() {
+  marked = true;
+}
+
+UntypedProxy::UntypedProxy(void* addr) {
+  address = addr;
+}
+
+string UntypedProxy::to_string(LocalRuntime &r, LexicalScope &s) {
+  char buffer[50];
+  sprintf(buffer, "<untyped proxy: %p>", address);
+  return string(buffer);
+}

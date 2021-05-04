@@ -13,7 +13,7 @@
 #include "expressions/foreign.hpp"
 #include "expressions/handler.hpp"
 #include "expressions/io.hpp"
-#include "expressions/language.hpp"
+#include "expressions/symbol.hpp"
 #include "expressions/mirror.hpp"
 #include "expressions/module.hpp"
 #include "expressions/network.hpp"

@@ -98,6 +98,20 @@ struct CPtr : public CProxy {
   CType* points_to;
   void *ptr;
 };
+
+struct UntypedProxy : public Object {
+  virtual void mark_node();
+
+  UntypedProxy(void *addr);
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope &s);
+
+  void *address;
+};
+
+
+
+
+
 } // namespace expr
 
 #endif

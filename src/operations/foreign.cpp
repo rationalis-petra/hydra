@@ -50,14 +50,14 @@ Object *op_foreign_sym(list<Object *> arg_list, LocalRuntime &r,
   if (addr == nullptr) {
     return nil::get();
   } else {
-    return new ForeignSymbol(addr);
+    return new UntypedProxy(addr);
   }
 }
 
 // define-foreign-function
 Object *op_internalize(list<Object *> arg_list, LocalRuntime &r,
                        LexicalScope &s) {
-  ForeignSymbol *sym = get_inbuilt<ForeignSymbol *>(arg_list.front());
+  UntypedProxy *sym = get_inbuilt<UntypedProxy *>(arg_list.front());
   arg_list.pop_front();
   // TODO: more general CTypes...
   CFnType *type = get_inbuilt<CFnType *>(arg_list.front());

@@ -8,8 +8,6 @@
 using std::list;
 using std::string;
 
-using type::hydra_cast;
-
 using namespace expr;
 using namespace interp;
 
@@ -95,7 +93,7 @@ Object *op_unbind(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_boundp(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  Symbol *sym = hydra_cast<Symbol>(arg_list.front());
+  Symbol *sym = get_inbuilt<Symbol*>(arg_list.front());
   auto loc = s.map.find(sym);
   if (loc != s.map.end()) {
     return t::get();

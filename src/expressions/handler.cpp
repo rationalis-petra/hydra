@@ -1,4 +1,5 @@
 #include "expressions.hpp"
+#include "utils.hpp"
 
 using namespace expr;
 using namespace interp;
@@ -12,12 +13,12 @@ bind_handler::bind_handler(std::list<Object *> lst, LocalRuntime &run,
 
 Object *bind_handler::handle(Object *condition) {
   for (Object *o : handling_code) {
-    Object *fst = dynamic_cast<Cons *>(o)->car;
-    Object *ty = type::hydra_cast<Cons>(fst)->car;
-    type::Type *t = dynamic_cast<type::Type *>(ty->eval(r, s));
+    Object *fst = get_inbuilt<Cons *>(o)->car;
+    Object *ty = get_inbuilt<Cons*>(fst)->car;
+    type::Type *t = get_inbuilt<type::Type *>(ty->eval(r, s));
 
     if (!t->check_type(condition)->null()) {
-      return dynamic_cast<Cons *>(dynamic_cast<Cons *>(o)->cdr)
+      return get_inbuilt<Cons *>(get_inbuilt<Cons *>(o)->cdr)
           ->car->eval(r, s);
     }
   }

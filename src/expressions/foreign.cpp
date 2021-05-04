@@ -2,7 +2,10 @@
 #include <stdio.h>
 
 #include "ltdl.h"
-#include "expressions.hpp"
+#include "expressions/foreign.hpp"
+#include "expressions/data/cvals.hpp"
+#include "expressions/data.hpp"
+
 #include "utils.hpp"
 
 using std::string;
@@ -11,31 +14,160 @@ using namespace expr;
 using namespace interp;
 
 // LIBRARIES
-ForeignLib::ForeignLib(lt_dlhandle _lib) : lib(_lib){}
+ForeignLib::ForeignLib(lt_dlhandle _lib) : lib(_lib) {
+  Symbol* parent = get_keyword("parent");
+  slots[parent] = Module::parent;
+  parents.insert(parent);
+}
 
 void ForeignLib::mark_node() {
   Object::mark_node();
 }
     
 string ForeignLib::to_string(LocalRuntime &r, LexicalScope &s) {
-  return "<foreign library>";
+  return "<module: " + name + ">";
+}
+
+Object *ForeignLib::get(std::string str) {
+  Symbol* sym = nullptr;
+  auto it = symbols.find(str);
+  if (it != symbols.end()) {
+    sym = it->second;
+  } else {
+    void *addr = lt_dlsym(lib, str.c_str());
+    if (addr) {
+      sym = new Symbol(str);
+      sym->value = new UntypedProxy(addr);
+    } else {
+      return nil::get();
+    }
+  }
+  return sym;
+}
+
+Object *ForeignLib::get(std::list<std::string> str_list) {
+  Symbol* sym = nullptr;
+  while (!str_list.empty()) {
+    sym = intern(str_list.front());
+    if (Module* mod = get_inbuilt<Module*>(sym->value)) {
+    } else {
+      string err = "Attempted to get from";
+      throw err;
+    }
+  }
+  return sym;
+}
+
+Symbol *ForeignLib::intern(std::string str) {
+  Symbol* sym = nullptr;
+  auto it = symbols.find(str);
+  if (it != symbols.end()) {
+    sym= it->second;
+  } else {
+    void *addr = lt_dlsym(lib, str.c_str());
+    sym = new Symbol(str);
+    if (addr) {
+      sym->value = new UntypedProxy(addr);
+    }
+  }
+
+  return sym;
+}
+
+Symbol *ForeignLib::intern(std::list<std::string> path) {
+  string str = path.front();
+  Object* out = get(str);
+  path.pop_front();
+
+  if (out->null()) {
+    if (path.empty()) {
+      return intern(str);
+    } else {
+      string err = "module " + str + " does not exist in module " + name;
+      throw err;
+    }
+  } else {
+    Symbol* sym = get_inbuilt<Symbol*>(out);
+    if (path.empty()) {
+      return sym;
+    } else {
+      Module* mod = get_inbuilt<Module*>(sym->value);
+      return mod->intern(path);
+    }
+  }
+
+}
+
+void ForeignLib::insert(Symbol* sym) {
+  auto it = symbols.find(sym->name);
+  if (it != symbols.end()) {
+    auto it2 = exports.find(it->second);
+    if (it2 != exports.end()) {
+      exports.erase(it2);
+      exports.insert(sym);
+    }
+  }
+  symbols[sym->name] = sym;
+}
+
+void ForeignLib::remove(std::string str) {
+  auto it = symbols.find(str);
+  if (it != symbols.end()) {
+    auto it2 = exports.find(it->second);
+    if (it2 != exports.end()) {
+      exports.erase(it2);
+    }
+    symbols.erase(it);
+  }
+}
+
+void ForeignLib::export_sym(std::string str) {
+  exports.insert(symbols[str]);
+}
+
+Object *ForeignLib::get_exported_symbols() {
+  Object* list = nil::get();
+  for (Symbol* s : exports) {
+    list = new Cons(s, list);
+  }
+  return list;
+}
+
+std::string ForeignLib::get_name() {
+  return name;
 }
 
 
-// SYMBOLS
-void ForeignSymbol::mark_node() {
-  marked = true;
-}
 
-ForeignSymbol::ForeignSymbol(void* addr) {
-  address = addr;
-}
 
-string ForeignSymbol::to_string(LocalRuntime &r, LexicalScope &s) {
-  char buffer[50];
-  sprintf(buffer, "<foreign symbol: %p>", address);
-  return string(buffer);
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ForeignOperator::ForeignOperator(CFnType* _type) {

@@ -8,8 +8,6 @@
 using std::list;
 using std::string;
 
-using type::hydra_cast;
-
 using namespace expr;
 using namespace interp;
 
@@ -40,7 +38,7 @@ Object *op_addfn(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   arg_list.pop_front();
 
   for (Object *o : arg_list) {
-    Operator *op = hydra_cast<Operator>(o);
+    Operator *op = get_inbuilt<Operator*>(o);
     f->add_safe(op, r, s);
   }
 

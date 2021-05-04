@@ -4,7 +4,7 @@
 #include <list>
 
 #include "expressions/object.hpp"
-#include "expressions/language.hpp"
+#include "expressions/symbol.hpp"
 #include "expressions/operation.hpp"
 #include "types/basic.hpp"
 

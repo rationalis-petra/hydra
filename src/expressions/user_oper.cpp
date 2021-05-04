@@ -10,8 +10,6 @@
 using namespace expr;
 using namespace interp;
 
-using type::hydra_cast;
-
 using std::list;
 using std::string;
 using std::function;
@@ -87,10 +85,10 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
   list<Object*> lambda_list;
 
   // STEP 1: determine if this function is given a return type!
-  if (Symbol *sym = dynamic_cast<Symbol *>(op_def.front())) {
+  if (Symbol *sym = get_inbuilt<Symbol *>(op_def.front())) {
     // The first element is a symbol, so we evaluate to get a type!
     Object *raw_type = sym->eval(r, s);
-    if (type::Type *ret_type = dynamic_cast<type::Type *>(raw_type)) {
+    if (type::Type *ret_type = get_inbuilt<type::Type *>(raw_type)) {
       type->return_type = ret_type;
     } else {
       string err = "First argument to fn is neither type nor argument-list";
@@ -99,7 +97,7 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
 
     // NOW, we need to make sure that the /second/ argument is a lambda-list
     op_def.pop_front();
-    if (Cons *cns = dynamic_cast<Cons *>(op_def.front())) {
+    if (Cons *cns = get_inbuilt<Cons *>(op_def.front())) {
       lambda_list = cons_to_list(cns);
     } else {
       string err = "Second argument to typed fn is not an argument-list";
@@ -129,14 +127,14 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
         throw err;
       }
     } else {
-      name = hydra_cast<Symbol>(*it);
+      name = get_inbuilt<Symbol*>(*it);
       t_type = new type::Any;
       default_value = nil::get();
     }
     // :self keyword
     if (name == get_keyword("self")) {
       if (++it != lambda_list.end()) {
-        self = hydra_cast<Symbol>(*it);
+        self = get_inbuilt<Symbol*>(*it);
         // type->return_type = t_type;
       } else {
         string err = "No self argument name!";
@@ -147,7 +145,7 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
     // :rest arguments
     else if (name == get_keyword("rest")) {
       if (++it != lambda_list.end()) {
-        if (Cons *cns = dynamic_cast<Cons *>(*it)) {
+        if (Cons *cns = get_inbuilt<Cons *>(*it)) {
           rest = get_inbuilt<Symbol*>(cns->car);
           type->rest_type = get_inbuilt<type::Type*>(
               get_inbuilt<Cons*>(cns->cdr)->car->eval(r, s));
@@ -199,7 +197,7 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
   
   // Now, check for a docstring
   op_def.pop_front();
-  if (HString *dstring = dynamic_cast<HString *>(op_def.front())) {
+  if (HString *dstring = get_inbuilt<HString *>(op_def.front())) {
     Symbol* dsym = get_keyword("docstring");
     metadata[dsym] = dstring;
     if (op_def.size() != 1) {
@@ -207,9 +205,9 @@ UserOperator::UserOperator(std::list<Object *> op_def, bool _is_fn,
     }
   }
 
-  Symbol *progn = hydra_cast<Symbol>(
-      hydra_cast<Module>(
-          hydra_cast<Symbol>(language_module->get("core"))->value)
+  Symbol *progn = get_inbuilt<Symbol*>(
+      get_inbuilt<Module*>(
+          get_inbuilt<Symbol*>(language_module->get("core"))->value)
           ->get("progn"));
   progn->name = "progn";
   Object *car = progn;

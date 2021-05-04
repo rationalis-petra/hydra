@@ -24,8 +24,6 @@ Module *expr::core_module = nullptr;
 GenericFn *expr::equal_operator = nullptr;
 GenericFn *expr::gn_to_string = nullptr;
 
-using type::hydra_cast;
-
 vector<pair<string, Object *>> inbuilts;
 
 vector<pair<string, Object *>> dev_setup;
@@ -126,12 +124,12 @@ int main(int argc, char **argv) {
   Istream *hydra_cin = new Istream();
   hydra_cin->stream = &cin;
   sym =
-      hydra_cast<Module>(language_module->intern("io")->value)->intern("+cin+");
+      get_inbuilt<Module*>(language_module->intern("io")->value)->intern("+cin+");
   sym->value = hydra_cin;
   Ostream* hydra_cout = new Ostream();
   hydra_cout->stream = &cout;
   sym =
-      hydra_cast<Module>(language_module->intern("io")->value)->intern("+cout+");
+      get_inbuilt<Module*>(language_module->intern("io")->value)->intern("+cout+");
   sym->value = hydra_cout;
 
   string in;
@@ -465,11 +463,11 @@ Object *read(Istream *istm) {
   // blank scope
   interp::LexicalScope scope;
   Symbol *cores = language_module->intern("core");
-  Module *corem = hydra_cast<Module>(cores->eval(r, scope));
+  Module *corem = get_inbuilt<Module*>(cores->eval(r, scope));
   core_module = corem;
 
   Symbol* s = corem->intern("read");
   Object *v = s->eval(r, scope);
-  Operator *op = hydra_cast<Operator>(v);
+  Operator *op = get_inbuilt<Operator*>(v);
   return op->call({istm}, r, scope);
 }

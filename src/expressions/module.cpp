@@ -1,6 +1,7 @@
 #include <string>
 
 #include "expressions.hpp"
+#include "utils.hpp"
 
 using std::string;
 using std::map;
@@ -74,11 +75,11 @@ Symbol *ModuleImpl::intern(list<string> path) {
       throw err;
     }
   } else {
-    Symbol* sym = type::hydra_cast<Symbol>(out);
+    Symbol* sym = get_inbuilt<Symbol*>(out);
     if (path.empty()) {
       return sym;
     } else {
-      ModuleImpl* mod = type::hydra_cast<ModuleImpl>(sym->value);
+      Module* mod = get_inbuilt<Module*>(sym->value);
       return mod->intern(path);
     }
   }
@@ -102,7 +103,7 @@ Object *ModuleImpl::get(list<string> path) {
     if (path.empty()) {
       return loc->second;
     } else {
-      if (ModuleImpl *mod = dynamic_cast<ModuleImpl*>(loc->second)) {
+      if (Module *mod = get_inbuilt<Module*>(loc->second)) {
         return mod->get(path);
       } else {
         string err = "Symbol: " + loc->first + " does not name a module in module " + name;  

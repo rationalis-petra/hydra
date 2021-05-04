@@ -1,12 +1,11 @@
-#include "expressions.hpp"
+#include "expressions/data.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
 
 #include <iostream>
 
 using std::list;
 using std::string;
-
-using type::hydra_cast;
 
 using namespace expr;
 using namespace interp;
@@ -36,9 +35,9 @@ Object *op_handler_catch(list<Object *> arg_list, LocalRuntime &r,
     arg_list.pop_front();
     for (Object *o : arg_list) {
 
-      Object *fst = dynamic_cast<Cons *>(o)->car;
-      Object *ty = hydra_cast<Cons>(fst)->car;
-      type::Type *t = dynamic_cast<type::Type *>(ty->eval(r, s));
+      Object *fst = get_inbuilt<Cons *>(o)->car;
+      Object *ty = get_inbuilt<Cons*>(fst)->car;
+      type::Type *t = get_inbuilt<type::Type *>(ty->eval(r, s));
       Object::collector->insert_root(t);
 
       if (!t->check_type(exc->obj)->null()) {

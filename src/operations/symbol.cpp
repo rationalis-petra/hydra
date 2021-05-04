@@ -2,6 +2,7 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
 
 using std::list;
 using std::string;
@@ -9,21 +10,20 @@ using std::string;
 using namespace expr;
 using namespace interp;
 
-using type::hydra_cast;
 
 Object *op_mk_const(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  hydra_cast<Symbol>(arg_list.front())->mut = false;
+  get_inbuilt<Symbol*>(arg_list.front())->mut = false;
   return arg_list.front();
 }
 
 
 Object *op_mk_mutable(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s) {
-  hydra_cast<Symbol>(arg_list.front())->mut = true;
+  get_inbuilt<Symbol*>(arg_list.front())->mut = true;
   return arg_list.front();
 }
 
 
-Operator* op::mk_mutable;
+Operator *op::mk_mutable;
 Operator *op::mk_const;
 
 void op::initialize_symbol() {

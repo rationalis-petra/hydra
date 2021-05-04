@@ -1,9 +1,14 @@
 #include "utils.hpp"
-#include <expressions/data/ctypes.hpp>
-#include <expressions/data/cvals.hpp>
+
+#include "expressions/data/ctypes.hpp"
+#include "expressions/data/cvals.hpp"
+#include "expressions/symbol.hpp"
+#include "expressions/data.hpp"
+#include "types.hpp"
 
 using namespace interp;
 using namespace expr;
+
 using std::list;
 using std::pair;
 using std::string;
