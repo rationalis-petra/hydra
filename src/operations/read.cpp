@@ -118,9 +118,43 @@ Object *mac_lcurl(Istream *is, char c, LocalRuntime &r) {
   throw "read error: { with no matching }!";
 }
 
+Object *mac_vec(Istream *is, char c, LocalRuntime &r) {
+  // continue to add tokens to list until we hit a ')'
+  list<Object *> list;
+
+  while (!is->stream->eof()) {
+    c = is->stream->peek();
+    switch (c) {
+    case ' ':
+    case '\n':
+    case '\t':
+      is->stream->read(&c, 1);
+      break;
+    case '|': {
+      is->stream->read(&c, 1);
+      if (is->stream->peek() == ']') {
+        is->stream->read(&c, 1);
+        return new Cons(op::mk_vec, to_cons(list));
+      } else {
+        string err = "yet do deal with | in vector...";
+        throw err;
+      }
+    } break;
+    default:
+      list.push_back(read(is, r));
+      break;
+    }
+  }
+  throw "read error: [| with no matching |]!";
+}
+
 Object *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
   // continue to add tokens to list until we hit a ')'
   list<Object *> list;
+  if (is->stream->peek() == '|') {
+    is->stream->read(&c, 1);
+    return mac_vec(is, c, r);
+  }
 
   while (!is->stream->eof()) {
     c = is->stream->peek();
@@ -143,9 +177,44 @@ Object *mac_lsquare(Istream *is, char c, LocalRuntime &r) {
   throw "read error: [ with no matching ]!";
 }
 
+Object *mac_tuple(Istream *is, char c, LocalRuntime &r) {
+  // continue to add tokens to list until we hit a ')'
+  list<Object *> list;
+
+  while (!is->stream->eof()) {
+    c = is->stream->peek();
+    switch (c) {
+    case ' ':
+    case '\n':
+    case '\t':
+      is->stream->read(&c, 1);
+      break;
+    case '|': {
+      is->stream->read(&c, 1);
+      if (is->stream->peek() == ')') {
+        is->stream->read(&c, 1);
+        return new Cons(op::mk_tuple, to_cons(list));
+      } else {
+        string err = "yet do deal with | in tuple...";
+        throw err;
+      }
+    } break;
+    default:
+      list.push_back(read(is, r));
+      break;
+    }
+  }
+  throw "read error: (| with no matching |)!";
+}
+
 Object *mac_lparen(Istream *is, char c, LocalRuntime &r) {
   // continue to add tokens to list until we hit a ')'
   list<Object *> list;
+
+  if (is->stream->peek() == '|') {
+    is->stream->read(&c, 1);
+    return mac_tuple(is, c, r);
+  }
 
   while (!is->stream->eof()) {
     c = is->stream->peek();
@@ -166,7 +235,7 @@ Object *mac_lparen(Istream *is, char c, LocalRuntime &r) {
       break;
     }
   }
-  throw "( or [with no matching ) or ]!";
+  throw "( or [ with no matching ) or ]!";
 }
 
 Object *mac_token(Istream *is, char c, LocalRuntime &r) {
@@ -183,6 +252,7 @@ Object *mac_token(Istream *is, char c, LocalRuntime &r) {
     case ')':
     case '[':
     case ']':
+    case '|':
       return to_value(token, r);
       break;
       // escape character!

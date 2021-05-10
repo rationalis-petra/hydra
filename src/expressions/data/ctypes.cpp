@@ -12,6 +12,7 @@ using namespace expr;
 using std::list;
 using std::pair;
 using std::string;
+using std::unordered_map;
 
 // CBASIC_TYPE
 Parent *CType::parent;
@@ -691,3 +692,31 @@ std::string CFnType::to_string(interp::LocalRuntime &r,
                                interp::LexicalScope &s) {
   return "<CFnType>";
 }
+
+CEnumType::CEnumType(unordered_map<Symbol *, int> map) : enum_map(map) {
+  Symbol *sym = get_keyword("parent");
+  slots[sym] = parent;
+  parents.insert(sym);
+}
+
+ffi_type* CEnumType::get_ffi_type() {
+  return &ffi_type_sint;
+}
+std::string CEnumType::to_string(interp::LocalRuntime &r, interp::LexicalScope& s) {
+  return "C enum";
+}
+
+CProxy *CEnumType::get_from_object(Object* obj) {
+  if (Symbol* sym = get_inbuilt<Symbol*>(obj)) {
+    return new CBasic<int>(enum_map[sym]);
+  } else {
+    string err =  "C enums require symbols";
+    throw err;
+  }
+}
+
+CProxy *CEnumType::get_from_bits(unsigned char* arr, int idx, int len) {
+  CBasicType t(expr::tint);
+  return t.get_from_bits(arr, idx, len);
+}
+

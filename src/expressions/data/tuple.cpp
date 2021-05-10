@@ -28,13 +28,13 @@ void Tuple::mark_node() {
 }
 
 string Tuple::to_string(LocalRuntime &r, LexicalScope &s) {
-  string out = "[";
+  string out = "(|";
 
   for (unsigned i = 0; i < values.size() ; i++) {
     out += hydra_to_string(values[i], r, s);
     if (i != values.size() - 1)
       out += " ";
   }
-  out += "]";
+  out += "|)";
   return out;
 }

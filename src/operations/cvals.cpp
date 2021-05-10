@@ -9,12 +9,14 @@ expr::Operator *op::mk_cfntype;
 
 expr::Operator* op::mk_proxy;
 expr::Operator* op::mk_ptrtype;
+expr::Operator* op::mk_enumtype;
 
 using namespace expr;
 using namespace interp;
 
 using std::list;
 using std::string;
+using std::unordered_map;
 
 struct IntermediateModifier {
   SizeModifier size;
@@ -127,6 +129,28 @@ Object* op_mk_cptrtype(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s)
   return new CPtrType(type);
 }
 
+Object* op_mk_enumtype(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s) {
+  unordered_map<Symbol*, int> map;
+  int counter = 0;
+  for (Object* obj : arg_list) {
+    if (Symbol* sym = get_inbuilt<Symbol*>(obj)) {
+      map[sym] = counter++;
+    } else if (Cons* cns = get_inbuilt<Cons*>(obj)) {
+      Symbol* sym = get_inbuilt<Symbol*>(cns->car);
+      cns = get_inbuilt<Cons*>(cns->cdr);
+      if (sym && cns) {
+        Integer* i = get_inbuilt<Integer*>(cns->car);
+        counter = i->value;
+        map[sym] = counter++;
+      } 
+    } else {
+      string err = "bad value to mk_enumtype";
+      throw err;
+    }
+  }
+  return new CEnumType(map);
+}
+
 void op::initialize_foreign_proxy() {
   op::mk_short = new CModifierSize("short",
                                    "short modifier",
@@ -162,5 +186,11 @@ void op::initialize_foreign_proxy() {
       "ptr", "make a C pointer type",
       op_mk_cptrtype,
       type::Fn::with_args({type::c_type_type}),
+      true);
+
+  op::mk_enumtype = new InbuiltOperator(
+      "enum", "make a C enum type",
+      op_mk_enumtype,
+      type::Fn::with_rest(new type::Any),
       true);
 }

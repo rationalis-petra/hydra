@@ -400,6 +400,7 @@ void make_modules() {
 
       // proxy
       make_pair("proxy", op::mk_proxy),
+      make_pair("enum", op::mk_enumtype),
 
       // the C metatype
       make_pair("CType", type::c_type_type)

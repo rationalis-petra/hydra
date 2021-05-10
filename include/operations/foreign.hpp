@@ -27,6 +27,7 @@ namespace op {
 
   extern expr::Operator* mk_cfntype;
   extern expr::Operator* mk_ptrtype;
+  extern expr::Operator* mk_enumtype;
 
   extern expr::Operator* mk_proxy;
 

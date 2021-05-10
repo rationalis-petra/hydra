@@ -16,7 +16,6 @@ struct CProxy;
 // Used to represent a parent-class for a datatype, e.g. Integer,
 // Char, etc.
 
-//enum CModifierType { none, cmptr, cmshort, cmlong, cmsigned, cmunsigned };
 
 struct CType : public Object {
   static Parent* parent;
@@ -68,6 +67,16 @@ struct CStructType : public CType {
   // a data structure enabling the retrieval of data from  
   std::map<Symbol*, CType*> types;
   std::map<Symbol*, int> type_indices;
+};
+
+struct CEnumType: public CType {
+  CEnumType(std::unordered_map<Symbol*, int> enum_map);
+  ffi_type* get_ffi_type();
+  std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
+  CProxy *get_from_object(Object* obj);
+  CProxy *get_from_bits(unsigned char* arr, int idx, int len);
+
+  std::unordered_map<Symbol*, int> enum_map;
 };
 
 struct CPtrType : public CType {
