@@ -8,7 +8,6 @@
 
 #include "expressions/accessor.hpp"
 #include "expressions/concurrency.hpp"
-#include "expressions/contract.hpp"
 #include "expressions/data.hpp"
 #include "expressions/foreign.hpp"
 #include "expressions/handler.hpp"

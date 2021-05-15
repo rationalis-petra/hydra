@@ -24,14 +24,14 @@ template <typename T> struct CBasic : CProxy {
     u.value = val;
   }
 
-  CBasic(unsigned char* arr, int idx, int len) {
+  CBasic(unsigned char* arr, size_t idx, size_t len) {
     if (idx + sizeof(T) > len) {
       std::string err = "attempt to construct CPoxy from bit-array would go "
                         "off end of bit-array";
       throw err;
     }
 
-    for (unsigned i = 0; i < sizeof(T); i++) {
+    for (size_t i = 0; i < sizeof(T); i++) {
       u.data[i] = arr[idx + i];
     }
   };

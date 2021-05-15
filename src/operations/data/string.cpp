@@ -26,7 +26,15 @@ Object *op_str_elt(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     string err = "Second element to str-elt should be index";
     throw err;
   }
-  return new Char(arr->value.at(idx->value));
+  
+  size_t i = idx->value.get_ui();
+  if (i < arr->value.size()) {
+    return new Char(arr->value[i]);
+  } else {
+    string err = "Attempting to get out-of-bounds index of string: " +
+      idx->value.get_str();
+    throw err;
+  }
 }
 
 Object *op_str_cat(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {

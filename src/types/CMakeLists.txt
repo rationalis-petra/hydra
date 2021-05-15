@@ -2,6 +2,7 @@
 add_library(types OBJECT cons.cpp
                          initialize.cpp
                          any.cpp
+                         class.cpp
                          mac.cpp
                          list.cpp
                          derives.cpp

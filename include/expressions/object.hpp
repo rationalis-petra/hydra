@@ -9,11 +9,14 @@
 #include "interpreter/runtime.hpp"
 #include "interpreter/continuation.hpp"
 
+namespace type {
+  struct TypeClass;
+}
+
 namespace expr {
 
 struct Operator;
 struct Parent;
-struct Contract;
 
 struct Object {
   // PARENTS
@@ -29,11 +32,12 @@ struct Object {
   virtual void mark_node();
   static interp::GarbageCollector *collector;
 
+  type::TypeClass* contract;
+  std::set<type::TypeClass *> types;
   std::set<Symbol *> parents;
   std::map<Symbol *, Object *> slots;
   std::map<Symbol *, Object *> metadata;
   void set_invoker(Operator* invoker);
-  Contract* contract;
 
   // STANDARD FUNCTIONS
   virtual bool null() const;

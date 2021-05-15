@@ -5,6 +5,7 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
 
 using std::invalid_argument;
 using std::list;
@@ -370,33 +371,14 @@ Object *read(Object *raw, LocalRuntime &r) {
 }
 
 Object *op_read(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-
-  if (arg_list.size() != 1) {
-    string err = "Incorrect number of arguments provided to read";
-    throw err;
-  }
   Object *obj = read(arg_list.front(), r);
   return obj;
 }
 
 Object *op_set_mac_char(list<Object *> arg_list, LocalRuntime &r,
                         LexicalScope &s) {
-
-  if (arg_list.size() != 2) {
-    string err =
-        "Incorrect number of arguments provided to set-macro-character";
-    throw err;
-  }
-  Char *character = dynamic_cast<Char *>(arg_list.front());
-  Operator *function = dynamic_cast<Operator *>(arg_list.back());
-  if (!character) {
-    string err = "set-macro-character expects character as first argument";
-    throw err;
-  }
-  if (!function) {
-    string err = "set-macro-character expects function as second argument";
-    throw err;
-  }
+  Char *character = get_inbuilt<Char *>(arg_list.front());
+  Operator *function = get_inbuilt<Operator *>(arg_list.back());
   r.r.readtable[character->value] = function;
   return function;
 }

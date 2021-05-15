@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
   // so the broad strokes of initialization are
   // init();
 
-  // ASSING values to Object::parent, Float::parent, etc.
+  // ASSIGN values to Object::parent, Float::parent, etc.
   init_parents();
 
   // SETUP MODULES
@@ -355,6 +355,7 @@ void make_modules() {
     make_pair("Fn", new type::Fn),
     make_pair("Gen", new type::GenFn),
 
+    make_pair("class", op::mk_typeclass),
     make_pair("type?", op::typep),
     //make_pair("type", op::mk_type),
     make_pair("subtype?", op::subtype)

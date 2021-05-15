@@ -2,6 +2,7 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
 
 using std::list;
 using std::string;
@@ -21,7 +22,7 @@ Object *op_vec_cat(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   Vector *vec = new Vector;
   for (Object *obj : arg_list) {
-    Vector *a = dynamic_cast<Vector *>(obj);
+    Vector *a = get_inbuilt<Vector *>(obj);
     if (a) {
       for (Object *o : a->array) {
         vec->array.push_back(o);
@@ -32,50 +33,47 @@ Object *op_vec_cat(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 }
 
 Object *op_vec_elt(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
+  Vector *arr = get_inbuilt<Vector *>(arg_list.front());
+  Integer *idx = get_inbuilt<Integer *>(arg_list.back());
+  size_t i = idx->value.get_ui();
 
-  if (arg_list.size() != 2) {
-    string err = "invalid number of args to elt";
+  if (i < arr->array.size()) {
+    return arr->array[i];
+  } else {
+    string err = "out of bounds index to vector: " + idx->value.get_str();
     throw err;
   }
-  Vector *arr = dynamic_cast<Vector *>(arg_list.front());
-  Integer *idx = dynamic_cast<Integer *>(arg_list.back());
-  if (!arr) {
-    string err = "First element to elt should be array";
-    throw err;
-  }
-  if (!idx) {
-    string err = "Second element to elt should be index";
-    throw err;
-  }
-  return arr->array.at(idx->value);
 }
 
 Object *op_vec_len(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  Vector *arr = dynamic_cast<Vector *>(arg_list.front());
+  Vector *arr = get_inbuilt<Vector *>(arg_list.front());
 
   return new Integer(arr->array.size());
 }
 
 Object *op_vec_set(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  Vector *arr = dynamic_cast<Vector *>(arg_list.front());
-  Integer *idx = dynamic_cast<Integer *>(arg_list.back());
-  if (!arr) {
-    string err = "First element to elt should be array";
+  Vector *arr = get_inbuilt<Vector *>(arg_list.front());
+  arg_list.pop_front();
+  Integer *idx = get_inbuilt<Integer *>(arg_list.front());
+  arg_list.pop_front();
+  Object* obj = arg_list.front();
+
+  size_t i = idx->value.get_ui();
+  if (i < arr->array.size()) {
+    arr->array[i] = obj;
+    return arr;
+  } else {
+    string err = "out of bounds index to vector: " + idx->value.get_str();
     throw err;
   }
-  if (!idx) {
-    string err = "Second element to elt should be index";
-    throw err;
-  }
-  return arr->array.at(idx->value);
 }
 
 Object *op_vec_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  Vector *vec1 = dynamic_cast<Vector *>(arg_list.front());
-  Vector *vec2 = dynamic_cast<Vector *>(arg_list.back());
+  Vector *vec1 = get_inbuilt<Vector *>(arg_list.front());
+  Vector *vec2 = get_inbuilt<Vector *>(arg_list.back());
 
   if (vec1->size() == vec2->size()) {
     for (int i = 0; i < vec1->size(); i++) {
@@ -96,10 +94,9 @@ void op::initialize_vector() {
       type::Fn::with_rest(new type::Any), true);
 
 
-
   // GENERIC FUNCTIONS
   Operator* in_vec_elt = new InbuiltOperator(
-      "vector elt",
+      "vector get",
       "Takes an array and an index, and returns the element at that index",
       op_vec_elt,
       type::Fn::with_all({new type::Vector, type::integer_type}, nullptr,

@@ -36,7 +36,3 @@ ENDIF(MSVC)
 
 add_subdirectory(src)
 
-# if (Win32) install(hydra)
-# else ()
-# install(hydra)
-# endif ()

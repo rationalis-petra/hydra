@@ -97,15 +97,26 @@ Object *GenericFn::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s
  applicables.sort([](Operator *op1, Operator *op2) {
     return !(op1->type->subtype(op2->type))->null();
   });
-  // now we have a sorted list, we just need to execute the methods, one-by-one
-  // only executing the next method if the previous one executed
-  // in addition, we need to introduce the 'call-next' function into
-  // the lexical scope
+
   if (applicables.empty()) {
     string err = "no applicable method found in generic function" +
                  hydra_to_string(this, r, s);
     throw err;
-  } else {
+  } else if (applicables.size() > 2) {
+    auto it = applicables.begin();
+    Operator* op1 = *it++;
+    Operator* op2 = *it;
+    if (!op2->type->subtype(op1->type)->null()) {
+      string err = "Ambiguous call in generic function";
+      throw err;
+    }
+  }
+
+  // now we have a sorted list, we just need to execute the methods, one-by-one
+  // only executing the next method if the previous one executed
+  // in addition, we need to introduce the 'call-next' function into
+  // the lexical scope
+  // } else {
     Symbol *call_next = core_module->intern("call-next");
     Operator *op = applicables.front();
     applicables.pop_front();
@@ -123,7 +134,7 @@ Object *GenericFn::call(list<Object*> arg_list, LocalRuntime &r, LexicalScope &s
       uop->scope->map.erase(call_next);
     }
     return out;
-  }
+    //}
 }
 
 NextFnc::NextFnc(list<Operator*> _fncs, list<Object*> _arg_list, Symbol* _nextsym) {

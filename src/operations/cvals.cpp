@@ -131,7 +131,7 @@ Object* op_mk_cptrtype(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s)
 
 Object* op_mk_enumtype(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s) {
   unordered_map<Symbol*, int> map;
-  int counter = 0;
+  long counter = 0;
   for (Object* obj : arg_list) {
     if (Symbol* sym = get_inbuilt<Symbol*>(obj)) {
       map[sym] = counter++;
@@ -140,7 +140,7 @@ Object* op_mk_enumtype(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s)
       cns = get_inbuilt<Cons*>(cns->cdr);
       if (sym && cns) {
         Integer* i = get_inbuilt<Integer*>(cns->car);
-        counter = i->value;
+        counter = i->value.get_si();
         map[sym] = counter++;
       } 
     } else {

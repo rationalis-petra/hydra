@@ -6,8 +6,11 @@
 #include <list>
 #include <vector>
 
+#include <gmpxx.h>
+
 #include "expressions/object.hpp"
 #include "expressions/parent.hpp"
+
 
 namespace expr {
 
@@ -31,10 +34,10 @@ struct Real : public Number {
 struct Integer : public Real {
   static Parent* parent;
 
-  Integer(int num);
+  Integer(mpz_class num);
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
 
-  int value;
+  mpz_class value;
   virtual Number* sqrt();
   virtual Number* add(Number* other);
   virtual Number* minus(Number* other);

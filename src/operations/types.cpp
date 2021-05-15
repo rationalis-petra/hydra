@@ -64,7 +64,7 @@ Object *op_mk_vector_type(list<Object *> arg_list, LocalRuntime &r,
     return new type::Vector(dynamic_cast<type::Type *>(arg_list.front()));
   } else {
     return new type::Vector(dynamic_cast<type::Type *>(arg_list.front()),
-                            get_inbuilt<Integer *>(arg_list.back())->value);
+                            get_inbuilt<Integer *>(arg_list.back())->value.get_si());
   }
 }
 
@@ -173,6 +173,19 @@ Object *op_mk_fn_type(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s)
   return fn;
 }
 
+
+Object *op_mk_typeclass(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) { 
+  type::TypeClass* cls = new type::TypeClass;
+
+  for (Object* arg : arg_list) {
+    list<Object*> lst = cons_to_list(arg);
+    type::Fn* fnc = get_inbuilt<type::Fn*>(op::mk_fn_type->call(lst, r, s));
+    cls->ops.push_back(fnc);
+  }
+
+  return cls;
+}
+
 Operator *op::typep;
 Operator *op::subtype;
 Operator *op::type_eq;
@@ -182,6 +195,7 @@ Operator *op::mk_cons_type;
 Operator *op::mk_tuple_type;
 Operator *op::mk_vector_type;
 Operator *op::mk_fn_type;
+Operator *op::mk_typeclass;
 
 // You'll notice that all types are nullptr this is because
 // some global type variables  require the type ops to be
@@ -191,6 +205,11 @@ Operator *op::mk_fn_type;
 // and add type annotations to our type operations.
 
 void op::initialize_type_ops() {
+
+  op::mk_typeclass = new InbuiltOperator(
+      "class",
+      "Creates a new typeclass\n",
+      op_mk_typeclass, nullptr, true);
 
   op::typep = new InbuiltOperator(
                                   "type?",
@@ -230,6 +249,9 @@ void op::initialize_type_ops() {
 
 //
 void op::type_type_ops() {
+  op::mk_typeclass->type =
+      type::Fn::with_rest(new type::List);
+
   op::typep->type = type::Fn::with_args({new type::MetaType, new type::Any});
 
   op::subtype->type =

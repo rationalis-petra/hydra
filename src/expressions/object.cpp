@@ -13,9 +13,12 @@ GarbageCollector* Object::collector;
 Parent* Object::common_behaviour;
 Parent* Object::default_behaviour;
 
-Object::Object() {collector->register_node(this);
+Object::Object() {
+  collector->register_node(this);
   marked = false;
+  contract = nullptr;
 }
+Object::~Object() {}
 
 void Object::mark_node() {
   if (marked) return;
@@ -30,7 +33,6 @@ void Object::mark_node() {
   }
 }
 
-Object::~Object() {}
 
 bool Object::null() const {
   return false;
@@ -149,7 +151,6 @@ Object *Object::delete_meta(Symbol* sym, interp::LocalRuntime &r, interp::Lexica
   metadata.erase(sym);
   return nil::get();
 }
-
 
 
 void Object::set_invoker(Operator* op) {

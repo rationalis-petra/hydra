@@ -24,7 +24,7 @@ find_package(Boost
   COMPONENTS filesystem 
   REQUIRED)    
 
-target_link_libraries(hydra ffi ltdl pthread ${Boost_LIBRARIES})
+target_link_libraries(hydra ffi ltdl pthread gmp gmpxx ${Boost_LIBRARIES})
 endif()
 
 

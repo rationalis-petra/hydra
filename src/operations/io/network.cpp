@@ -70,17 +70,19 @@ Object *op_mk_tcp_acceptor(list<Object *> arg_list, LocalRuntime &r,
   tcp::acceptor *acceptor;
   tcp::endpoint point;
   Integer *num = get_inbuilt<Integer *>(arg_list.front());
+  signed a = num->value.get_si();
+
   if (arg_list.size() == 2) {
     Symbol *sym = get_inbuilt<Symbol *>(arg_list.back());
     if (sym == get_keyword("v6")) {
-      point = tcp::endpoint(tcp::v6(), num->value);
+      point = tcp::endpoint(tcp::v6(), a);
     } else if (sym == get_keyword("v4")) {
-      point = tcp::endpoint(tcp::v6(), num->value);
+      point = tcp::endpoint(tcp::v6(), a);
     } else {
       return expr::nil::get();
     }
   } else {
-    point = tcp::endpoint(tcp::v6(), num->value);
+    point = tcp::endpoint(tcp::v6(), a);
   }
 
   acceptor = new tcp::acceptor(context, point);
