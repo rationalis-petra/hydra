@@ -4,6 +4,7 @@
 #include "operations/types.hpp"
 #include "expressions.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 using std::string;
 
@@ -34,7 +35,7 @@ string Cons::to_string(LocalRuntime &r, LexicalScope &s) {
 }
 
 expr::Object *Cons::check_type(expr::Object *obj) {
-  if (expr::Cons *cns = dynamic_cast<expr::Cons *>(obj)) {
+  if (expr::Cons *cns = get_inbuilt<expr::Cons *>(obj)) {
     if (type_car->check_type(cns->car)->null()) {
       return expr::nil::get();
     }

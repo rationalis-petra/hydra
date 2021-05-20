@@ -18,6 +18,7 @@ Object::Object() {
   marked = false;
   contract = nullptr;
 }
+
 Object::~Object() {}
 
 void Object::mark_node() {

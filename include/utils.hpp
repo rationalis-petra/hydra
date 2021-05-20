@@ -1,7 +1,11 @@
+#ifndef HYDRA_UTILS_HPP
+#define HYDRA_UTILS_HPP
+
 #include <list>
 
 #include <iostream>
 #include "expressions/object.hpp"
+
 
 std::list<expr::Object*> cons_to_list(expr::Object* v);
 expr::Object* list_to_cons(std::list<expr::Object*> v);
@@ -28,3 +32,5 @@ template<typename T> T get_inbuilt(expr::Object* obj) {
 }
 
 std::string hydra_to_string(expr::Object* obj, interp::LocalRuntime &r, interp::LexicalScope &s);
+
+#endif

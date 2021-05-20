@@ -3,6 +3,7 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
 
 using std::list;
 using std::string;
@@ -10,7 +11,17 @@ using std::string;
 using namespace expr;
 using namespace interp;
 
-Object *make_list(list<Object *> objects) {
+GenericFn *op::set;
+GenericFn *op::get;
+GenericFn *op::len;
+GenericFn *op::cat;
+
+Operator *op::mk_list;
+GenericFn *op::cdr;
+GenericFn *op::car;
+Operator *op::mk_cons;
+
+Object *internal_cons(list<Object *> objects) {
   if (objects.size() == 1) {
     if (dynamic_cast<Cons *>(objects.front()) ||
         (objects.front() == nil::get())) {
@@ -22,25 +33,20 @@ Object *make_list(list<Object *> objects) {
   } else {
     Object *o = objects.front();
     objects.pop_front();
-    return new Cons(o, make_list(objects));
+    return new Cons(o, internal_cons(objects));
   }
 }
 
 Object *op_mk_list(list<Object *> alist, LocalRuntime &r, LexicalScope &s) {
   alist.push_back(nil::get());
-  return make_list(alist);
+  return internal_cons(alist);
 }
 
 Object *op_cons(list<Object *> alist, LocalRuntime &r, LexicalScope &s) {
-  return make_list(alist);
+  return internal_cons(alist);
 }
 
 Object *op_cdr(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
-
-  if (arg_list.size() != 1) {
-    throw "invalid number of args to cdr";
-  }
-
   if (Cons *cons = dynamic_cast<Cons *>(arg_list.front())) {
     return cons->cdr;
   } else {
@@ -52,17 +58,8 @@ Object *op_cdr(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_car(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  if (arg_list.size() != 1) {
-    throw "invalid number of args to car";
-  }
-
-  if (Cons *cons = dynamic_cast<Cons *>(arg_list.front())) {
-    return cons->car;
-  } else {
-    string err = "Non-cons argument provided to car: " +
-                 hydra_to_string(arg_list.front(), r, s);
-    throw err;
-  }
+  Cons *cons = get_inbuilt<Cons *>(arg_list.front());
+  return cons->car;
 }
 
 Object *op_cons_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
@@ -79,15 +76,6 @@ Object *op_cons_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   }
 }
 
-GenericFn *op::set;
-GenericFn *op::get;
-GenericFn *op::len;
-GenericFn *op::cat;
-
-Operator *op::mk_list;
-Operator *op::mk_cons;
-GenericFn *op::cdr;
-GenericFn *op::car;
 
 
 void op::initialize_data() {
@@ -108,7 +96,6 @@ void op::initialize_data() {
 
 void op::initialize_cons() {
 
-
   op::mk_cons =
       new InbuiltOperator("cons",
                           "Creates a new cons cell and places the first "
@@ -116,8 +103,9 @@ void op::initialize_cons() {
                           "Will fail if the second is not cons or nil",
                           op_cons,
                           type::Fn::with_all({new type::Any, new type::Any},
-                                             new type::Any, new type::Cons),
+                                         new type::Any, new type::Cons),
                           true);
+
   Operator* in_op_cdr = new InbuiltOperator(
       "cdr", "Takes a cons cell as input, and returns the cdr", op_cdr,
       type::Fn::with_args({new type::Cons}), true);

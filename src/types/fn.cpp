@@ -83,7 +83,6 @@ Object *Fn::check_type(Object *obj) {
 }
 
 
-#include <iostream>
 Object *Fn::check_args(list<Object*> alist) {
   for (auto type : arg_list) {
     if (alist.empty()) {

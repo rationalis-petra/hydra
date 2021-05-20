@@ -243,6 +243,9 @@ void op::initialize_type_ops() {
   op::mk_vector_type = new InbuiltOperator("Vector", "Constructs a vector type",
                                            op_mk_vector_type, nullptr, true);
 
+  op::mk_cons_type = new InbuiltOperator("Cons", "Constructs a cons type",
+                                         op_mk_cons_type, nullptr, true);
+
   op::mk_fn_type =
     new InbuiltOperator("Fn", "Constructs a fn type", op_mk_fn_type, nullptr, true);
 }
@@ -268,6 +271,8 @@ void op::type_type_ops() {
 
   op::mk_vector_type->type =
       type::Fn::with_args({new type::MetaType, type::integer_type});
+  op::mk_cons_type->type =
+    type::Fn::with_args_optional({}, {new type::MetaType, new type::MetaType});
 
   op::mk_fn_type->type =
       type::Fn::with_args({new type::List, new type::MetaType});
