@@ -17,6 +17,7 @@ using namespace std;
 using namespace expr;
 
 extern string lang;
+extern string loop;
 
 Module *expr::language_module = nullptr;
 Module *expr::keyword_module = nullptr;
@@ -134,21 +135,23 @@ int main(int argc, char **argv) {
 
   string in;
   Istream *prog = new Istream();
-  prog->stream = new stringstream(lang);
   Object *ast;
   Object *out;
 
   // execute string in lang.cpp
-  try {
-    while (!prog->stream->eof()) {
-      interp::LexicalScope s;
-      ast = read(prog);
-      out = ast->eval(r, s);
+  for (std::string s : {lang, loop}) {
+    prog->stream = new stringstream(s);
+    try {
+      while (!prog->stream->eof()) {
+        interp::LexicalScope s;
+        ast = read(prog);
+        out = ast->eval(r, s);
+      }
+    } catch (string e) {
+      cout << e << endl;
+    } catch (const char *err) {
+      cout << err << endl;
     }
-  } catch (string e) {
-    cout << e << endl;
-  } catch (const char *err) {
-    cout << err << endl;
   }
 
   // if argc > 1, assume that the first argument
@@ -272,11 +275,6 @@ void make_modules() {
     make_pair("clone", op::clone),
 
     // streams
-    make_pair("write", op::write),
-    make_pair("peek", op::peek),
-    make_pair("put", op::put),
-    make_pair("next", op::next),
-    make_pair("end?", op::endp),
     make_pair("eval", op::eval),
     make_pair("read", op::read),
     make_pair("set-macro-character", op::set_mac_char),
@@ -408,10 +406,17 @@ void make_modules() {
       // make_pair("CProxy", type::c_proxy_type),
   };
 
-  io_setup = {// io
-        make_pair("print", op::print),
-        make_pair("open-file", op::open_file),
-        make_pair("close", op::close)};
+  io_setup = {
+      // io
+
+      make_pair("write", op::write),
+      make_pair("peek", op::peek),
+      make_pair("put", op::put),
+      make_pair("next", op::next),
+      make_pair("end?", op::endp),
+
+      make_pair("print", op::print), make_pair("open-file", op::open_file),
+      make_pair("close", op::close)};
 
   concurrent_setup = {
     make_pair("thread", op::thread),

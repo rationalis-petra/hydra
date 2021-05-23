@@ -24,6 +24,7 @@ void init_operators() {
   op::initialize_arithmetic();
   op::initialize_mirror();
   op::initialize_user_obj();
+  // initialize cons first because of the get/set operators!
   op::initialize_cons();
   op::initialize_string();
   op::initialize_vector();

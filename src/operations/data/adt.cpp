@@ -76,11 +76,12 @@ void op::initialize_tuple() {
 
   Operator* in_tuple_elt = new InbuiltOperator(
       "tuple elt", "Will return the nth element of a tuple", op_tuple_elt,
-      type::Fn::with_args({type::integer_type, new type::Tuple}), true);
-  op::set->add(in_tuple_elt);
+      type::Fn::with_args({new type::Tuple, type::integer_type}), true);
+  op::get->add(in_tuple_elt);
    
 
   op::mk_union = new InbuiltOperator(
       "union", "Will return a tagged value", op_union,
       type::Fn::with_args({new type::Any, type::symbol_type}), true);
+
 }

@@ -110,14 +110,14 @@ void op::initialize_cons() {
       "cdr", "Takes a cons cell as input, and returns the cdr", op_cdr,
       type::Fn::with_args({new type::Cons}), true);
   op::cdr = new GenericFn;
-  op::cdr->type = type::Fn::with_args({new type::Cons});
+  op::cdr->type = type::Fn::with_args({new type::Any});
   op::cdr->add(in_op_cdr);
 
   Operator* in_op_car = new InbuiltOperator(
       "car", "Takes a cons cell as input, and returns the car", op_car,
       type::Fn::with_args({new type::Cons}), true);
   op::car = new GenericFn;
-  op::car->type = type::Fn::with_args({new type::Cons});
+  op::car->type = type::Fn::with_args({new type::Any});
   op::car->add(in_op_car);
 
   Operator* in_cons_eq = new InbuiltOperator(

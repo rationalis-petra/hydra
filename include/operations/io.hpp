@@ -13,8 +13,7 @@ namespace op {
   extern expr::GenericFn* next;
   extern expr::GenericFn* peek;
   extern expr::GenericFn* put;
-
-  extern expr::Operator* endp;
+  extern expr::GenericFn* endp;
 
   extern expr::Operator* print;
   extern expr::Operator* open_file;

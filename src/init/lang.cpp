@@ -72,11 +72,24 @@ std::string lang = R"(
         (cons (quote :self) (cons name arg-list))
          body)))))
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 "The comment character macro - we may have comments at last!"
 (def comment-reader (stream char)
-  (if (or (= char #newline) (end? stream))
+  (if (or (= char #newline) (&:hydra:io:end? stream))
       (read stream)
-      (comment-reader stream (next stream))))
+      (comment-reader stream (&:hydra:io:next stream))))
 
 (set-macro-character #; comment-reader)
 
@@ -113,6 +126,9 @@ std::string lang = R"(
 
 (export (current-module) 'cdar)
 (def cdar (x) (cdr (car x)))
+
+(export (current-module) 'cddr)
+(def cddr (x) (cdr (cdr x)))
 
 (export (current-module) 'len)
 (defimpl len ((list List) :self len)
@@ -151,9 +167,12 @@ std::string lang = R"(
          (apply append (cdr lists)))))
 
 (defimpl get ((lst List) (idx Integer))
-  (if (= 0 idx) 
-      (car lst)
-      (get (cdr lst) (- idx 1))))
+  (cond 
+    ((= 0 idx) 
+     (car lst))
+    ((= nil lst)
+     (signal-condition "out of range for list-get!"))
+    (t (get (cdr lst) (- idx 1)))))
 
 
 ;;; LOGIC
@@ -302,7 +321,7 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 (def gensym ()
   (let ((x (get! gensym-counter)))
      (set! gensym-counter (+ gensym-counter 1))
-     (symbol (to-string x))))
+     (symbol (append "GS" (to-string x)))))
 
 (export (current-module) 'use-module)
 (def use-module (module1 module2)
@@ -323,7 +342,7 @@ FUNC with arguments begin the nth-argument in each of the provided ARG-VECs"
 (def load (filename)
   (let ((fstream (open-file filename :input))
         (module (current-module)))
-   (while (not (end? fstream))
+   (while (not (&:hydra:io:end? fstream))
      (eval (read fstream)))
    (close fstream)
    (in-module module)))

@@ -142,11 +142,6 @@ Object *op_put(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 Object *op_endp(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
-  if (arg_list.size() != 1) {
-    string err = "Invalid number of arguments provided to endp";
-    throw err;
-  }
-
   istream *strm;
   if (Istream *stream = dynamic_cast<Istream *>(arg_list.front())) {
     strm = static_cast<istream *>(stream->stream);
@@ -202,10 +197,10 @@ GenericFn *op::peek;
 GenericFn *op::next;
 GenericFn *op::put;
 GenericFn *op::write;
+GenericFn *op::endp;
 
 Operator *op::open_file;
 Operator *op::print;
-Operator *op::endp;
 
 GenericFn *op::close;
 
@@ -258,7 +253,7 @@ void op::initialize_io() {
       true);
   op::peek = new GenericFn;
   op::peek->type =
-    type::Fn::with_all({type::istream_type}, nullptr, type::character_type);
+    type::Fn::with_all({new type::Any}, nullptr, new type::Any);
   op::peek->add(in_op_peek);
 
   Operator *in_op_put = new InbuiltOperator(
@@ -270,14 +265,17 @@ void op::initialize_io() {
       true);
   op::put = new GenericFn;
   op::put->type =
-    type::Fn::with_all({type::ostream_type}, type::character_type, type::character_type);
+    type::Fn::with_all({new type::Any}, new type::Any, new type::Any);
   op::put->add(in_op_put);
 
-  op::endp = new InbuiltOperator(
+  Operator* op_in_end = new InbuiltOperator(
       "end?",
       "Returns t if a given input stream has reached the\n"
       "end of the file, and nil otherwise",
       op_endp, type::Fn::with_args({type::istream_type}), true);
+  op::endp = new GenericFn;
+  op::endp->type = type::Fn::with_args({new type::Any});
+  op::endp->add(op_in_end);
 
 
 
@@ -291,7 +289,7 @@ void op::initialize_io() {
 
   op::write = new GenericFn;
   op::write->type =
-    type::Fn::with_all({type::ostream_type}, new type::Any, new type::Any);
+    type::Fn::with_all({new type::Any}, new type::Any, new type::Any);
   op::write->add(in_op_write);
 
 }
