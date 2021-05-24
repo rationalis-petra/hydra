@@ -16,13 +16,15 @@ std::string loop = R"(
 
 
 ;; DRIVERS
+(defgen some? (val))
+(defgen drive ((val Driver))
+  "Drive will return the next value in the driver")
+
 (def driver-parent {})
 (def Driver (Derives driver-parent))
 
 (def numdriver-parent {})
 (def NumDriver (Derives numdriver-parent))
-
-;;(def some ())
 
 (def numdriver ((from Integer) (to Integer))
   {[:parent numdriver-parent :parent]
@@ -30,24 +32,44 @@ std::string loop = R"(
    [:to to :accessor]
    [:inc (if (< from to) ++ --) :accessor]})
 
-(defgen drive ((val Driver))
-  "Drive will return the next value in the driver")
 
 (def drive ((val NumDriver))
   (unless (= (:from val) (:to val))
     (:from val ((:inc val) (:from val)))))
 
+
 (def some? ((val NumDriver))
   (!= (:from val) (:to val)))
 
-;;(def add-driver ((name String) ()))
+
+(def iterdriver-parent {})
+(def IterDriver (Derives iterdriver-parent))
+
+(def iterdriver ((from Integer) collection)
+  {[:parent iterdriver-parent :parent]
+   [:at 0 :accessor]
+   [:to (len collection) :reader]
+   [:collection collection :accessor]})
+
+(def drive ((val IterDriver))
+  (unless (= (:at val) (:to val))
+    (car [(get (:collection val) (:at val))
+          (:at val (++ (:at val)))])))
+
+(def some? ((val IterDriver))
+  (!= (:at val) (:to val)))
 
 
 
-(def process-for (list)
-  (let ((var (car list)))
 
-))
+
+
+
+
+
+
+
+
 
 (def stack-parent {})
 (def Stack (Derives stack-parent))
@@ -76,7 +98,7 @@ std::string loop = R"(
     (cond
       ((name= (cadr clause) 'from)
          (mk-from (cddr clause)))
-      ((name= (cadr clause 'in))
+      ((name= (cadr clause) 'in)
          (mk-in (cddr clause))))))
 
 ;; From driver: in the clause (for i from _)
@@ -88,7 +110,8 @@ std::string loop = R"(
 
 ;; In Clause: for i in collection
 ;; mk-in is called on the _
-(def mk-in (clause) (signal-condition "mk-in undefined"))
+(def mk-in (clause) 
+  ['iterdriver 0 (car clause)])
 
 (def mk-dridefs (vars drivers)
   (unless (empty? vars)
