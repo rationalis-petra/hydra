@@ -1,9 +1,10 @@
 # Hydra
-A small interpreted, object-oriented language. Inspired by self & lisp, hydra aims to make development
-fun.
-A [wiki](https://github.com/rationalis-petra/hydra/wiki) is available, but everything is currently quite small.
+A small interpreted, object-oriented language which is based off of self and lisp programming languages.
+As far as documentation goes, I use the github [wiki](https://github.com/rationalis-petra/hydra/wiki), although 
+this doesn't (currently) document all features.
 
-If you are looking at the source-code, the [readme-source](README_SOURCE.md) should help, being as there are relatively few comments.
+If you are looking through the source-code, the [readme-source](README_SOURCE.md) describes the reasoning behind
+the baisic file/class structure.
 
 ## Syntax
 Hydra syntax is extremely simple - the general form of a program is `(operation-to-perform value-1 value-2 ...)`. For example, and if statement:
