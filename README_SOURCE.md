@@ -36,11 +36,12 @@ in a standardized manner, although the general idea is that they are encapsulate
 `InbuiltOperator` class, which is initialized with a type and function pointer, then given a (string) name
 so it can be accessed in the langauge runtime. This works as follows:
 + In the appropriate header file under `Operations`, e.g. `arithmetic.hpp`
-  + Declare a pointer to an `Operator` object, e.g. `Operator* plus` 
+  + Declare a pointer to an `Operator` object, e.g. `Operator* plus` within the `op` namespace
   + Also, declare a function `init_<op_type>`, e.g. `init_arithmetic` with input/return type `void`
 + In the corresponding cpp file:
-  + Define a local function, e.g. `do_op_plus`
+  + Define a local function, e.g. `do_op_plus` this should be the actual implementation of the function you want!
   + Define the `init_arithmetic` function, and make sure it contains a call of the form `op::plus = new InbuiltOperator(...)`,
-    where we pass the name, docstring, type, function pointer and a boolean.
+    where we pass the name, docstring, type, function pointer and a boolean. This ensures the function is initialized and 
+    can be used at runtime.
 + In init/operators.cpp, add a call to `init_arithmetic()` if it is not already there
-+ in main.cpp, add a pair, add a name/value pair, e.g. `{"+", op::plus}`, so op::plus becomes accessible at runtime.
++ in main.cpp, add a name/value pair, e.g. `{"+", op::plus}`, so op::plus becomes accessible at runtime.
