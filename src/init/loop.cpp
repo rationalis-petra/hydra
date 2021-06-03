@@ -35,18 +35,20 @@ std::string loop = R"(
 
 (def drive ((val NumDriver))
   (unless (= (:from val) (:to val))
-    (:from val ((:inc val) (:from val)))))
+    (let ((out (:from val)))
+      (:from val ((:inc val) (:from val)))
+      out)))
 
 
 (def some? ((val NumDriver))
   (!= (:from val) (:to val)))
 
 
-(def iterdriver-parent {})
-(def IterDriver (Derives iterdriver-parent))
+(def trait-iterdriver {})
+(def IterDriver (Derives trait-iterdriver))
 
 (def iterdriver ((from Integer) collection)
-  {[:parent iterdriver-parent :parent]
+  {[:parent trait-iterdriver :parent]
    [:at 0 :accessor]
    [:to (len collection) :reader]
    [:collection collection :accessor]})
