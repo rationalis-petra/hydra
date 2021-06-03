@@ -35,12 +35,12 @@ Object *op_vec_cat(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 Object *op_vec_elt(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Vector *arr = get_inbuilt<Vector *>(arg_list.front());
   Integer *idx = get_inbuilt<Integer *>(arg_list.back());
-  size_t i = idx->value.get_ui();
+  size_t i = idx->get_ul();
 
   if (i < arr->array.size()) {
     return arr->array[i];
   } else {
-    string err = "out of bounds index to vector: " + idx->value.get_str();
+    string err = "out of bounds index to vector: " + hydra_to_string(idx, r, s);
     throw err;
   }
 }
@@ -60,12 +60,12 @@ Object *op_vec_set(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   arg_list.pop_front();
   Object* obj = arg_list.front();
 
-  size_t i = idx->value.get_ui();
+  size_t i = idx->get_ul();
   if (i < arr->array.size()) {
     arr->array[i] = obj;
     return arr;
   } else {
-    string err = "out of bounds index to vector: " + idx->value.get_str();
+    string err = "out of bounds index to vector: " + hydra_to_string(idx, r, s);
     throw err;
   }
 }

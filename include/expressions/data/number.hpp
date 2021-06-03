@@ -6,7 +6,7 @@
 #include <list>
 #include <vector>
 
-#include <gmpxx.h>
+#include <gmp.h>
 
 #include "expressions/object.hpp"
 #include "expressions/parent.hpp"
@@ -34,15 +34,20 @@ struct Real : public Number {
 struct Integer : public Real {
   static Parent* parent;
 
-  Integer(mpz_class num);
+  Integer();
+  Integer(long num);
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
 
-  mpz_class value;
   virtual Number* sqrt();
   virtual Number* add(Number* other);
   virtual Number* minus(Number* other);
   virtual Number* multiply(Number* other);
   virtual Number* divide(Number* other);
+  virtual signed long get_sl();
+  virtual unsigned long get_ul();
+
+private:
+  mpz_t value;
 };
 
 struct Float : public Real {

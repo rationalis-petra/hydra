@@ -42,12 +42,12 @@ Object *op_tuple_elt(list<Object *> arg_list, LocalRuntime &r,
   Tuple *tup = dynamic_cast<Tuple *>(arg_list.front());
   Integer *idx = dynamic_cast<Integer *>(arg_list.back());
 
-  size_t a = idx->value.get_ui();
+  size_t a = idx->get_ul();
   if (a < tup->values.size()) {
     return tup->values[a];
   } else {
     string err = "Attempting to get out-of-bounds index of tuple: " +
-                 idx->value.get_str();
+      hydra_to_string(idx, r, s);
     throw err;
   }
 }

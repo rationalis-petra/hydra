@@ -19,11 +19,23 @@ string Integer::to_string(LocalRuntime &r, LexicalScope &s) {
   return value.get_str();
 }
 
-Integer::Integer(mpz_class num) : value(num) {
+Integer::Integer() {
   Symbol *pt = keyword_module->intern("parent");
   parents.insert(pt);
   slots[pt] = parent;
-  value = num;
+
+  mpz_init(value);
+
+  numtype = hinteger;
+}
+Integer::Integer(long num) {
+  Symbol *pt = keyword_module->intern("parent");
+  parents.insert(pt);
+  slots[pt] = parent;
+
+  mpz_init(value);
+  mpz_set_si(value, num);
+
   numtype = hinteger;
 }
 
@@ -31,11 +43,13 @@ Number *Integer::add(Number *other) {
   switch (other->numtype) {
   case hinteger: {
     Integer *i = static_cast<Integer *>(other);
-    return new Integer(value + i->value);
+    Integer* out = new Integer();
+    mpz_add(out->value, value, i->value);
+    return out;
   } break;
   case hfloat: {
     Float *i = static_cast<Float *>(other);
-    return new Float(value.get_d() + i->value);
+    return new Float(mpz_get_d(value) + i->value);
   } break;
   case hcomplex: {
     Complex *cmplx = static_cast<Complex *>(other);
@@ -50,11 +64,13 @@ Number *Integer::minus(Number *other) {
   switch (other->numtype) {
   case hinteger: {
     Integer *i = static_cast<Integer *>(other);
-    return new Integer(value - i->value);
+    Integer *out = new Integer;
+    mpz_sub(out->value, value, i->value);
+    return out;
   } break;
   case hfloat: {
     Float *i = static_cast<Float *>(other);
-    return new Float(value.get_d() - i->value);
+    return new Float(mpz_get_d(value) - i->value);
   } break;
   case hcomplex: {
     Complex *cmplx = static_cast<Complex *>(other);
@@ -69,11 +85,13 @@ Number *Integer::multiply(Number *other) {
   switch (other->numtype) {
   case hinteger: {
     Integer *i = static_cast<Integer *>(other);
-    return new Integer(value * i->value);
+    Integer *out = new Integer;
+    mpz_mul(out->value, value, i->value);
+    return out;
   } break;
   case hfloat: {
     Float *i = static_cast<Float *>(other);
-    return new Float(value.get_d() * i->value);
+    return new Float(mpz_get_d(value) * i->value);
   } break;
   case hcomplex: {
     Complex *cmplx = static_cast<Complex *>(other);
@@ -87,11 +105,13 @@ Number *Integer::divide(Number *other) {
   switch (other->numtype) {
   case hinteger: {
     Integer *i = static_cast<Integer *>(other);
-    return new Integer(value / i->value);
+    Integer *out = new Integer;
+    mpz_cdiv_q(out->value, value, i->value);
+    return out;
   } break;
   case hfloat: {
     Float *i = static_cast<Float *>(other);
-    return new Float(value.get_d() / i->value);
+    return new Float(mpz_get_d(value) / i->value);
   } break;
   case hcomplex: {
     Complex *cmplx = static_cast<Complex *>(other);
@@ -105,8 +125,15 @@ Number *Integer::divide(Number *other) {
   string err = "integer-div: case exhaustion";
   throw err;
 }
-Number *Integer::sqrt() { return new Float(::sqrt(value.get_si())); }
+Number *Integer::sqrt() { return new Float(::sqrt(mpz_get_si(value))); }
 
+signed long Integer::get_sl() {
+  return mpz_get_si(value);
+}
+
+unsigned long Integer::get_ul() {
+  return mpz_get_ui(value);
+}
 
 
 
@@ -149,7 +176,7 @@ Number *Float::add(Number *other) {
   switch (other->numtype) {
   case hinteger: {
     Integer *i = static_cast<Integer *>(other);
-    return new Float(value + i->value.get_d());
+    return new Float(value + mpz_get_d(i->value));
   } break;
   case hfloat: {
     Float *i = static_cast<Float *>(other);
@@ -167,7 +194,7 @@ Number *Float::minus(Number *other) {
   switch (other->numtype) {
   case hinteger: {
     Integer *i = static_cast<Integer *>(other);
-    return new Float(value - i->value.get_d());
+    return new Float(value - mpz_get_d(i->value));
   } break;
   case hfloat: {
     Float *i = static_cast<Float *>(other);
@@ -185,7 +212,7 @@ Number *Float::multiply(Number *other) {
   switch (other->numtype) {
   case hinteger: {
     Integer *i = static_cast<Integer *>(other);
-    return new Float(value * i->value.get_d());
+    return new Float(value * mpz_get_d(i->value));
   } break;
   case hfloat: {
     Float *i = static_cast<Float *>(other);
@@ -203,7 +230,7 @@ Number *Float::divide(Number *other) {
   switch (other->numtype) {
   case hinteger: {
     Integer *i = static_cast<Integer *>(other);
-    return new Float(value / i->value.get_d());
+    return new Float(value / mpz_get_d(i->value));
   } break;
   case hfloat: {
     Float *i = static_cast<Float *>(other);

@@ -27,12 +27,12 @@ Object *op_str_elt(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
     throw err;
   }
   
-  size_t i = idx->value.get_ui();
+  size_t i = idx->get_ul();
   if (i < arr->value.size()) {
     return new Char(arr->value[i]);
   } else {
     string err = "Attempting to get out-of-bounds index of string: " +
-      idx->value.get_str();
+      hydra_to_string(idx, r, s);
     throw err;
   }
 }
