@@ -263,7 +263,7 @@ CProxy *CBasicType::get_from_object(Object *obj) {
         break;
       case tint:
         if (Integer *inte = get_inbuilt<Integer *>(obj)) {
-          return new CBasic<int>(inte->value.get_si());
+          return new CBasic<int>(inte->get_sl());
         }
         break;
       case tfloat:
@@ -283,7 +283,7 @@ CProxy *CBasicType::get_from_object(Object *obj) {
       switch (type) {
       case tint:
         if (Integer *sho = get_inbuilt<Integer *>(obj)) {
-          return new CBasic<short>(sho->value.get_si());
+          return new CBasic<short>(sho->get_sl());
         }
         break;
       default:
@@ -294,7 +294,7 @@ CProxy *CBasicType::get_from_object(Object *obj) {
       switch (type) {
       case tint:
         if (Integer *lng = get_inbuilt<Integer *>(obj)) {
-          return new CBasic<long>(lng->value.get_si());
+          return new CBasic<long>(lng->get_sl());
         }
         break;
       case tdouble:
@@ -320,7 +320,7 @@ CProxy *CBasicType::get_from_object(Object *obj) {
         break;
       case tint:
         if (Integer *inte = get_inbuilt<Integer *>(obj)) {
-          return new CBasic<unsigned int>(inte->value.get_ui());
+          return new CBasic<unsigned int>(inte->get_ul());
         }
         break;
       default:
@@ -333,7 +333,7 @@ CProxy *CBasicType::get_from_object(Object *obj) {
       switch (type) {
       case tint:
         if (Integer *inte = get_inbuilt<Integer *>(obj)) {
-          return new CBasic<unsigned short>(inte->value.get_ui());
+          return new CBasic<unsigned short>(inte->get_ul());
         }
         break;
       default:
@@ -344,7 +344,7 @@ CProxy *CBasicType::get_from_object(Object *obj) {
       switch (type) {
       case tint:
         if (Integer *inte = get_inbuilt<Integer *>(obj)) {
-          return new CBasic<unsigned long>(inte->value.get_ui());
+          return new CBasic<unsigned long>(inte->get_ul());
         }
         break;
       default:
@@ -365,7 +365,7 @@ CProxy *CBasicType::get_from_object(Object *obj) {
         break;
       case tint:
         if (Integer *inte = get_inbuilt<Integer *>(obj)) {
-          return new CBasic<signed int>(inte->value.get_si());
+          return new CBasic<signed int>(inte->get_sl());
         }
         break;
       default:
@@ -378,7 +378,7 @@ CProxy *CBasicType::get_from_object(Object *obj) {
       switch (type) {
       case tint:
         if (Integer *inte = get_inbuilt<Integer *>(obj)) {
-          return new CBasic<signed short>(inte->value.get_si());
+          return new CBasic<signed short>(inte->get_sl());
         }
         break;
       default:
@@ -389,7 +389,7 @@ CProxy *CBasicType::get_from_object(Object *obj) {
       switch (type) {
       case tint:
         if (Integer *inte = get_inbuilt<Integer *>(obj)) {
-          return new CBasic<signed long>(inte->value.get_si());
+          return new CBasic<signed long>(inte->get_sl());
         }
         break;
       default:

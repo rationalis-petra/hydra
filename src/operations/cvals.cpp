@@ -140,7 +140,7 @@ Object* op_mk_enumtype(list<Object*> arg_list, LocalRuntime& r, LexicalScope &s)
       cns = get_inbuilt<Cons*>(cns->cdr);
       if (sym && cns) {
         Integer* i = get_inbuilt<Integer*>(cns->car);
-        counter = i->value.get_si();
+        counter = i->get_sl();
         map[sym] = counter++;
       } 
     } else {

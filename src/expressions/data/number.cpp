@@ -16,7 +16,7 @@ Parent *Real::parent;
 Parent *Integer::parent;
 
 string Integer::to_string(LocalRuntime &r, LexicalScope &s) {
-  return value.get_str();
+  return mpz_get_str(NULL, 10, value);
 }
 
 Integer::Integer() {
@@ -377,4 +377,13 @@ void Complex::mark_node() {
   Object::mark_node();
   num1->mark_node();
   num2->mark_node();
+}
+
+int Integer::compare(Integer* other) {
+  return mpz_cmp(value, other->value);
+}
+
+
+Integer::~Integer() {
+  mpz_clear(value);
 }

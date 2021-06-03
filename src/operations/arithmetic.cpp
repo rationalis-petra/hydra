@@ -84,7 +84,7 @@ Object *op_int_gr(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
   Integer *a1 = get_inbuilt<Integer *>(arg_list.front());
   Integer *a2 = get_inbuilt<Integer *>(arg_list.back());
-  if (a1->value > a2->value) {
+  if (a1->compare(a2) > 0) {
     return t::get();
   } else {
     return nil::get();
@@ -104,7 +104,7 @@ Object *op_int_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   Integer *a1 = get_inbuilt<Integer *>(arg_list.front());
   Integer *a2 = get_inbuilt<Integer *>(arg_list.back());
   // so arg_list is a list containing integers!
-  if (a1->value == a2->value) {
+  if (a1->compare(a2) == 0) {
     return t::get();
   } else {
     return nil::get();

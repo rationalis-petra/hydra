@@ -2,6 +2,7 @@
 
 #include "expressions.hpp"
 #include "operations.hpp"
+#include "utils.hpp"
 
 using std::list;
 using std::string;

@@ -70,7 +70,7 @@ Object *op_mk_tcp_acceptor(list<Object *> arg_list, LocalRuntime &r,
   tcp::acceptor *acceptor;
   tcp::endpoint point;
   Integer *num = get_inbuilt<Integer *>(arg_list.front());
-  signed a = num->value.get_si();
+  long a = num->get_sl();
 
   if (arg_list.size() == 2) {
     Symbol *sym = get_inbuilt<Symbol *>(arg_list.back());

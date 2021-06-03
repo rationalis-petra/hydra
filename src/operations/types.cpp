@@ -64,7 +64,7 @@ Object *op_mk_vector_type(list<Object *> arg_list, LocalRuntime &r,
     return new type::Vector(dynamic_cast<type::Type *>(arg_list.front()));
   } else {
     return new type::Vector(dynamic_cast<type::Type *>(arg_list.front()),
-                            get_inbuilt<Integer *>(arg_list.back())->value.get_si());
+                            get_inbuilt<Integer *>(arg_list.back())->get_sl());
   }
 }
 

@@ -36,6 +36,7 @@ struct Integer : public Real {
 
   Integer();
   Integer(long num);
+  ~Integer();
   std::string to_string(interp::LocalRuntime &r, interp::LexicalScope& s);
 
   virtual Number* sqrt();
@@ -45,6 +46,9 @@ struct Integer : public Real {
   virtual Number* divide(Number* other);
   virtual signed long get_sl();
   virtual unsigned long get_ul();
+  virtual int compare(Integer* other);
+
+  friend struct Float;
 
 private:
   mpz_t value;
