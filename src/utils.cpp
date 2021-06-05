@@ -51,7 +51,7 @@ Symbol* get_keyword(string str) {
   if (obj->null()) {
     Symbol* sym = keyword_module->intern(str);
     sym->value = (Object*) sym;
-    GenericFn* gfn = new GenericFn;
+    GenericFn* gfn = new GenericFn(":" + str);
     gfn->type = type::Fn::with_all({new type::Any}, new type::Any, new type::Any);
     sym->set_invoker(gfn);
     return sym;

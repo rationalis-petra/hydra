@@ -66,6 +66,7 @@ struct UserOperator : public Operator {
 struct GenericFn : public Operator {
   // FUNTCIONS
   GenericFn();
+  GenericFn(std::string name);
   virtual void mark_node();
 
   void add(Operator *op);

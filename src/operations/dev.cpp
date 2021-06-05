@@ -87,11 +87,11 @@ GenericFn *op::macexpand;
 
 void op::initialize_dev() {
 
-  op::describe = new GenericFn();
+  op::describe = new GenericFn("doc");
   op::describe->type = type::Fn::with_args({new type::Any});
-  op::time = new GenericFn();
+  op::time = new GenericFn("time");
   op::time->type = type::Fn::with_args({new type::Any});
-  op::macexpand = new GenericFn();
+  op::macexpand = new GenericFn("macro-expand");
   op::macexpand->type = type::Fn::with_args({new type::Any});
 
   op::describe->add(new InbuiltOperator(

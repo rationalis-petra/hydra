@@ -213,7 +213,7 @@ void op::initialize_io() {
   Operator* in_file_closeo = new InbuiltOperator(
       "close", "Takes an input stream representing a file, and closes it",
       op_close, type::Fn::with_args({type::ostream_type}), true);
-  op::close = new GenericFn;
+  op::close = new GenericFn("close");
   op::close->type = type::Fn::with_args({new type::Any});
   op::close->add(in_file_closei);
   op::close->add(in_file_closeo);
@@ -239,7 +239,7 @@ void op::initialize_io() {
       op_next,
       type::Fn::with_all({type::istream_type}, nullptr, type::istream_type),
       true);
-  op::next = new GenericFn();
+  op::next = new GenericFn("next");
   op::next->type =
       type::Fn::with_all({type::istream_type}, nullptr, type::istream_type);
   op::next->add(in_op_next);
@@ -251,7 +251,7 @@ void op::initialize_io() {
       op_peek,
       type::Fn::with_all({type::istream_type}, nullptr, type::character_type),
       true);
-  op::peek = new GenericFn;
+  op::peek = new GenericFn("peek");
   op::peek->type =
     type::Fn::with_all({new type::Any}, nullptr, new type::Any);
   op::peek->add(in_op_peek);
@@ -263,7 +263,7 @@ void op::initialize_io() {
       op_put,
       type::Fn::with_all({type::ostream_type}, type::character_type, type::character_type),
       true);
-  op::put = new GenericFn;
+  op::put = new GenericFn("put");
   op::put->type =
     type::Fn::with_all({new type::Any}, new type::Any, new type::Any);
   op::put->add(in_op_put);
@@ -273,7 +273,7 @@ void op::initialize_io() {
       "Returns t if a given input stream has reached the\n"
       "end of the file, and nil otherwise",
       op_endp, type::Fn::with_args({type::istream_type}), true);
-  op::endp = new GenericFn;
+  op::endp = new GenericFn("end?");
   op::endp->type = type::Fn::with_args({new type::Any});
   op::endp->add(op_in_end);
 
@@ -287,7 +287,7 @@ void op::initialize_io() {
       type::Fn::with_all({type::ostream_type}, new type::Any, new type::Any),
       true);
 
-  op::write = new GenericFn;
+  op::write = new GenericFn("write");
   op::write->type =
     type::Fn::with_all({new type::Any}, new type::Any, new type::Any);
   op::write->add(in_op_write);

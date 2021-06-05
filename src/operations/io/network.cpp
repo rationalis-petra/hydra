@@ -136,7 +136,7 @@ void op::initialize_network() {
       "tcp-acceptor", "creates a new tcp acceptor", op_mk_tcp_acceptor,
       type::Fn::with_args_optional({type::integer_type}, {type::symbol_type}), true);
 
-  op::accept = new GenericFn;
+  op::accept = new GenericFn("accept");
   op::accept->type =
       type::Fn::with_args({type::acceptor_type});
 

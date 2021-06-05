@@ -79,18 +79,18 @@ Object *op_cons_eq(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
 
 
 void op::initialize_data() {
-  op::set = new GenericFn();
+  op::set = new GenericFn("set");
   op::set->type = type::Fn::with_all({new type::Any, new type::Any},
                                      new type::Any, new type::Any);
   
-  op::get = new GenericFn();
+  op::get = new GenericFn("get");
   op::get->type = type::Fn::with_all({new type::Any},
                                      new type::Any, new type::Any);
 
-  op::len = new GenericFn();
+  op::len = new GenericFn("len");
   op::len->type = type::Fn::with_args({new type::Any});
 
-  op::cat = new GenericFn();
+  op::cat = new GenericFn("append");
   op::cat->type = type::Fn::with_rest(new type::Any);
 }
 
@@ -109,14 +109,14 @@ void op::initialize_cons() {
   Operator* in_op_cdr = new InbuiltOperator(
       "cdr", "Takes a cons cell as input, and returns the cdr", op_cdr,
       type::Fn::with_args({new type::Cons}), true);
-  op::cdr = new GenericFn;
+  op::cdr = new GenericFn("cdr");
   op::cdr->type = type::Fn::with_args({new type::Any});
   op::cdr->add(in_op_cdr);
 
   Operator* in_op_car = new InbuiltOperator(
       "car", "Takes a cons cell as input, and returns the car", op_car,
       type::Fn::with_args({new type::Cons}), true);
-  op::car = new GenericFn;
+  op::car = new GenericFn("car");
   op::car->type = type::Fn::with_args({new type::Any});
   op::car->add(in_op_car);
 

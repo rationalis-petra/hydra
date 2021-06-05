@@ -152,7 +152,7 @@ void op::initialize_string() {
   Operator* in_to_str = new InbuiltOperator("to-string",
       "Converts an object into a string", op_to_str,
       type::Fn::with_all({new type::Any}, nullptr, type::string_type), true);
-  op::to_str = new GenericFn();
+  op::to_str = new GenericFn("to-string");
   op::to_str->type = type::Fn::with_all({new type::Any}, nullptr, type::string_type);
   op::to_str->add(in_to_str);
 

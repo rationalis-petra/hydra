@@ -217,7 +217,7 @@ void make_modules() {
   op::bin_equal->add(op::type_eq);
   equal_operator = op::equal;
 
-  gn_to_string = new GenericFn;
+  gn_to_string = new GenericFn("to-string");
   gn_to_string->is_fn = true;
   gn_to_string->type->arg_list.push_back(new type::Any);
   gn_to_string->type->return_type = type::string_type;
@@ -267,7 +267,7 @@ void make_modules() {
     make_pair("set-parent", op::set_slot_parent),
     make_pair("remove-slot", op::delete_slot),
 
-    make_pair("get-meta", op::get_meta),
+    make_pair("get-metaslots", op::get_meta),
     make_pair("get-metaslot", op::get_meta_val),
     make_pair("set-metaslot", op::set_meta_val),
     make_pair("remove-metaslot", op::delete_meta),

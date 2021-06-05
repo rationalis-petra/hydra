@@ -65,7 +65,7 @@ void op::initialize_concurrency() {
                         op_lock_mutex,
                         type::Fn::with_args({type::mutex_type}),
                         true);
-  op::lock_mutex = new GenericFn;
+  op::lock_mutex = new GenericFn("lock");
   op::lock_mutex->type = type::Fn::with_args({type::mutex_type});
   op::lock_mutex->add(in_op_lock);
   
@@ -75,7 +75,7 @@ void op::initialize_concurrency() {
                         op_unlock_mutex,
                         type::Fn::with_args({type::mutex_type}),
                         true);
-  op::unlock_mutex = new GenericFn;
+  op::unlock_mutex = new GenericFn("unlock");
   op::unlock_mutex->type = type::Fn::with_args({type::mutex_type});
   op::unlock_mutex->add(in_op_unlock);
 }

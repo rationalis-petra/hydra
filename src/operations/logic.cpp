@@ -94,15 +94,15 @@ void op::initialize_logic() {
 
 
 
-  op::bin_equal = new GenericFn;
+  op::bin_equal = new GenericFn("binary=");
   op::bin_equal->type = type::Fn::with_args({new type::Any, new type::Any});
-  op::bin_greater = new GenericFn;
+  op::bin_greater = new GenericFn("binary>");
   op::bin_greater->type = type::Fn::with_args({new type::Any, new type::Any});
 
-  op::equal = new GenericFn;
+  op::equal = new GenericFn("=");
   op::equal->type = type::Fn::with_rest(new type::Any);
   op::equal->add(in_op_equal);
-  op::greater = new GenericFn;
+  op::greater = new GenericFn(">");
   op::greater->type = type::Fn::with_rest(new type::Any);
   op::greater->add(in_op_greater);
 

@@ -16,14 +16,23 @@ using namespace interp;
 
 // GENERIC FUNCTION
 
+GenericFn::GenericFn(string name) {
+  is_fn = true;
+  type->rest_type = nullptr;
+  type->return_type = new type::Any;
+
+  metadata[get_keyword("name")] = new HString(name);
+}
+
 GenericFn::GenericFn() {
   is_fn = true;
   type->rest_type = nullptr;
   type->return_type = new type::Any;
+
 }
 
 string GenericFn::to_string(LocalRuntime &r, LexicalScope &s) {
-  auto iter = slots.find(get_keyword("name"));
+  auto iter = metadata.find(get_keyword("name"));
   if (iter != slots.end()) {
     return "<gfn: " + iter->second->to_string(r, s) + ">";
   } else {

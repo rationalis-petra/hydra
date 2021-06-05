@@ -148,7 +148,7 @@ void op::initialize_arithmetic() {
       "Binary Addition (+ x y)",
       "Returns the sum of its arguemnts",
       op_bin_plus, type::Fn::with_args({type::number_type, type::number_type}), true);
-  op::bin_plus = new GenericFn();
+  op::bin_plus = new GenericFn("binary+");
   op::bin_plus->add(in_bin_plus);
   op::bin_plus->type = type::Fn::with_args({type::number_type, type::number_type});
 
@@ -157,7 +157,7 @@ void op::initialize_arithmetic() {
       "Binary Subtraction (- x y)",
       "Returns the difference of its arguemnts",
       op_bin_minus, type::Fn::with_args({type::number_type, type::number_type}), true);
-  op::bin_minus = new GenericFn();
+  op::bin_minus = new GenericFn("binary-");
   op::bin_minus->add(in_bin_minus);
   op::bin_minus->type = type::Fn::with_args({type::number_type, type::number_type});
 
@@ -166,7 +166,7 @@ void op::initialize_arithmetic() {
       "Binary Multiplication (* x y)",
       "Returns the product of its arguemnts",
       op_bin_multiply, type::Fn::with_args({type::number_type, type::number_type}), true);
-  op::bin_multiply = new GenericFn();
+  op::bin_multiply = new GenericFn("binary*");
   op::bin_multiply->add(in_bin_multiply);
   op::bin_multiply->type = type::Fn::with_args({type::number_type, type::number_type});
 
@@ -175,7 +175,7 @@ void op::initialize_arithmetic() {
       "Binary Divide (/ x y)",
       "Returns the divisor of its arguemnts",
       op_bin_divide, type::Fn::with_args({type::number_type, type::number_type}), true);
-  op::bin_divide = new GenericFn();
+  op::bin_divide = new GenericFn("binary/");
   op::bin_divide->add(in_bin_divide);
   op::bin_divide->type = type::Fn::with_args({type::number_type, type::number_type});
 
@@ -189,7 +189,7 @@ void op::initialize_arithmetic() {
       "provided with no arguments, returns 0",
       op_plus, type::Fn::with_rest(type::number_type), true);
 
-  op::plus = new GenericFn();
+  op::plus = new GenericFn("+");
   op::plus->add(in_op_plus);
   plus->type->rest_type = type::number_type;
 
@@ -201,7 +201,7 @@ void op::initialize_arithmetic() {
       type::Fn::with_all({type::number_type, type::number_type},
                          type::number_type, type::number_type),
       true);
-  op::minus = new GenericFn;
+  op::minus = new GenericFn("-");
   op::minus->type->rest_type = type::number_type;
   op::minus->add(in_op_minus);
 
@@ -211,7 +211,7 @@ void op::initialize_arithmetic() {
       "one if no arguments provided",
       op_multiply, type::Fn::with_rest(type::number_type),
       true);
-  op::multiply = new GenericFn;
+  op::multiply = new GenericFn("*");
   op::multiply->type->rest_type = type::number_type;
   op::multiply->add(in_op_multiply);
 
@@ -222,7 +222,7 @@ void op::initialize_arithmetic() {
       type::Fn::with_all({type::number_type, type::number_type},
                          type::number_type, type::number_type),
       true);
-  op::divide = new GenericFn;
+  op::divide = new GenericFn("/");
   op::divide->type->rest_type = type::number_type;
   op::divide->add(in_op_divide);
 
@@ -231,7 +231,7 @@ void op::initialize_arithmetic() {
       "Returns the square-root of its' argument ",
       op_sqrt, type::Fn::with_args({type::real_type}),
       true);
-  op::sqrt = new GenericFn;
+  op::sqrt = new GenericFn("sqrt");
   op::sqrt->type = type::Fn::with_args({type::real_type});
   op::sqrt->add(in_op_sqrt);
 

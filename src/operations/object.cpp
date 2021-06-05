@@ -123,9 +123,9 @@ GenericFn *op::mk_obj;
 GenericFn *op::clone;
 
 void op::initialize_user_obj() {
-  op::mk_obj = new GenericFn;
+  op::mk_obj = new GenericFn("object");
   op::mk_obj->type = type::Fn::with_all({}, new type::Cons, new type::Any);
-  op::clone = new GenericFn;
+  op::clone = new GenericFn("clone");
   op::clone->type = type::Fn::with_rest(new type::Any);
 
   op::mk_obj->add(new InbuiltOperator(
