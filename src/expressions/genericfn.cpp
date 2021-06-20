@@ -28,13 +28,13 @@ GenericFn::GenericFn() {
   is_fn = true;
   type->rest_type = nullptr;
   type->return_type = new type::Any;
-
 }
 
 string GenericFn::to_string(LocalRuntime &r, LexicalScope &s) {
-  auto iter = metadata.find(get_keyword("name"));
-  if (iter != slots.end()) {
-    return "<gfn: " + iter->second->to_string(r, s) + ">";
+  auto it = metadata.find(get_keyword("name"));
+
+  if (it != metadata.end()) {
+    return "<gfn: " + hydra_to_string(it->second, r, s) + ">";
   } else {
     return "<anonymous gfn>";
   }
@@ -43,6 +43,7 @@ string GenericFn::to_string(LocalRuntime &r, LexicalScope &s) {
 void GenericFn::mark_node() {
   if (marked)
     return;
+  mark_node();
 
   marked = true;
   type->mark_node();

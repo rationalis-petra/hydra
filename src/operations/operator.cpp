@@ -24,12 +24,7 @@ Object *op_gen(list<Object *> arg_list, LocalRuntime &r, LexicalScope &s) {
   GenericFn *out = new GenericFn;
   out->type->rest_type = new type::Any;
   arg_list.pop_front();
-  if (!arg_list.empty()) {
-    if (HString *str = dynamic_cast<HString *>(arg_list.front())) {
-      Symbol* dstring = get_keyword("docstring");
-      out->metadata[dstring] = str;
-    }
-  }
+  // TODO: flesh me out!
   return out;
 }
 
